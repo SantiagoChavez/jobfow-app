@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Application from '../models/Application.js';
 
 /**
@@ -155,4 +156,43 @@ export const getApplications = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc    Obtener el detalle completo de una postulación por ID
+ * @route   GET /api/applications/:id
+ * @access  Public
+ */
+export const getApplicationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de postulación inválido',
+      });
+    }
+
+    const application = await Application.findById(id);
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Postulación no encontrada',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: application,
+    });
+  } catch (error) {
+    console.error(`Error al obtener postulación ${req.params.id}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al obtener la postulación',
+    });
+  }
+};
+
 
