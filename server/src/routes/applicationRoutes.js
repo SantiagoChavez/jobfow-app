@@ -4,6 +4,7 @@ import {
   getApplications,
   getApplicationById,
   updateApplicationStatus,
+  deleteApplication,
 } from '../controllers/applicationController.js';
 
 const router = Router();
@@ -15,7 +16,8 @@ router.route('/')
 
 // Rutas por ID: /api/applications/:id
 router.route('/:id')
-  .get(getApplicationById);
+  .get(getApplicationById)
+  .delete(deleteApplication);
 
 // Cambio de estado: /api/applications/:id/status
 router.route('/:id/status')
