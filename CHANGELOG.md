@@ -9,6 +9,13 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+### Added
+- **Inicialización del cliente frontend (`/client`):**
+  - Configuración con Vite + React usando `pnpm`.
+  - Integración de Tailwind CSS v3, PostCSS y Autoprefixer.
+  - Configuración del tema con la paleta de identidad "Deep Cobalt & Crisp Gold" (`navy-base`, `navy-surface`, `navy-highlight`, `gold-primary`, `gold-light`, `gold-dark`, `sky-tech`, `ice-blue`).
+  - Limpieza de boilerplate inicial y componente base de prueba en `client/src/App.jsx`.
+
 ### Planned (Próximas Tareas)
 - **Conexión a Base de Datos:** Configurar conexión a MongoDB mediante Mongoose (`server/src/config/db.js`).
 - **Modelos de Datos:** Implementar schemas de Mongoose para `Application` e `Interaction`.
@@ -18,7 +25,6 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Endpoint `POST /api/applications/:id/interactions` con algoritmo de cálculo automático de `tiempoRespuestaDias` y transición de estados (`CONTACTO` / `ENTREVISTA`).
   - Endpoint `GET /api/analytics/summary` para resumen estadístico (total postulaciones, con respuesta, tasa de respuesta y días promedio).
   - Endpoint `GET /api/reports/pdf` para generación y streaming de reporte semanal en PDF.
-- **Frontend (`/client`):** Inicialización de la aplicación cliente con React y Vite.
 
 ---
 

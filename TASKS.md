@@ -97,10 +97,11 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 ---
 
 ## 💻 Fase 4: Frontend Mobile-First (`/client`)
-- [ ] **4.1 Inicialización de la Aplicación Cliente**
-  - [ ] Inicializar `/client` con Vite + React usando pnpm.
+- [-] **4.1 Inicialización de la Aplicación Cliente**
+  - [x] Inicializar `/client` con Vite + React usando pnpm.
+  - [x] Configurar Tailwind CSS, PostCSS y paleta "Deep Cobalt & Crisp Gold".
   - [ ] Configurar cliente HTTP (Axios / Fetch) con URL base configurable.
-  - [ ] Establecer estilos y diseño visual limpio, moderno y responsivo (optimizado para carga rápida en móvil).
+  - [ ] Establecer estilos y componentes visuales base.
 - [ ] **4.2 Formulario Rápido de Carga (Quick Add)**
   - [ ] Campos: Empresa, Puesto/Rol, URL de la oferta, Requisitos (textarea para pegar).
   - [ ] Envío rápido y confirmación visual inmediata.
