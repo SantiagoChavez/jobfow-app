@@ -54,31 +54,26 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 ---
 
 ## ⚙️ Fase 2: Lógica de Negocio y Endpoints Core (Backend)
-- [ ] **2.1 Utilidad de Extracción de Skills (`skillExtractor`)**
-  - [ ] Crear `server/src/utils/skillExtractor.js`.
-  - [ ] Implementar función para extraer palabras clave/tecnologías (React, Node, TypeScript, Docker, SQL, Python, etc.) a partir del texto de requisitos.
-- [ ] **2.2 Crear Postulación (`POST /api/applications`)**
-  - [ ] Crear controlador `server/src/controllers/applicationController.js`.
-  - [ ] Validar campos obligatorios (`empresa`, `rol`); responder 400 Bad Request si faltan datos.
-  - [ ] Procesar `requisitosTexto` con `skillExtractor`.
-  - [ ] Insertar automáticamente la primera interacción: `{ tipo: "POSTULACION_ENVIADA", fecha: fechaAplicacion }`.
-  - [ ] Guardar en base de datos con estado `"ENVIADA"` y responder 201 Created con el documento creado.
-- [ ] **2.3 Listar y Filtrar Postulaciones (`GET /api/applications`)**
-  - [ ] Implementar listado con orden descendente por `fechaAplicacion`.
-  - [ ] Permitir filtros por query params: `estado`, rango de fechas (`from`, `to`), y búsqueda por empresa o rol.
-- [ ] **2.4 Registrar Interacción y Calcular Métricas (`POST /api/applications/:id/interactions`)**
-  - [ ] Validar existencia de la postulación (retornar 404 si no existe).
-  - [ ] Agregar nuevo evento al array de `interacciones`.
-  - [ ] **Regla analítica de negocio:**
-    - Si `tipo === "RESPUESTA_RECIBIDA"` y `tiempoRespuestaDias === null`:
-      - Calcular diferencia en milisegundos: `fechaEvento - fechaAplicacion`.
-      - Convertir a días: `Math.round(diffMs / (1000 * 60 * 60 * 24))`.
-      - Asignar `tiempoRespuestaDias`.
-      - Actualizar estado a `"CONTACTO"` o `"ENTREVISTA"`.
-  - [ ] Guardar y retornar el documento actualizado (status 200).
-- [ ] **2.5 Configurar Enrutador de Postulaciones**
-  - [ ] Crear `server/src/routes/applicationRoutes.js`.
-  - [ ] Conectar rutas en `server.js` bajo el prefijo `/api/applications`.
+- [x] **2.1 Crear Postulación (`POST /api/applications`)**
+  - [x] Validar campos obligatorios (`company.name`, `role`).
+  - [x] Insertar primera interacción automática (`POSTULACION_ENVIADA`).
+  - [x] Responder 201 Created con el documento creado.
+- [x] **2.2 Listar y Filtrar Postulaciones (`GET /api/applications`)**
+  - [x] Implementar listado ordenado descendente por fecha de aplicación.
+  - [x] Filtros por query params: `status`, `priority`, `workMode`, y búsqueda por texto `search` (empresa / rol).
+- [x] **2.3 Detalle de Postulación (`GET /api/applications/:id`)**
+  - [x] Validación de ObjectId con Mongoose.
+  - [x] Retorno del documento completo o 404 Not Found.
+- [x] **2.4 Actualizar Estado y Calcular Tiempos (`PATCH /api/applications/:id/status`)**
+  - [x] Validación de enums de estado (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`, `OFERTA`).
+  - [x] Cálculo automático de `responseTimeDays` si pasa a CONTACTO o ENTREVISTA y era null.
+  - [x] Registro automático del cambio de estado en el historial de `interactions`.
+- [x] **2.5 Eliminar Postulación (`DELETE /api/applications/:id`)**
+  - [x] Validación de ObjectId y eliminación física en MongoDB Atlas.
+- [x] **2.6 Configuración de Enrutador (`server/src/routes/applicationRoutes.js`)**
+  - [x] Enrutador montado en `server.js` bajo `/api/applications`.
+- [ ] **2.7 Registrar Interacción Manual (`POST /api/applications/:id/interactions`)**
+- [ ] **2.8 Utilidad Avanzada de Extracción de Skills (`skillExtractor.js`)**
 
 ---
 

@@ -144,9 +144,12 @@ jobhunter-app/
 | Método | Ruta | Descripción | Estado |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | Chequeo de salud del servicio | ✅ Verificado (200 OK) |
-| `POST` | `/api/applications` | Registrar una nueva postulación | ⏳ Planificado |
-| `GET` | `/api/applications` | Listar y filtrar postulaciones activas | ⏳ Planificado |
-| `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción y recalcular métricas | ⏳ Planificado |
+| `POST` | `/api/applications` | Registrar una nueva postulación con validaciones | ✅ Implementado |
+| `GET` | `/api/applications` | Listar postulaciones con filtros por estado y prioridad | ✅ Implementado |
+| `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
+| `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación y recalcular métricas | ✅ Implementado |
+| `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
+| `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual | ⏳ Planificado |
 | `GET` | `/api/analytics/summary` | Resumen de métricas para dashboard | ⏳ Planificado |
 | `GET` | `/api/reports/pdf?from=...&to=...` | Generar y descargar reporte PDF semanal | ⏳ Planificado |
 

@@ -26,13 +26,20 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Creación del modelo enriquecido `Application` (`server/src/models/Application.js`) con subdocumento `interactions`, campos extendidos (`company`, `role`, `status`, `priority`, `workMode`, `salary`, `recruiter`, etc.), timestamps e índices de consulta.
   - Integración de `connectDB()` en el ciclo de inicio de `server/src/server.js`.
 
-### Planned (Próximas Tareas - Tarjeta 3)
-- **Lógica de Negocio y Controladores:**
-  - Endpoint `POST /api/applications` con validación y extracción inicial de skills.
-  - Endpoint `GET /api/applications` con filtros por estado y fechas.
-  - Endpoint `POST /api/applications/:id/interactions` con algoritmo de cálculo automático de `tiempoRespuestaDias` y transición de estados (`CONTACTO` / `ENTREVISTA`).
-  - Endpoint `GET /api/analytics/summary` para resumen estadístico (total postulaciones, con respuesta, tasa de respuesta y días promedio).
-  - Endpoint `GET /api/reports/pdf` para generación y streaming de reporte semanal en PDF.
+- **Controladores y Rutas de Postulaciones (Tarjeta 3):**
+  - `POST /api/applications`: Creación de postulación con validación de campos obligatorios e inserción automática de primera interacción.
+  - `GET /api/applications`: Listado de postulaciones con orden cronológico y filtros por `status`, `priority`, `workMode` y búsqueda `search`.
+  - `GET /api/applications/:id`: Consulta de detalle completo de postulación por ObjectId.
+  - `PATCH /api/applications/:id/status`: Actualización de estado (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`, `OFERTA`), cálculo de `responseTimeDays` y registro de interacción.
+  - `DELETE /api/applications/:id`: Eliminación física de postulación con validación de ObjectId.
+
+### Planned (Próximas Tareas)
+- **Lógica Avanzada & Reportes:**
+  - Endpoint `POST /api/applications/:id/interactions` para registro de eventos manuales con notas.
+  - Extractor avanzado de skills (`skillExtractor.js`).
+  - Endpoint `GET /api/analytics/summary` para resumen estadístico del dashboard.
+  - Endpoint `GET /api/reports/pdf` para reporte semanal descargable en PDF.
+- **Frontend (`/client`):** Implementación de vistas Kanban Tracker, formulario de carga rápida y dashboard.
 
 ---
 
