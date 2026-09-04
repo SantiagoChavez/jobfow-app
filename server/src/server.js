@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
+import applicationRoutes from './routes/applicationRoutes.js';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -21,6 +22,9 @@ app.get('/health', (req, res) => {
     timestamp: new Date(),
   });
 });
+
+// Rutas de la API
+app.use('/api/applications', applicationRoutes);
 
 // Conectar a la base de datos y arrancar servidor
 const startServer = async () => {
