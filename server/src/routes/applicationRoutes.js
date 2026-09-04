@@ -1,9 +1,14 @@
 import { Router } from 'express';
-import { createApplication } from '../controllers/applicationController.js';
+import {
+  createApplication,
+  getApplications,
+} from '../controllers/applicationController.js';
 
 const router = Router();
 
 // Rutas base: /api/applications
-router.route('/').post(createApplication);
+router.route('/')
+  .post(createApplication)
+  .get(getApplications);
 
 export default router;

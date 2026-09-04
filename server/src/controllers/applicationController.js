@@ -97,3 +97,62 @@ export const createApplication = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc    Listar todas las postulaciones con filtros por estado y prioridad
+ * @route   GET /api/applications
+ * @access  Public
+ */
+export const getApplications = async (req, res) => {
+  try {
+    const { status, priority, workMode, search } = req.query;
+
+    const filter = {};
+
+    // Filtro por estado
+    if (status) {
+      if (status.includes(',')) {
+        filter.status = { $in: status.split(',').map((s) => s.trim().toUpperCase()) };
+      } else {
+        filter.status = status.trim().toUpperCase();
+      }
+    }
+
+    // Filtro por prioridad
+    if (priority) {
+      if (priority.includes(',')) {
+        filter.priority = { $in: priority.split(',').map((p) => p.trim().toUpperCase()) };
+      } else {
+        filter.priority = priority.trim().toUpperCase();
+      }
+    }
+
+    // Filtro opcional por modalidad
+    if (workMode) {
+      filter.workMode = workMode.trim().toUpperCase();
+    }
+
+    // Búsqueda por nombre de empresa o rol
+    if (search && search.trim()) {
+      filter.$or = [
+        { 'company.name': { $regex: search.trim(), $options: 'i' } },
+        { role: { $regex: search.trim(), $options: 'i' } },
+      ];
+    }
+
+    const applications = await Application.find(filter).sort({ appliedAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: applications.length,
+      data: applications,
+    });
+  } catch (error) {
+    console.error('Error al listar postulaciones:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al obtener las postulaciones',
+    });
+  }
+};
+
