@@ -36,6 +36,7 @@ JobHunter nace para resolver un problema crítico en la búsqueda activa de empl
 - [x] **Backend Express inicializado** con middlewares de CORS, JSON parser y endpoint de salud `GET /health` verificado.
 - [x] **Frontend inicializado con React + Vite y Tailwind CSS v3** con paleta de diseño "Deep Cobalt & Crisp Gold".
 - [x] **Estrategia de ramas Git configurada** (`main`, `pre-staging`, `dev`).
+- [x] **Persistencia con MongoDB Atlas & Mongoose (Tarjeta 2):** Conexión asíncrona configurada y esquema enriquecido `Application` con subdocumento `interactions` e índices optimizados.
 - [ ] **Formulario rápido de carga:** Registro de Empresa, Rol, URL de la oferta y texto de Requisitos.
 - [ ] **Extracción básica de skills/keywords:** Detección de tecnologías clave a partir de la descripción.
 - [ ] **Historial de interacciones:** Registro cronológico de eventos por postulación (*"Postulación enviada"*, *"Mensaje a recruiter"*, *"Respuesta recibida"*).
@@ -103,7 +104,7 @@ jobhunter-app/
 * **Frontend:** React 19, Vite 8, Tailwind CSS v3, PostCSS, Autoprefixer.
 * **Backend:** Node.js (>= v20), Express 5, ES Modules (`"type": "module"`).
 * **Gestor de paquetes:** `pnpm` (v11+).
-* **Base de datos:** MongoDB / Mongoose (Planificada en Fase 1).
+* **Base de datos:** MongoDB Atlas / Mongoose 9 (Conexión y modelo `Application` implementados).
 * **Utilidades:** `cors`, `dotenv`, `nodemon` (desarrollo backend).
 
 ---
@@ -111,24 +112,28 @@ jobhunter-app/
 ## 🗄️ Modelo de Datos
 
 ```text
-[ EMPRESA ]
- └── nombre (String, requerido)
- └── web (String, opcional)
- └── rubro (String, opcional)
-
-[ POSTULACIÓN ]
- └── empresaId / datosEmpresa
- └── rol (String, requerido)
- └── url (String, opcional)
- └── fechaAplicacion (Date, default: Date.now)
- └── estado (ENVIADA | CONTACTO | ENTREVISTA | RECHAZADA)
- └── requisitosTexto (String)
- └── skillsDetectadas ([String])
- └── tiempoRespuestaDias (Number, calculado al recibir primer contacto)
- └── interacciones: [
-      ├── tipo (POSTULACION_ENVIADA | MENSAJE_RECRUITER | RESPUESTA_RECIBIDA | ENTREVISTA | RECHAZO)
-      ├── fecha (Date)
-      └── notas (String)
+[ APPLICATION ]
+ ├── company:
+ │    ├── name (String, requerido)
+ │    ├── website (String)
+ │    └── industry (String)
+ ├── role (String, requerido)
+ ├── status (ENVIADA | CONTACTO | ENTREVISTA | RECHAZADA | OFERTA)
+ ├── priority (LOW | MEDIUM | HIGH)
+ ├── workMode (REMOTE | HYBRID | ON_SITE)
+ ├── salary (String)
+ ├── experienceLevel (String)
+ ├── recruiter: { name, email }
+ ├── jobUrl (String)
+ ├── requirementsRaw (String)
+ ├── extractedSkills: [String]
+ ├── appliedAt (Date, default: Date.now)
+ ├── responseTimeDays (Number, default: null)
+ ├── timestamps: (createdAt, updatedAt)
+ └── interactions: [
+      ├── type (POSTULACION_ENVIADA | MENSAJE_ENVIADO | RESPUESTA_RECIBIDA | ENTREVISTA | RECHAZO | OFERTA)
+      ├── date (Date, default: Date.now)
+      └── notes (String)
      ]
 ```
 
