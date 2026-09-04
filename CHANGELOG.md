@@ -20,12 +20,13 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Sincronización remota de las ramas hacia GitHub (`origin`).
 - **Diseño & Modelos de Referencia UI/UX:**
   - Incorporación del documento `modelo para job hunter.pdf` que define las vistas de referencia: Dashboard, Tablero Kanban (Tracker), tabla de postulaciones, calendario y perfil de usuario.
-- **Verificación en vivo del Backend:**
-  - Validación de endpoint `GET /health` respondiendo status `200 OK` con JSON descriptivo en el servidor activo.
+- **Persistencia y Modelos de Datos (Tarjeta 2):**
+  - Instalación de dependencia `mongoose` en `/server`.
+  - Módulo de conexión asíncrono a MongoDB Atlas (`server/src/config/db.js`) con manejo de errores y salida de proceso controlada.
+  - Creación del modelo enriquecido `Application` (`server/src/models/Application.js`) con subdocumento `interactions`, campos extendidos (`company`, `role`, `status`, `priority`, `workMode`, `salary`, `recruiter`, etc.), timestamps e índices de consulta.
+  - Integración de `connectDB()` en el ciclo de inicio de `server/src/server.js`.
 
-### Planned (Próximas Tareas)
-- **Conexión a Base de Datos:** Configurar conexión a MongoDB mediante Mongoose (`server/src/config/db.js`).
-- **Modelos de Datos:** Implementar schemas de Mongoose para `Application` e `Interaction`.
+### Planned (Próximas Tareas - Tarjeta 3)
 - **Lógica de Negocio y Controladores:**
   - Endpoint `POST /api/applications` con validación y extracción inicial de skills.
   - Endpoint `GET /api/applications` con filtros por estado y fechas.

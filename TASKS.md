@@ -25,29 +25,31 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-## 🗄️ Fase 1: Persistencia y Modelos de Datos (Backend)
-- [ ] **1.1 Configuración de Base de Datos**
-  - [ ] Instalar `mongoose` en `/server` vía `pnpm add mongoose`.
-  - [ ] Crear módulo de conexión `server/src/config/db.js`.
-  - [ ] Agregar variable `MONGODB_URI` en `.env.example` y `.env`.
-  - [ ] Conectar la base de datos en el ciclo de vida de `server.js`.
-- [ ] **1.2 Modelo de Postulaciones (`Application`)**
-  - [ ] Crear `server/src/models/Application.js`.
-  - [ ] Definir subdocumento/esquema para `interactions`:
-    - `tipo`: Enum (`POSTULACION_ENVIADA`, `MENSAJE_RECRUITER`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OTRO`).
-    - `fecha`: Date (default `Date.now`).
-    - `notas`: String opcional.
-  - [ ] Definir campos principales de `Application`:
-    - `empresa`: Object/String (nombre requerido, web, rubro).
-    - `rol`: String (requerido).
-    - `url`: String opcional.
-    - `prioridad`: Enum (`High`, `Medium`, `Low`, default: `Medium`).
-    - `fechaAplicacion`: Date (default `Date.now`).
-    - `estado`: Enum (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`).
-    - `requisitosTexto`: String opcional.
-    - `skillsDetectadas`: Array de strings.
-    - `tiempoRespuestaDias`: Number (null por defecto hasta el primer contacto).
-    - `interacciones`: Array de subdocumentos de interacción.
+## 🗄️ Fase 1: Persistencia y Modelos de Datos (Backend - Tarjeta 2 Completada)
+- [x] **1.1 Configuración de Base de Datos**
+  - [x] Instalar `mongoose` en `/server` vía `pnpm add mongoose`.
+  - [x] Crear módulo de conexión `server/src/config/db.js` con manejo de errores y desconexión segura.
+  - [x] Agregar variable `MONGODB_URI` en `.env.example` y `.env`.
+  - [x] Conectar la base de datos en el ciclo de vida de `server.js` previo a la escucha de Express.
+- [x] **1.2 Modelo de Postulaciones Enriquecido (`Application`)**
+  - [x] Crear `server/src/models/Application.js`.
+  - [x] Definir subdocumento `interactionSchema`:
+    - `type`: Enum (`POSTULACION_ENVIADA`, `MENSAJE_ENVIADO`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OFERTA`), required.
+    - `date`: Date (default `Date.now`).
+    - `notes`: String con trim.
+  - [x] Definir campos de `applicationSchema`:
+    - `company`: `name` (requerido), `website`, `industry`.
+    - `role`: String (requerido).
+    - `status`: Enum (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`, `OFERTA`), default `'ENVIADA'`.
+    - `priority`: Enum (`LOW`, `MEDIUM`, `HIGH`), default `'MEDIUM'`.
+    - `workMode`: Enum (`REMOTE`, `HYBRID`, `ON_SITE`), default `'REMOTE'`.
+    - `salary`, `experienceLevel`.
+    - `recruiter`: `name`, `email`.
+    - `jobUrl`, `requirementsRaw`, `extractedSkills`.
+    - `interactions`: Array de `interactionSchema`.
+    - `appliedAt` (Date), `responseTimeDays` (Number, default null).
+  - [x] Configurar `{ timestamps: true }`.
+  - [x] Configurar índices para reportes (`status/appliedAt`, `priority`, `company.name`).
 
 ---
 
