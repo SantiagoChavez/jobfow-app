@@ -11,10 +11,17 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ### Added
 - **Inicialización del cliente frontend (`/client`):**
-  - Configuración con Vite + React usando `pnpm`.
+  - Configuración con Vite 8 + React 19 usando `pnpm`.
   - Integración de Tailwind CSS v3, PostCSS y Autoprefixer.
   - Configuración del tema con la paleta de identidad "Deep Cobalt & Crisp Gold" (`navy-base`, `navy-surface`, `navy-highlight`, `gold-primary`, `gold-light`, `gold-dark`, `sky-tech`, `ice-blue`).
   - Limpieza de boilerplate inicial y componente base de prueba en `client/src/App.jsx`.
+- **Estrategia de Ramas Git:**
+  - Configuración de ramas `main` (producción), `pre-staging` (pruebas de integración y pre-deploy) y `dev` (desarrollo activo).
+  - Sincronización remota de las ramas hacia GitHub (`origin`).
+- **Diseño & Modelos de Referencia UI/UX:**
+  - Incorporación del documento `modelo para job hunter.pdf` que define las vistas de referencia: Dashboard, Tablero Kanban (Tracker), tabla de postulaciones, calendario y perfil de usuario.
+- **Verificación en vivo del Backend:**
+  - Validación de endpoint `GET /health` respondiendo status `200 OK` con JSON descriptivo en el servidor activo.
 
 ### Planned (Próximas Tareas)
 - **Conexión a Base de Datos:** Configurar conexión a MongoDB mediante Mongoose (`server/src/config/db.js`).
