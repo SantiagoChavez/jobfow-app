@@ -3,6 +3,7 @@ import {
   createApplication,
   getApplications,
   getApplicationById,
+  updateApplicationStatus,
 } from '../controllers/applicationController.js';
 
 const router = Router();
@@ -15,5 +16,9 @@ router.route('/')
 // Rutas por ID: /api/applications/:id
 router.route('/:id')
   .get(getApplicationById);
+
+// Cambio de estado: /api/applications/:id/status
+router.route('/:id/status')
+  .patch(updateApplicationStatus);
 
 export default router;

@@ -195,4 +195,84 @@ export const getApplicationById = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Actualizar el estado de una postulación
+ * @route   PATCH /api/applications/:id/status
+ * @access  Public
+ */
+export const updateApplicationStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de postulación inválido',
+      });
+    }
+
+    const validStatuses = ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'RECHAZADA', 'OFERTA'];
+    if (!status || typeof status !== 'string' || !validStatuses.includes(status.trim().toUpperCase())) {
+      return res.status(400).json({
+        success: false,
+        message: `Estado inválido o no proporcionado. Valores permitidos: ${validStatuses.join(', ')}`,
+      });
+    }
+
+    const normalizedStatus = status.trim().toUpperCase();
+
+    const application = await Application.findById(id);
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Postulación no encontrada',
+      });
+    }
+
+    const oldStatus = application.status;
+    application.status = normalizedStatus;
+
+    // Lógica analítica: si pasa a CONTACTO o ENTREVISTA y no se calculó tiempo de respuesta
+    if (
+      (normalizedStatus === 'CONTACTO' || normalizedStatus === 'ENTREVISTA') &&
+      application.responseTimeDays === null
+    ) {
+      const diffMs = Date.now() - new Date(application.appliedAt).getTime();
+      application.responseTimeDays = Math.max(0, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    // Registrar interacción correspondiente al cambio de estado
+    let interactionType = 'MENSAJE_ENVIADO';
+    if (normalizedStatus === 'CONTACTO') interactionType = 'RESPUESTA_RECIBIDA';
+    else if (normalizedStatus === 'ENTREVISTA') interactionType = 'ENTREVISTA';
+    else if (normalizedStatus === 'OFERTA') interactionType = 'OFERTA';
+    else if (normalizedStatus === 'RECHAZADA') interactionType = 'RECHAZO';
+
+    application.interactions.push({
+      type: interactionType,
+      date: new Date(),
+      notes: notes && typeof notes === 'string' && notes.trim()
+        ? notes.trim()
+        : `Estado actualizado de ${oldStatus} a ${normalizedStatus}`,
+    });
+
+    await application.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Estado actualizado a ${normalizedStatus}`,
+      data: application,
+    });
+  } catch (error) {
+    console.error(`Error al actualizar estado de la postulación ${req.params.id}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al actualizar el estado',
+    });
+  }
+};
+
+
 
