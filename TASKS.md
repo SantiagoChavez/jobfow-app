@@ -1,6 +1,6 @@
-# 📌 Backlog de Tareas - JobHunter
+# 📌 Backlog de Tareas - Jobflow
 
-Este documento centraliza el roadmap y el desglose de tareas técnicas necesarias para llevar el MVP de JobHunter a producción, ordenadas por fases incrementales y prioridades.
+Este documento centraliza el roadmap y el desglose de tareas técnicas necesarias para llevar el MVP de Jobflow a producción, ordenadas por fases incrementales y prioridades.
 
 ---
 
@@ -11,69 +11,69 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-##  Fase 0: Inicialización del Proyecto (Completada)
+## 🚀 Fase 0: Inicialización del Proyecto (Completada)
 - [x] **0.1** Crear archivo `.gitignore` robusto en la raíz del repositorio.
 - [x] **0.2** Inicializar módulo `/server` con `pnpm init` y configurar `"type": "module"`.
 - [x] **0.3** Instalar dependencias de producción (`express`, `cors`, `dotenv`) y de desarrollo (`nodemon`).
 - [x] **0.4** Configurar scripts `dev` y `start` en `server/package.json`.
 - [x] **0.5** Crear estructura de directorios en `server/src/` (`config/`, `controllers/`, `models/`, `routes/`, `utils/`).
 - [x] **0.6** Configurar `.env` y `.env.example` con la variable `PORT=5000`.
-- [x] **0.7** Implementar servidor Express en `server/src/server.js` con endpoint `GET /health`.
+- [x] **0.7** Implementar servidor Express en `server/src/server.js` con endpoint `GET /health` y verificar respuesta 200 OK.
 - [x] **0.8** Crear documentación base (`README.md`, `CHANGELOG.md` y `TASKS.md`).
+- [x] **0.9** Configurar flujo de ramas Git (`main`, `pre-staging`, `dev`) y sincronizar con repositorio remoto (`origin`).
+- [x] **0.10** Incorporar especificaciones de diseño y modelos de referencia visual (`modelo para jobflow.pdf`).
 
 ---
 
-## 🗄️ Fase 1: Persistencia y Modelos de Datos (Backend)
-- [ ] **1.1 Configuración de Base de Datos**
-  - [ ] Instalar `mongoose` en `/server` vía `pnpm add mongoose`.
-  - [ ] Crear módulo de conexión `server/src/config/db.js`.
-  - [ ] Agregar variable `MONGODB_URI` en `.env.example` y `.env`.
-  - [ ] Conectar la base de datos en el ciclo de vida de `server.js`.
-- [ ] **1.2 Modelo de Postulaciones (`Application`)**
-  - [ ] Crear `server/src/models/Application.js`.
-  - [ ] Definir subdocumento/esquema para `interactions`:
-    - `tipo`: Enum (`POSTULACION_ENVIADA`, `MENSAJE_RECRUITER`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OTRO`).
-    - `fecha`: Date (default `Date.now`).
-    - `notas`: String opcional.
-  - [ ] Definir campos principales de `Application`:
-    - `empresa`: Object/String (nombre requerido, web, rubro).
-    - `rol`: String (requerido).
-    - `url`: String opcional.
-    - `fechaAplicacion`: Date (default `Date.now`).
-    - `estado`: Enum (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`).
-    - `requisitosTexto`: String opcional.
-    - `skillsDetectadas`: Array de strings.
-    - `tiempoRespuestaDias`: Number (null por defecto hasta el primer contacto).
-    - `interacciones`: Array de subdocumentos de interacción.
+## 🗄️ Fase 1: Persistencia y Modelos de Datos (Backend - Tarjeta 2 Completada)
+- [x] **1.1 Configuración de Base de Datos**
+  - [x] Instalar `mongoose` en `/server` vía `pnpm add mongoose`.
+  - [x] Crear módulo de conexión `server/src/config/db.js` con manejo de errores y desconexión segura.
+  - [x] Agregar variable `MONGODB_URI` en `.env.example` y `.env`.
+  - [x] Conectar la base de datos en el ciclo de vida de `server.js` previo a la escucha de Express.
+- [x] **1.2 Modelo de Postulaciones Enriquecido (`Application`)**
+  - [x] Crear `server/src/models/Application.js`.
+  - [x] Definir subdocumento `interactionSchema`:
+    - `type`: Enum (`POSTULACION_ENVIADA`, `MENSAJE_ENVIADO`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OFERTA`), required.
+    - `date`: Date (default `Date.now`).
+    - `notes`: String con trim.
+  - [x] Definir campos de `applicationSchema`:
+    - `company`: `name` (requerido), `website`, `industry`.
+    - `role`: String (requerido).
+    - `status`: Enum (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`, `OFERTA`), default `'ENVIADA'`.
+    - `priority`: Enum (`LOW`, `MEDIUM`, `HIGH`), default `'MEDIUM'`.
+    - `workMode`: Enum (`REMOTE`, `HYBRID`, `ON_SITE`), default `'REMOTE'`.
+    - `salary`, `experienceLevel`.
+    - `recruiter`: `name`, `email`.
+    - `jobUrl`, `requirementsRaw`, `extractedSkills`.
+    - `interactions`: Array de `interactionSchema`.
+    - `appliedAt` (Date), `responseTimeDays` (Number, default null).
+  - [x] Configurar `{ timestamps: true }`.
+  - [x] Configurar índices para reportes (`status/appliedAt`, `priority`, `company.name`).
 
 ---
 
 ## ⚙️ Fase 2: Lógica de Negocio y Endpoints Core (Backend)
-- [ ] **2.1 Utilidad de Extracción de Skills (`skillExtractor`)**
-  - [ ] Crear `server/src/utils/skillExtractor.js`.
-  - [ ] Implementar función para extraer palabras clave/tecnologías (React, Node, TypeScript, Docker, SQL, Python, etc.) a partir del texto de requisitos.
-- [ ] **2.2 Crear Postulación (`POST /api/applications`)**
-  - [ ] Crear controlador `server/src/controllers/applicationController.js`.
-  - [ ] Validar campos obligatorios (`empresa`, `rol`); responder 400 Bad Request si faltan datos.
-  - [ ] Procesar `requisitosTexto` con `skillExtractor`.
-  - [ ] Insertar automáticamente la primera interacción: `{ tipo: "POSTULACION_ENVIADA", fecha: fechaAplicacion }`.
-  - [ ] Guardar en base de datos con estado `"ENVIADA"` y responder 201 Created con el documento creado.
-- [ ] **2.3 Listar y Filtrar Postulaciones (`GET /api/applications`)**
-  - [ ] Implementar listado con orden descendente por `fechaAplicacion`.
-  - [ ] Permitir filtros por query params: `estado`, rango de fechas (`from`, `to`), y búsqueda por empresa o rol.
-- [ ] **2.4 Registrar Interacción y Calcular Métricas (`POST /api/applications/:id/interactions`)**
-  - [ ] Validar existencia de la postulación (retornar 404 si no existe).
-  - [ ] Agregar nuevo evento al array de `interacciones`.
-  - [ ] **Regla analítica de negocio:**
-    - Si `tipo === "RESPUESTA_RECIBIDA"` y `tiempoRespuestaDias === null`:
-      - Calcular diferencia en milisegundos: `fechaEvento - fechaAplicacion`.
-      - Convertir a días: `Math.round(diffMs / (1000 * 60 * 60 * 24))`.
-      - Asignar `tiempoRespuestaDias`.
-      - Actualizar estado a `"CONTACTO"` o `"ENTREVISTA"`.
-  - [ ] Guardar y retornar el documento actualizado (status 200).
-- [ ] **2.5 Configurar Enrutador de Postulaciones**
-  - [ ] Crear `server/src/routes/applicationRoutes.js`.
-  - [ ] Conectar rutas en `server.js` bajo el prefijo `/api/applications`.
+- [x] **2.1 Crear Postulación (`POST /api/applications`)**
+  - [x] Validar campos obligatorios (`company.name`, `role`).
+  - [x] Insertar primera interacción automática (`POSTULACION_ENVIADA`).
+  - [x] Responder 201 Created con el documento creado.
+- [x] **2.2 Listar y Filtrar Postulaciones (`GET /api/applications`)**
+  - [x] Implementar listado ordenado descendente por fecha de aplicación.
+  - [x] Filtros por query params: `status`, `priority`, `workMode`, y búsqueda por texto `search` (empresa / rol).
+- [x] **2.3 Detalle de Postulación (`GET /api/applications/:id`)**
+  - [x] Validación de ObjectId con Mongoose.
+  - [x] Retorno del documento completo o 404 Not Found.
+- [x] **2.4 Actualizar Estado y Calcular Tiempos (`PATCH /api/applications/:id/status`)**
+  - [x] Validación de enums de estado (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`, `OFERTA`).
+  - [x] Cálculo automático de `responseTimeDays` si pasa a CONTACTO o ENTREVISTA y era null.
+  - [x] Registro automático del cambio de estado en el historial de `interactions`.
+- [x] **2.5 Eliminar Postulación (`DELETE /api/applications/:id`)**
+  - [x] Validación de ObjectId y eliminación física en MongoDB Atlas.
+- [x] **2.6 Configuración de Enrutador (`server/src/routes/applicationRoutes.js`)**
+  - [x] Enrutador montado en `server.js` bajo `/api/applications`.
+- [ ] **2.7 Registrar Interacción Manual (`POST /api/applications/:id/interactions`)**
+- [ ] **2.8 Utilidad Avanzada de Extracción de Skills (`skillExtractor.js`)**
 
 ---
 
@@ -85,7 +85,7 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
     - `conRespuesta`: Cantidad de postulaciones con `tiempoRespuestaDias != null`.
     - `tasaRespuesta`: `(conRespuesta / totalEnviadas) * 100` (%).
     - `promedioDiasRespuesta`: Promedio de `tiempoRespuestaDias` de las que obtuvieron respuesta.
-    - Desglose por estados (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`).
+    - Desglose por estados (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`).
 - [ ] **3.2 Generación de Reporte PDF Semanal (`GET /api/reports/pdf`)**
   - [ ] Evaluar librería de generación de PDF en streaming (`pdfkit` o `puppeteer-core` / HTML to PDF).
   - [ ] Diseñar plantilla del reporte con formato profesional:
@@ -96,18 +96,24 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-## 💻 Fase 4: Frontend Mobile-First (`/client`)
-- [ ] **4.1 Inicialización de la Aplicación Cliente**
-  - [ ] Inicializar `/client` con Vite + React usando pnpm.
-  - [ ] Configurar cliente HTTP (Axios / Fetch) con URL base configurable.
-  - [ ] Establecer estilos y diseño visual limpio, moderno y responsivo (optimizado para carga rápida en móvil).
-- [ ] **4.2 Formulario Rápido de Carga (Quick Add)**
-  - [ ] Campos: Empresa, Puesto/Rol, URL de la oferta, Requisitos (textarea para pegar).
-  - [ ] Envío rápido y confirmación visual inmediata.
-- [ ] **4.3 Gestión de Postulaciones e Interacciones**
-  - [ ] Listado de tarjetas de postulación agrupadas por estado o fecha.
-  - [ ] Acción rápida "Me Respondieron" para registrar respuesta con 1 clic.
-  - [ ] Modal/Drawer para agregar notas o mensajes enviados al recruiter.
-- [ ] **4.4 Dashboard de Métricas & Exportación**
-  - [ ] Tarjetas con métricas principales (Postulaciones esta semana, Tasa de respuesta, Tiempo promedio).
+## 💻 Fase 4: Frontend y Vistas Basadas en Modelo UI (`/client`)
+- [-] **4.1 Inicialización de la Aplicación Cliente**
+  - [x] Inicializar `/client` con Vite 8 + React 19 usando `pnpm`.
+  - [x] Configurar Tailwind CSS v3, PostCSS y paleta "Deep Cobalt & Crisp Gold".
+  - [x] Limpiar boilerplate y verificar renderizado en navegador (`http://localhost:5173`).
+  - [ ] Configurar cliente HTTP (Axios / Fetch) con URL base configurable (`VITE_API_URL`).
+- [ ] **4.2 Shell y Navegación Principal (Layout)**
+  - [ ] Sidebar lateral estilizado: Logo Jobflow, enlaces (Dashboard, Applications, Tracker, Calendar, Analytics, Profile).
+  - [ ] Header con perfil de usuario y botón de acción rápida `+ Add Application`.
+- [ ] **4.3 Formulario Rápido de Carga (Modal / Quick Add)**
+  - [ ] Modal con campos: Empresa, Puesto/Rol, URL de la oferta, Prioridad, Requisitos (textarea).
+  - [ ] Enlace con API `POST /api/applications` y actualización optimista.
+- [ ] **4.4 Tablero Tracker (Kanban Board)**
+  - [ ] Columnas según modelo: *Saved*, *Applied*, *Interview*, *Offer*, *Rejected*.
+  - [ ] Tarjetas con nombre de empresa, rol, fecha y botón de acción rápida ("Me respondieron").
+- [ ] **4.5 Vista de Tabla de Postulaciones (Applications View)**
+  - [ ] Tabla interactiva con filtros por estado, orden por fecha y buscador por texto.
+- [ ] **4.6 Dashboard y Analítica**
+  - [ ] Tarjetas resumen con métricas (Applications, Interviews, Offers, Response Rate).
+  - [ ] Componente de actividad semanal y distribución de postulaciones.
   - [ ] Botón de descarga de "Reporte Semanal en PDF" con selector de fechas para entregar al coach.
