@@ -153,8 +153,8 @@ Jobflow-app/
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
 | `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación y recalcular métricas | ✅ Implementado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
-| `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual | ⏳ Planificado |
-| `GET` | `/api/analytics/summary` | Resumen de métricas para dashboard | ⏳ Planificado |
+| `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual y recalcular tiempos | ✅ Implementado y testeado |
+| `GET` | `/api/analytics/summary` | Resumen de métricas consolidadas (KPIs, distribución y tiempos) | ✅ Implementado y testeado |
 | `GET` | `/api/reports/pdf?from=...&to=...` | Generar y descargar reporte PDF semanal | ⏳ Planificado |
 
 ---
@@ -201,6 +201,8 @@ pnpm run dev
 ### En `/server`:
 * `pnpm run dev`: Inicia el servidor backend con recarga automática (`nodemon`).
 * `pnpm start`: Inicia el servidor en modo producción con Node nativo.
+* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest.
+* `pnpm run test:watch`: Ejecuta las pruebas en modo interactivo/watch.
 
 ### En `/client`:
 * `pnpm run dev`: Inicia el servidor de desarrollo de Vite con HMR.

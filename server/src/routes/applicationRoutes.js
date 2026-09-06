@@ -5,6 +5,7 @@ import {
   getApplicationById,
   updateApplicationStatus,
   deleteApplication,
+  addInteraction,
 } from '../controllers/applicationController.js';
 
 const router = Router();
@@ -23,4 +24,9 @@ router.route('/:id')
 router.route('/:id/status')
   .patch(updateApplicationStatus);
 
+// Registro de interacciones: /api/applications/:id/interactions
+router.route('/:id/interactions')
+  .post(addInteraction);
+
 export default router;
+

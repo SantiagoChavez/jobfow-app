@@ -39,11 +39,24 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - `PATCH /api/applications/:id/status`: Actualización de estado (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `RECHAZADA`, `OFERTA`), cálculo de `responseTimeDays` y registro de interacción.
   - `DELETE /api/applications/:id`: Eliminación física de postulación con validación de ObjectId.
 
+- **Registro de Interacciones y Métricas de Tiempos (Tarjeta 4):**
+  - `POST /api/applications/:id/interactions`: Registro cronológico de interacciones (`POSTULACION_ENVIADA`, `MENSAJE_ENVIADO`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OFERTA`).
+  - Lógica de cálculo automático de `responseTimeDays` (días transcurridos sin valores negativos) y cambio de estado a `CONTACTO` en primera respuesta recibida.
+  - Transición a estado `ENTREVISTA` protegiendo el estado `OFERTA`.
+  - Desacoplamiento de Express `app.js` y `server.js` para pruebas automatizadas.
+  - Configuración del entorno de testing con **Vitest** y **Supertest** en `/server`.
+  - Suite de pruebas unitarias y de integración (`server/src/tests/interactions.test.js`) cubriendo casos felices y 5 edge cases (100% pass).
+
+- **Analítica y Métricas - MongoDB Aggregation Pipeline (Tarjeta 5):**
+  - `GET /api/analytics/summary`: Endpoint consolidado que resuelve métricas en una única agregación facetada (`$facet`).
+  - Pipeline de KPIs principales (`totalApplications`, `totalInterviews`, `totalOffers`, `responseRate`).
+  - Pipeline de distribución de postulaciones por estado (`statusDistribution`) con cálculo relativo de porcentaje.
+  - Pipeline de tiempos de respuesta (`responseMetrics`) con cálculo de promedio aritmético global (`avgResponseDays`) y ranking de top 5 empresas más ágiles (`fastestCompanies`).
+  - Suite de pruebas con Vitest y Supertest (`server/src/tests/analytics.test.js`) cubriendo casos con base vacía (sin división por cero), dataset real y manejo de errores (100% pass).
+
 ### Planned (Próximas Tareas)
 - **Lógica Avanzada & Reportes:**
-  - Endpoint `POST /api/applications/:id/interactions` para registro de eventos manuales con notas.
   - Extractor avanzado de skills (`skillExtractor.js`).
-  - Endpoint `GET /api/analytics/summary` para resumen estadístico del dashboard.
   - Endpoint `GET /api/reports/pdf` para reporte semanal descargable en PDF.
 - **Frontend (`/client`):** Implementación de vistas Kanban Tracker, formulario de carga rápida y dashboard.
 

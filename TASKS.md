@@ -72,20 +72,23 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Validación de ObjectId y eliminación física en MongoDB Atlas.
 - [x] **2.6 Configuración de Enrutador (`server/src/routes/applicationRoutes.js`)**
   - [x] Enrutador montado en `server.js` bajo `/api/applications`.
-- [ ] **2.7 Registrar Interacción Manual (`POST /api/applications/:id/interactions`)**
+- [x] **2.7 Registrar Interacción Manual (`POST /api/applications/:id/interactions` - Tarjeta 4)**
+  - [x] Validación de ObjectId y enum de tipos de interacción permitidos (`POSTULACION_ENVIADA`, `MENSAJE_ENVIADO`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OFERTA`).
+  - [x] Registro cronológico de interacciones con fecha y notas.
+  - [x] Cálculo automático de `responseTimeDays` (diferencia en días sin negativos) y transición a `CONTACTO`.
+  - [x] Transición a `ENTREVISTA` protegiendo el estado `OFERTA`.
+  - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/interactions.test.js`).
 - [ ] **2.8 Utilidad Avanzada de Extracción de Skills (`skillExtractor.js`)**
 
 ---
 
 ## 📊 Fase 3: Analítica y Reportes para el Coach (Backend)
-- [ ] **3.1 Resumen Estadístico (`GET /api/analytics/summary`)**
-  - [ ] Crear controlador y ruta para analíticas.
-  - [ ] Calcular indicadores globales y del período:
-    - `totalEnviadas`: Total de postulaciones registradas.
-    - `conRespuesta`: Cantidad de postulaciones con `tiempoRespuestaDias != null`.
-    - `tasaRespuesta`: `(conRespuesta / totalEnviadas) * 100` (%).
-    - `promedioDiasRespuesta`: Promedio de `tiempoRespuestaDias` de las que obtuvieron respuesta.
-    - Desglose por estados (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`).
+- [x] **3.1 Resumen Estadístico (`GET /api/analytics/summary` - Tarjeta 5)**
+  - [x] Crear controlador `analyticsController.js` y ruta `analyticsRoutes.js`.
+  - [x] Pipeline de KPIs principales (`totalApplications`, `totalInterviews`, `totalOffers`, `responseRate`).
+  - [x] Pipeline de distribución de postulaciones por estado con cálculo de porcentajes.
+  - [x] Pipeline de tiempos de respuesta (`avgResponseDays` y ranking `fastestCompanies` top 5).
+  - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/analytics.test.js`).
 - [ ] **3.2 Generación de Reporte PDF Semanal (`GET /api/reports/pdf`)**
   - [ ] Evaluar librería de generación de PDF en streaming (`pdfkit` o `puppeteer-core` / HTML to PDF).
   - [ ] Diseñar plantilla del reporte con formato profesional:
