@@ -311,8 +311,76 @@ export const deleteApplication = async (req, res) => {
       message: 'Error interno del servidor al eliminar la postulación',
     });
   }
+};/**
+ * @desc    Registrar una interacción en una postulación y calcular tiempos de respuesta
+ * @route   POST /api/applications/:id/interactions
+ * @access  Public
+ */
+export const addInteraction = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type, date, notes } = req.body;
+
+    // Validar que el ID sea un ObjectId válido de Mongoose
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'ID de postulación inválido' });
+    }
+
+    // Validar que type esté dentro del enum permitido
+    const allowedTypes = [
+      'POSTULACION_ENVIADA',
+      'MENSAJE_ENVIADO',
+      'RESPUESTA_RECIBIDA',
+      'ENTREVISTA',
+      'RECHAZO',
+      'OFERTA',
+    ];
+
+    if (!type || !allowedTypes.includes(type)) {
+      return res.status(400).json({ error: 'Tipo de interacción inválido' });
+    }
+
+    // Buscar la postulación por ID
+    const application = await Application.findById(id);
+
+    if (!application) {
+      return res.status(404).json({ error: 'Postulación no encontrada' });
+    }
+
+    // Crear la interacción con fallback de fecha
+    const interaction = {
+      type,
+      date: date || Date.now(),
+      notes: notes && typeof notes === 'string' ? notes.trim() : undefined,
+    };
+
+    // Empujar la interacción al array
+    application.interactions.push(interaction);
+
+    // LÓGICA DE NEGOCIO:
+    // 1. Si es RESPUESTA_RECIBIDA y aún no se calculó tiempo de respuesta
+    if (type === 'RESPUESTA_RECIBIDA' && application.responseTimeDays === null) {
+      const diffTime = Math.max(0, new Date(date || Date.now()) - new Date(application.appliedAt));
+      application.responseTimeDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (application.status === 'ENVIADA') {
+        application.status = 'CONTACTO';
+      }
+    }
+
+    // 2. Si es ENTREVISTA y no está en estado OFERTA
+    if (type === 'ENTREVISTA' && application.status !== 'OFERTA') {
+      application.status = 'ENTREVISTA';
+    }
+
+    // Guardar cambios en persistencia
+    await application.save();
+
+    return res.status(201).json(application);
+  } catch (error) {
+    console.error(`Error al registrar interacción en postulación ${req.params.id}:`, error);
+    return res.status(500).json({
+      error: 'Error interno del servidor al registrar la interacción',
+    });
+  }
 };
-
-
-
-
