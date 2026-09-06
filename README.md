@@ -1,8 +1,12 @@
-# 🎯 JobHunter
+<p align="center">
+  <img src="./client/src/assets/Jobflow-banner.png" alt="Jobflow - Radar & Career Tracker" width="540" />
+</p>
+
+# 🎯 Jobflow
 
 > **Plataforma ágil de gestión y analítica de postulaciones laborales para desarrolladores.**
 
-JobHunter nace para resolver un problema crítico en la búsqueda activa de empleo: el registro manual desordenado y la falta de métricas accionables para seguimiento personal y coaching profesional (evidencia de postulaciones, tiempos de respuesta y tasa de conversión).
+Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo: el registro manual desordenado y la falta de métricas accionables para seguimiento personal y coaching profesional (evidencia de postulaciones, tiempos de respuesta y tasa de conversión).
 
 ---
 
@@ -58,7 +62,7 @@ El proyecto sigue un flujo de ramificación ordenado para garantizar estabilidad
 
 ## 🎨 Diseño y Modelo de Referencia
 
-El diseño de la interfaz se basa en el documento de especificación visual `modelo para job hunter.pdf`, adoptando el sistema estético **"Deep Cobalt & Crisp Gold"**:
+El diseño de la interfaz se basa en el documento de especificación visual `modelo para jobflow.pdf`, adoptando el sistema estético **"Deep Cobalt & Crisp Gold"**:
 
 * **Paleta cromática base:**
   * Fondo principal: `#0B1329` (`bg-navy-base`)
@@ -78,7 +82,7 @@ El diseño de la interfaz se basa en el documento de especificación visual `mod
 ## 🏗️ Arquitectura del Proyecto
 
 ```text
-jobhunter-app/
+Jobflow-app/
 ├── client/                     # Frontend SPA (React 19, Vite, Tailwind CSS)
 │   ├── src/
 │   │   ├── App.jsx             # Componente raíz
@@ -166,8 +170,8 @@ jobhunter-app/
 
 ### 1. Clonar el repositorio y situarse en la rama `dev`
 ```bash
-git clone https://github.com/SantiagoChavez/jobhunter-app.git
-cd jobhunter-app
+git clone https://github.com/SantiagoChavez/jobfow-app.git
+cd Jobflow-app
 git checkout dev
 ```
 

@@ -1,6 +1,6 @@
-# 📌 Backlog de Tareas - JobHunter
+# 📌 Backlog de Tareas - Jobflow
 
-Este documento centraliza el roadmap y el desglose de tareas técnicas necesarias para llevar el MVP de JobHunter a producción, ordenadas por fases incrementales y prioridades.
+Este documento centraliza el roadmap y el desglose de tareas técnicas necesarias para llevar el MVP de Jobflow a producción, ordenadas por fases incrementales y prioridades.
 
 ---
 
@@ -21,7 +21,7 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 - [x] **0.7** Implementar servidor Express en `server/src/server.js` con endpoint `GET /health` y verificar respuesta 200 OK.
 - [x] **0.8** Crear documentación base (`README.md`, `CHANGELOG.md` y `TASKS.md`).
 - [x] **0.9** Configurar flujo de ramas Git (`main`, `pre-staging`, `dev`) y sincronizar con repositorio remoto (`origin`).
-- [x] **0.10** Incorporar especificaciones de diseño y modelos de referencia visual (`modelo para job hunter.pdf`).
+- [x] **0.10** Incorporar especificaciones de diseño y modelos de referencia visual (`modelo para jobflow.pdf`).
 
 ---
 
@@ -103,7 +103,7 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Limpiar boilerplate y verificar renderizado en navegador (`http://localhost:5173`).
   - [ ] Configurar cliente HTTP (Axios / Fetch) con URL base configurable (`VITE_API_URL`).
 - [ ] **4.2 Shell y Navegación Principal (Layout)**
-  - [ ] Sidebar lateral estilizado: Logo JobHunter, enlaces (Dashboard, Applications, Tracker, Calendar, Analytics, Profile).
+  - [ ] Sidebar lateral estilizado: Logo Jobflow, enlaces (Dashboard, Applications, Tracker, Calendar, Analytics, Profile).
   - [ ] Header con perfil de usuario y botón de acción rápida `+ Add Application`.
 - [ ] **4.3 Formulario Rápido de Carga (Modal / Quick Add)**
   - [ ] Modal con campos: Empresa, Puesto/Rol, URL de la oferta, Prioridad, Requisitos (textarea).

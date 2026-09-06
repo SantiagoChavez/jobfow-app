@@ -9,6 +9,12 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+### Changed
+- **Renombrado integral del proyecto a Jobflow:**
+  - Actualización de nombres de paquetes (`jobflow-server`, `jobflow-client`) y endpoint `/health` (`Jobflow API`).
+  - Actualización de documentación, backlog de tareas y archivos de referencia (`Planificacion de jobflow.pdf`, `modelo para jobflow.pdf`).
+  - Incorporación del banner oficial `Jobflow-banner` como portada del `README.md`.
+
 ### Added
 - **Inicialización del cliente frontend (`/client`):**
   - Configuración con Vite 8 + React 19 usando `pnpm`.
@@ -19,7 +25,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Configuración de ramas `main` (producción), `pre-staging` (pruebas de integración y pre-deploy) y `dev` (desarrollo activo).
   - Sincronización remota de las ramas hacia GitHub (`origin`).
 - **Diseño & Modelos de Referencia UI/UX:**
-  - Incorporación del documento `modelo para job hunter.pdf` que define las vistas de referencia: Dashboard, Tablero Kanban (Tracker), tabla de postulaciones, calendario y perfil de usuario.
+  - Incorporación del documento `modelo para jobflow.pdf` que define las vistas de referencia: Dashboard, Tablero Kanban (Tracker), tabla de postulaciones, calendario y perfil de usuario.
 - **Persistencia y Modelos de Datos (Tarjeta 2):**
   - Instalación de dependencia `mongoose` en `/server`.
   - Módulo de conexión asíncrono a MongoDB Atlas (`server/src/config/db.js`) con manejo de errores y salida de proceso controlada.
@@ -47,7 +53,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ### Added
 - **Estructura base del repositorio:** Arquitectura desacoplada en raíz (`/server` y futura `/client`).
-- **Gestión de dependencias:** Inicialización del proyecto backend usando `pnpm` (`jobhunter-server`).
+- **Gestión de dependencias:** Inicialización del proyecto backend usando `pnpm` (`jobflow-server`).
 - **Configuración de Git:** Archivo `.gitignore` configurado para excluir dependencias (`node_modules/`), variables de entorno locales (`.env*`), artefactos de build y logs del sistema.
 - **Servidor Express con ES Modules:**
   - Servidor Express en `server/src/server.js` utilizando módulos nativos ECMAScript (`"type": "module"`).
