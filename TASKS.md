@@ -72,7 +72,12 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Validación de ObjectId y eliminación física en MongoDB Atlas.
 - [x] **2.6 Configuración de Enrutador (`server/src/routes/applicationRoutes.js`)**
   - [x] Enrutador montado en `server.js` bajo `/api/applications`.
-- [ ] **2.7 Registrar Interacción Manual (`POST /api/applications/:id/interactions`)**
+- [x] **2.7 Registrar Interacción Manual (`POST /api/applications/:id/interactions` - Tarjeta 4)**
+  - [x] Validación de ObjectId y enum de tipos de interacción permitidos (`POSTULACION_ENVIADA`, `MENSAJE_ENVIADO`, `RESPUESTA_RECIBIDA`, `ENTREVISTA`, `RECHAZO`, `OFERTA`).
+  - [x] Registro cronológico de interacciones con fecha y notas.
+  - [x] Cálculo automático de `responseTimeDays` (diferencia en días sin negativos) y transición a `CONTACTO`.
+  - [x] Transición a `ENTREVISTA` protegiendo el estado `OFERTA`.
+  - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/interactions.test.js`).
 - [ ] **2.8 Utilidad Avanzada de Extracción de Skills (`skillExtractor.js`)**
 
 ---
