@@ -154,7 +154,7 @@ Jobflow-app/
 | `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación y recalcular métricas | ✅ Implementado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
 | `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual y recalcular tiempos | ✅ Implementado y testeado |
-| `GET` | `/api/analytics/summary` | Resumen de métricas para dashboard | ⏳ Planificado |
+| `GET` | `/api/analytics/summary` | Resumen de métricas consolidadas (KPIs, distribución y tiempos) | ✅ Implementado y testeado |
 | `GET` | `/api/reports/pdf?from=...&to=...` | Generar y descargar reporte PDF semanal | ⏳ Planificado |
 
 ---

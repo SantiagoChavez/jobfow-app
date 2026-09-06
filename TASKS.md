@@ -83,14 +83,12 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 ---
 
 ## 📊 Fase 3: Analítica y Reportes para el Coach (Backend)
-- [ ] **3.1 Resumen Estadístico (`GET /api/analytics/summary`)**
-  - [ ] Crear controlador y ruta para analíticas.
-  - [ ] Calcular indicadores globales y del período:
-    - `totalEnviadas`: Total de postulaciones registradas.
-    - `conRespuesta`: Cantidad de postulaciones con `tiempoRespuestaDias != null`.
-    - `tasaRespuesta`: `(conRespuesta / totalEnviadas) * 100` (%).
-    - `promedioDiasRespuesta`: Promedio de `tiempoRespuestaDias` de las que obtuvieron respuesta.
-    - Desglose por estados (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`).
+- [x] **3.1 Resumen Estadístico (`GET /api/analytics/summary` - Tarjeta 5)**
+  - [x] Crear controlador `analyticsController.js` y ruta `analyticsRoutes.js`.
+  - [x] Pipeline de KPIs principales (`totalApplications`, `totalInterviews`, `totalOffers`, `responseRate`).
+  - [x] Pipeline de distribución de postulaciones por estado con cálculo de porcentajes.
+  - [x] Pipeline de tiempos de respuesta (`avgResponseDays` y ranking `fastestCompanies` top 5).
+  - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/analytics.test.js`).
 - [ ] **3.2 Generación de Reporte PDF Semanal (`GET /api/reports/pdf`)**
   - [ ] Evaluar librería de generación de PDF en streaming (`pdfkit` o `puppeteer-core` / HTML to PDF).
   - [ ] Diseñar plantilla del reporte con formato profesional:
