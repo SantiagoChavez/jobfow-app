@@ -203,7 +203,7 @@ export const getApplicationById = async (req, res) => {
 export const updateApplicationStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, notes } = req.body;
+    const { status, notes, date } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -239,8 +239,9 @@ export const updateApplicationStatus = async (req, res) => {
       (normalizedStatus === 'CONTACTO' || normalizedStatus === 'ENTREVISTA') &&
       application.responseTimeDays === null
     ) {
-      const diffMs = Date.now() - new Date(application.appliedAt).getTime();
-      application.responseTimeDays = Math.max(0, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+      const targetDate = date ? new Date(date) : new Date();
+      const diffMs = Math.max(0, targetDate.getTime() - new Date(application.appliedAt).getTime());
+      application.responseTimeDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
     }
 
     // Registrar interacción correspondiente al cambio de estado
@@ -252,7 +253,7 @@ export const updateApplicationStatus = async (req, res) => {
 
     application.interactions.push({
       type: interactionType,
-      date: new Date(),
+      date: date ? new Date(date) : new Date(),
       notes: notes && typeof notes === 'string' && notes.trim()
         ? notes.trim()
         : `Estado actualizado de ${oldStatus} a ${normalizedStatus}`,
@@ -323,7 +324,11 @@ export const addInteraction = async (req, res) => {
 
     // Validar que el ID sea un ObjectId válido de Mongoose
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'ID de postulación inválido' });
+      return res.status(400).json({
+        success: false,
+        error: 'ID de postulación inválido',
+        message: 'ID de postulación inválido',
+      });
     }
 
     // Validar que type esté dentro del enum permitido
@@ -337,20 +342,29 @@ export const addInteraction = async (req, res) => {
     ];
 
     if (!type || !allowedTypes.includes(type)) {
-      return res.status(400).json({ error: 'Tipo de interacción inválido' });
+      return res.status(400).json({
+        success: false,
+        error: 'Tipo de interacción inválido',
+        message: 'Tipo de interacción inválido',
+      });
     }
 
     // Buscar la postulación por ID
     const application = await Application.findById(id);
 
     if (!application) {
-      return res.status(404).json({ error: 'Postulación no encontrada' });
+      return res.status(404).json({
+        success: false,
+        error: 'Postulación no encontrada',
+        message: 'Postulación no encontrada',
+      });
     }
 
     // Crear la interacción con fallback de fecha
+    const interactionDate = date ? new Date(date) : new Date();
     const interaction = {
       type,
-      date: date || Date.now(),
+      date: interactionDate,
       notes: notes && typeof notes === 'string' ? notes.trim() : undefined,
     };
 
@@ -360,7 +374,7 @@ export const addInteraction = async (req, res) => {
     // LÓGICA DE NEGOCIO:
     // 1. Si es RESPUESTA_RECIBIDA y aún no se calculó tiempo de respuesta
     if (type === 'RESPUESTA_RECIBIDA' && application.responseTimeDays === null) {
-      const diffTime = Math.max(0, new Date(date || Date.now()) - new Date(application.appliedAt));
+      const diffTime = Math.max(0, interactionDate.getTime() - new Date(application.appliedAt).getTime());
       application.responseTimeDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
       if (application.status === 'ENVIADA') {
@@ -380,7 +394,9 @@ export const addInteraction = async (req, res) => {
   } catch (error) {
     console.error(`Error al registrar interacción en postulación ${req.params.id}:`, error);
     return res.status(500).json({
+      success: false,
       error: 'Error interno del servidor al registrar la interacción',
+      message: 'Error interno del servidor al registrar la interacción',
     });
   }
 };
