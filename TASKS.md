@@ -89,13 +89,13 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Pipeline de distribución de postulaciones por estado con cálculo de porcentajes.
   - [x] Pipeline de tiempos de respuesta (`avgResponseDays` y ranking `fastestCompanies` top 5).
   - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/analytics.test.js`).
-- [ ] **3.2 Generación de Reporte PDF Semanal (`GET /api/reports/pdf`)**
-  - [ ] Evaluar librería de generación de PDF en streaming (`pdfkit` o `puppeteer-core` / HTML to PDF).
-  - [ ] Diseñar plantilla del reporte con formato profesional:
-    - Encabezado con datos del desarrollador y rango de fechas (`from` - `to`).
-    - Bloque de métricas clave (total postulaciones, tasa de respuesta, tiempo medio de respuesta).
-    - Tabla detallada de evidencia con fecha, empresa, rol, estado y última interacción.
-  - [ ] Configurar endpoint para responder con streaming de buffer binario y cabecera `Content-Type: application/pdf`.
+- [x] **3.2 Generación de Reporte PDF Semanal (`GET /api/reports/pdf` - Tarjeta 6)**
+  - [x] Integrar librerías `pdfkit` y `pdfkit-table` para generación vectorial en Node.js.
+  - [x] Servicio modular `pdfService.js` con plantilla A4, identidad Deep Cobalt & Gold.
+  - [x] Bloque de KPIs (Total, En Proceso, Ofertas, Tasa de Respuesta) y tabla estructurada de postulaciones.
+  - [x] Numeración dinámica de páginas en pie de página.
+  - [x] Controlador `reportController.js` con filtrado por fechas (`from`, `to`), fallback a últimos 30 días y descarga binaria.
+  - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/reports.test.js`).
 
 ---
 

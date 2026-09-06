@@ -54,10 +54,15 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Pipeline de tiempos de respuesta (`responseMetrics`) con cálculo de promedio aritmético global (`avgResponseDays`) y ranking de top 5 empresas más ágiles (`fastestCompanies`).
   - Suite de pruebas con Vitest y Supertest (`server/src/tests/analytics.test.js`) cubriendo casos con base vacía (sin división por cero), dataset real y manejo de errores (100% pass).
 
+- **Generación de Reportes PDF Descargables (Tarjeta 6):**
+  - Instalación de dependencias `pdfkit` y `pdfkit-table` para generación vectorial server-side en Node.js.
+  - Servicio `pdfService.js`: Diseño de plantilla A4 profesional con identidad Deep Cobalt & Gold, bloque de KPIs, tabla estructurada de postulaciones y pie de página con paginación dinámica.
+  - Controlador `reportController.js`: Endpoint `GET /api/reports/pdf` con filtrado por rango de fechas (`from`, `to`), fallback inteligente a últimos 30 días y descarga binaria con cabeceras `Content-Type` y `Content-Disposition`.
+  - Suite de pruebas con Vitest y Supertest (`server/src/tests/reports.test.js`) validando status 200, cabeceras de descarga, firma mágica `%PDF` y manejo de errores (100% pass).
+
 ### Planned (Próximas Tareas)
 - **Lógica Avanzada & Reportes:**
   - Extractor avanzado de skills (`skillExtractor.js`).
-  - Endpoint `GET /api/reports/pdf` para reporte semanal descargable en PDF.
 - **Frontend (`/client`):** Implementación de vistas Kanban Tracker, formulario de carga rápida y dashboard.
 
 ---
