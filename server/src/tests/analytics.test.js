@@ -161,11 +161,17 @@ describe('GET /api/analytics/summary - Analítica y Métricas (MongoDB Aggregati
       count: 1,
     });
 
-    // 4. Verificación de Distribución de Estados
+    // 4. Verificación de Distribución de Estados (garantiza los 5 estados del enum para proteger gráficos en Frontend)
+    expect(res.body.statusDistribution).toHaveLength(5);
     const entrevistaDist = res.body.statusDistribution.find((s) => s.status === 'ENTREVISTA');
     expect(entrevistaDist).toBeDefined();
     expect(entrevistaDist.count).toBe(2);
     expect(entrevistaDist.percentage).toBe(40.0); // (2 / 5) * 100
+
+    const rechazadaDist = res.body.statusDistribution.find((s) => s.status === 'RECHAZADA');
+    expect(rechazadaDist).toBeDefined();
+    expect(rechazadaDist.count).toBe(0);
+    expect(rechazadaDist.percentage).toBe(0);
   });
 
   it('Manejo de Errores: Debe responder 500 si el pipeline de agregación arroja una excepción', async () => {
@@ -175,5 +181,7 @@ describe('GET /api/analytics/summary - Analítica y Métricas (MongoDB Aggregati
 
     expect(res.status).toBe(500);
     expect(res.body.error).toBe('Error interno del servidor al calcular las analíticas');
+    expect(res.body.success).toBe(false);
   });
 });
+

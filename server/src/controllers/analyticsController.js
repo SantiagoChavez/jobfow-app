@@ -132,13 +132,21 @@ export const getAnalyticsSummary = async (req, res) => {
     };
 
     // 2. Procesar Distribución por Estado con cálculo de porcentaje
-    const statusDistribution = (result?.statusDistribution || []).map((item) => ({
-      status: item.status,
-      count: item.count,
-      percentage: totalApplications > 0
-        ? Number(((item.count / totalApplications) * 100).toFixed(1))
-        : 0,
-    }));
+    const ALL_STATUSES = ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'OFERTA', 'RECHAZADA'];
+    const statusMap = new Map(
+      (result?.statusDistribution || []).map((item) => [item.status, item.count])
+    );
+
+    const statusDistribution = totalApplications > 0
+      ? ALL_STATUSES.map((status) => {
+          const count = statusMap.get(status) || 0;
+          return {
+            status,
+            count,
+            percentage: Number(((count / totalApplications) * 100).toFixed(1)),
+          };
+        })
+      : [];
 
     // 3. Procesar Tiempos de Respuesta y Empresas Ágiles
     const responseStats = result?.responseStats?.[0];
@@ -166,7 +174,9 @@ export const getAnalyticsSummary = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener analíticas consolidadas:', error);
     return res.status(500).json({
+      success: false,
       error: 'Error interno del servidor al calcular las analíticas',
+      message: 'Error interno del servidor al calcular las analíticas',
     });
   }
 };
