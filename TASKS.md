@@ -103,24 +103,30 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-## 💻 Fase 4: Frontend y Vistas Basadas en Modelo UI (`/client`)
-- [-] **4.1 Inicialización de la Aplicación Cliente**
+## 💻 Fase 4: Frontend y Vistas Basadas en Modelo UI (`/client` - Tarjeta 8)
+- [x] **4.1 Inicialización y Capa de Servicios HTTP**
   - [x] Inicializar `/client` con Vite 8 + React 19 usando `pnpm`.
   - [x] Configurar Tailwind CSS v3, PostCSS y paleta "Deep Cobalt & Crisp Gold".
-  - [x] Limpiar boilerplate y verificar renderizado en navegador (`http://localhost:5173`).
-  - [ ] Configurar cliente HTTP (Axios / Fetch) con URL base configurable (`VITE_API_URL`).
-- [ ] **4.2 Shell y Navegación Principal (Layout)**
-  - [ ] Sidebar lateral estilizado: Logo Jobflow, enlaces (Dashboard, Applications, Tracker, Calendar, Analytics, Profile).
-  - [ ] Header con perfil de usuario y botón de acción rápida `+ Add Application`.
-- [ ] **4.3 Formulario Rápido de Carga (Modal / Quick Add)**
-  - [ ] Modal con campos: Empresa, Puesto/Rol, URL de la oferta, Prioridad, Requisitos (textarea).
-  - [ ] Enlace con API `POST /api/applications` y actualización optimista.
-- [ ] **4.4 Tablero Tracker (Kanban Board)**
-  - [ ] Columnas según modelo: *Saved*, *Applied*, *Interview*, *Offer*, *Rejected*.
-  - [ ] Tarjetas con nombre de empresa, rol, fecha y botón de acción rápida ("Me respondieron").
-- [ ] **4.5 Vista de Tabla de Postulaciones (Applications View)**
-  - [ ] Tabla interactiva con filtros por estado, orden por fecha y buscador por texto.
-- [ ] **4.6 Dashboard y Analítica**
-  - [ ] Tarjetas resumen con métricas (Applications, Interviews, Offers, Response Rate).
-  - [ ] Componente de actividad semanal y distribución de postulaciones.
-  - [ ] Botón de descarga de "Reporte Semanal en PDF" con selector de fechas para entregar al coach.
+  - [x] Proxy de desarrollo configurado en `client/vite.config.js` (`/api` -> `http://localhost:5000`).
+  - [x] Capa de servicios HTTP en `client/src/services/api.js` (CRUD, status, interactions, matching y PDF blob download).
+- [x] **4.2 Shell y Navegación Principal (Layout & Mobile-First)**
+  - [x] Header Navbar con Logo Jobflow Radar, selector de vista y botón `+ Nueva Postulación`.
+  - [x] BottomNav fija para dispositivos móviles con botón flotante central de acción rápida.
+- [x] **4.3 Formulario Rápido de Carga (Modal / Quick Add)**
+  - [x] Modal `QuickAddModal.jsx` con campos completos (empresa, puesto, modalidad, prioridad, salario, url, reclutador).
+  - [x] Análisis en vivo de afinidad de skills con debounce consultando `POST /api/applications/match-preview`.
+  - [x] Badges visuales de porcentaje de afinidad y desglose de skills coincidentes y faltantes.
+- [x] **4.4 Tablero Tracker (Kanban Board)**
+  - [x] Columnas por estado: `ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`.
+  - [x] Tarjetas compactas con empresa, rol, badges de prioridad/modalidad, días transcurridos y botón rápido *"⚡ Me respondieron"*.
+- [x] **4.5 Vista de Tabla de Postulaciones (Applications View)**
+  - [x] Tabla interactiva `ApplicationTable.jsx` con buscador de texto en vivo y filtros por estado.
+  - [x] Acciones por fila para ver detalle, abrir enlace de la vacante y eliminar.
+- [x] **4.6 Dashboard y Analítica**
+  - [x] `KPICards.jsx`: Bloque de 4 métricas (Postulaciones, Entrevistas, Ofertas, Tasa de Respuesta) consumiendo `/api/analytics/summary`.
+  - [x] `UpcomingReminders.jsx`: Alertas de seguimientos prioritarios según días transcurridos y estado.
+  - [x] `ReportModal.jsx`: Descarga directa del reporte oficial en PDF con selector de rango de fechas y presets.
+- [x] **4.7 Modal Detalle de Postulación (`ApplicationDetailModal.jsx`)**
+  - [x] Pestañas *Overview*, *Timeline* y *Reclutador*.
+  - [x] Formulario para registrar eventos e interacciones cronológicas (`POST /api/applications/:id/interactions`).
+  - [x] Cambio ágil de estado en tiempo real.
