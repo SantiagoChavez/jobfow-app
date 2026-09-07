@@ -78,7 +78,11 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Cálculo automático de `responseTimeDays` (diferencia en días sin negativos) y transición a `CONTACTO`.
   - [x] Transición a `ENTREVISTA` protegiendo el estado `OFERTA`.
   - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/interactions.test.js`).
-- [ ] **2.8 Utilidad Avanzada de Extracción de Skills (`skillExtractor.js`)**
+- [x] **2.8 Matching y Comparación de Habilidades Técnicas (`POST /api/applications/match-preview` - Tarjeta 7)**
+  - [x] Catálogo de skills técnicas normalizado con alias y diccionario del mercado (`server/src/config/skillsCatalog.js`).
+  - [x] Servicio algorítmico de matching semántico y cálculo de afinidad (`server/src/services/matchService.js`).
+  - [x] Controlador y endpoints `POST /api/applications/match-preview` y `POST /api/match/preview`.
+  - [x] Suite de pruebas automatizadas con Vitest y Supertest (`server/src/tests/match.test.js`).
 
 ---
 
