@@ -25,9 +25,9 @@ export const USER_SKILLS = [
  */
 export const TECH_DICTIONARY = [
   // Lenguajes
-  { name: 'JavaScript', aliases: ['javascript', 'js', 'es6', 'ecmascript'], regex: /\b(javascript|js|es6|ecmascript)\b/i },
-  { name: 'TypeScript', aliases: ['typescript', 'ts'], regex: /\b(typescript|ts)\b/i },
-  { name: 'Python', aliases: ['python', 'python3', 'py'], regex: /\b(python3?|py)\b/i },
+  { name: 'JavaScript', aliases: ['javascript', 'js', 'es6', 'ecmascript'], regex: /(?<!\.)\b(javascript|es6|ecmascript)\b|(?<![.\w])js\b(?!(\.|\w))/i },
+  { name: 'TypeScript', aliases: ['typescript', 'ts'], regex: /(?<!\.)\btypescript\b|(?<![.\w])ts\b(?!(\.|\w))/i },
+  { name: 'Python', aliases: ['python', 'python3', 'py'], regex: /(?<!\.)\bpython3?\b|(?<![.\w])py\b(?!(\.|\w))/i },
   { name: 'Java', aliases: ['java'], regex: /\bjava\b(?!script)/i },
   { name: 'C#', aliases: ['c#', 'csharp'], regex: /(\bc#\b|\bcsharp\b)/i },
   { name: 'PHP', aliases: ['php'], regex: /\bphp\b/i },
@@ -36,7 +36,7 @@ export const TECH_DICTIONARY = [
 
   // Frontend
   { name: 'React', aliases: ['react', 'react.js', 'reactjs'], regex: /\breact(\.js|js)?\b/i },
-  { name: 'Next.js', aliases: ['next.js', 'nextjs', 'next'], regex: /\bnext(\.js|js)?\b/i },
+  { name: 'Next.js', aliases: ['next.js', 'nextjs'], regex: /\bnext(\.js|js)\b/i },
   { name: 'Vue', aliases: ['vue', 'vue.js', 'vuejs'], regex: /\bvue(\.js|js)?\b/i },
   { name: 'Angular', aliases: ['angular', 'angularjs'], regex: /\bangular(js)?\b/i },
   { name: 'Tailwind CSS', aliases: ['tailwind', 'tailwind css', 'tailwindcss'], regex: /\btailwind(\s*css)?\b/i },
@@ -47,7 +47,7 @@ export const TECH_DICTIONARY = [
   // Backend & APIs
   { name: 'Node.js', aliases: ['node', 'node.js', 'nodejs'], regex: /\bnode(\.js|js)?\b/i },
   { name: 'Express', aliases: ['express', 'express.js', 'expressjs'], regex: /\bexpress(\.js|js)?\b/i },
-  { name: 'NestJS', aliases: ['nestjs', 'nest.js', 'nest'], regex: /\bnest(\.js|js)?\b/i },
+  { name: 'NestJS', aliases: ['nestjs', 'nest.js'], regex: /\bnest(\.js|js)\b/i },
   { name: 'FastAPI', aliases: ['fastapi'], regex: /\bfastapi\b/i },
   { name: 'Django', aliases: ['django'], regex: /\bdjango\b/i },
   { name: 'Spring Boot', aliases: ['spring boot', 'spring'], regex: /\bspring(\s*boot)?\b/i },
