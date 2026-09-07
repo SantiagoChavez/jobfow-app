@@ -7,6 +7,7 @@ import {
   deleteApplication,
   addInteraction,
 } from '../controllers/applicationController.js';
+import { previewMatch } from '../controllers/matchController.js';
 
 const router = Router();
 
@@ -14,6 +15,10 @@ const router = Router();
 router.route('/')
   .post(createApplication)
   .get(getApplications);
+
+// Previsualización de afinidad de skills: /api/applications/match-preview
+router.route('/match-preview')
+  .post(previewMatch);
 
 // Rutas por ID: /api/applications/:id
 router.route('/:id')

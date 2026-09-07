@@ -58,8 +58,8 @@ export const createApplication = async (req, res) => {
       status: status || 'ENVIADA',
       priority: priority || 'MEDIUM',
       workMode: workMode || 'REMOTE',
-      salary: salary ? salary.trim() : undefined,
-      experienceLevel: experienceLevel ? experienceLevel.trim() : undefined,
+      salary: salary != null ? String(salary).trim() : undefined,
+      experienceLevel: experienceLevel != null ? String(experienceLevel).trim() : undefined,
       recruiter: recruiter
         ? {
             name: recruiter.name ? recruiter.name.trim() : undefined,

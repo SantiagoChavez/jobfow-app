@@ -3,6 +3,7 @@ import cors from 'cors';
 import applicationRoutes from './routes/applicationRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
+import matchRoutes from './routes/matchRoutes.js';
 
 const app = express();
 
@@ -23,5 +24,6 @@ app.get('/health', (req, res) => {
 app.use('/api/applications', applicationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/match', matchRoutes);
 
 export default app;

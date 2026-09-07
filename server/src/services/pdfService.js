@@ -109,12 +109,12 @@ export const generateApplicationsPdfReport = async (applications = [], metrics =
 
       const table = {
         headers: [
-          { label: 'Empresa', width: 95, align: 'left' },
-          { label: 'Puesto', width: 125, align: 'left' },
-          { label: 'Estado', width: 75, align: 'center' },
-          { label: 'Modalidad', width: 75, align: 'center' },
-          { label: 'Prioridad', width: 65, align: 'center' },
-          { label: 'Fecha', width: 75, align: 'center' },
+          { label: 'Empresa', width: 95, align: 'left', headerColor: '#1E3A8A' },
+          { label: 'Puesto', width: 125, align: 'left', headerColor: '#1E3A8A' },
+          { label: 'Estado', width: 75, align: 'center', headerColor: '#1E3A8A' },
+          { label: 'Modalidad', width: 75, align: 'center', headerColor: '#1E3A8A' },
+          { label: 'Prioridad', width: 65, align: 'center', headerColor: '#1E3A8A' },
+          { label: 'Fecha', width: 75, align: 'center', headerColor: '#1E3A8A' },
         ],
         rows: tableRows,
       };
@@ -135,6 +135,10 @@ export const generateApplicationsPdfReport = async (applications = [], metrics =
       for (let i = range.start; i < range.start + range.count; i++) {
         doc.switchToPage(i);
 
+        // Desactivar temporalmente margen inferior para evitar saltos accidentales
+        const oldBottomMargin = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0;
+
         // Línea divisoria inferior
         doc.strokeColor('#E2E8F0').lineWidth(0.5)
           .moveTo(40, doc.page.height - 35)
@@ -143,16 +147,20 @@ export const generateApplicationsPdfReport = async (applications = [], metrics =
 
         // Leyenda JobFlow
         doc.font('Helvetica').fontSize(8).fillColor('#94A3B8')
-          .text('Generado automáticamente por JobFlow • Plataforma de Seguimiento Profesional', 40, doc.page.height - 27, {
+          .text('Generado automáticamente por JobFlow • Plataforma de Seguimiento Profesional', 40, doc.page.height - 26, {
             align: 'left',
+            lineBreak: false,
           });
 
         // Paginación
         doc.font('Helvetica').fontSize(8).fillColor('#94A3B8')
-          .text(`Página ${i + 1} de ${range.count}`, pageWidth - 140, doc.page.height - 27, {
+          .text(`Página ${i + 1} de ${range.count}`, pageWidth - 140, doc.page.height - 26, {
             width: 100,
             align: 'right',
+            lineBreak: false,
           });
+
+        doc.page.margins.bottom = oldBottomMargin;
       }
 
       doc.end();
