@@ -9,6 +9,7 @@ import ApplicationTable from './components/ApplicationTable.jsx';
 import QuickAddModal from './components/QuickAddModal.jsx';
 import ApplicationDetailModal from './components/ApplicationDetailModal.jsx';
 import ReportModal from './components/ReportModal.jsx';
+import { useToast } from './context/ToastContext.jsx';
 import {
   getApplications,
   createApplication,
@@ -20,9 +21,13 @@ import {
 
 export function App() {
   const [applications, setApplications] = useState([]);
+  const [pagination, setPagination] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Hook centralizado de notificaciones toast
+  const { showToast } = useToast();
 
   // Estados de navegación y filtros
   const [currentView, setCurrentView] = useState('kanban'); // 'kanban' | 'table'
@@ -34,24 +39,17 @@ export function App() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
 
-  // Notificación toast { message: string, type: 'success' | 'error' }
-  const [toast, setToast] = useState(null);
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
-  };
-
   // Carga de datos desde la API
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const [appsData, analyticsData] = await Promise.all([
-        getApplications(),
+      const [appsRes, analyticsData] = await Promise.all([
+        getApplications({ all: true }),
         getAnalyticsSummary().catch(() => null),
       ]);
-      setApplications(appsData);
+      setApplications(appsRes.data || []);
+      setPagination(appsRes.pagination || null);
       setAnalytics(analyticsData);
     } catch (err) {
       console.error('Error al cargar datos:', err);
@@ -168,7 +166,7 @@ export function App() {
       getAnalyticsSummary().then((res) => setAnalytics(res)).catch(() => {});
     } catch (err) {
       console.error('Error al eliminar:', err);
-      alert(err.message || 'Error al eliminar');
+      showToast(err.message || 'Error al eliminar', 'error');
     }
   };
 
@@ -189,24 +187,6 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-navy-base text-slate-100 flex flex-col selection:bg-gold-primary selection:text-navy-base">
-      {/* Toast Notificación */}
-      {toast && (
-        <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xl shadow-black/40 flex items-center gap-2 animate-bounce transition-all ${
-            toast.type === 'error'
-              ? 'bg-rose-950/95 text-rose-200 border border-rose-500/50'
-              : 'bg-navy-highlight text-white border border-gold-primary/40'
-          }`}
-        >
-          <span
-            className={`w-2 h-2 rounded-full ${
-              toast.type === 'error' ? 'bg-rose-400' : 'bg-gold-primary'
-            }`}
-          />
-          {toast.message}
-        </div>
-      )}
-
       {/* Navbar Superior */}
       <Navbar
         currentView={currentView}
@@ -261,6 +241,7 @@ export function App() {
         ) : (
           <ApplicationTable
             applications={filteredApplications}
+            pagination={pagination}
             onSelectApplication={(app) => setSelectedApp(app)}
             onDeleteApplication={handleDeleteApplication}
             onOpenAddModal={() => setIsAddModalOpen(true)}

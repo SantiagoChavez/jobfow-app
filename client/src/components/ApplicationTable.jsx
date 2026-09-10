@@ -17,6 +17,7 @@ const PRIORITY_BADGES = {
 
 export const ApplicationTable = ({
   applications,
+  pagination,
   onSelectApplication,
   onDeleteApplication,
   onOpenAddModal,
@@ -159,6 +160,26 @@ export const ApplicationTable = ({
           ))}
         </tbody>
       </table>
+
+      {/* Barra de Paginación y Resumen */}
+      <div className="py-3 px-4 bg-navy-base/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+        <div className="flex items-center gap-2">
+          <span>
+            Mostrando <strong className="text-white font-bold">{applications.length}</strong>
+            {pagination?.totalDocs != null && (
+              <> de <strong className="text-white font-bold">{pagination.totalDocs}</strong> postulaciones</>
+            )}
+          </span>
+        </div>
+
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-lg bg-navy-surface border border-slate-700 text-slate-300 font-semibold text-[11px]">
+              Página {pagination.currentPage} de {pagination.totalPages}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
