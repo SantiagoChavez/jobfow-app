@@ -100,17 +100,52 @@ export const createApplication = async (req, res) => {
 };
 
 /**
- * @desc    Listar todas las postulaciones con filtros por estado y prioridad
+ * Lista blanca de campos permitidos para ordenamiento dinámico
+ */
+const ALLOWED_SORT_FIELDS = {
+  appliedAt: 'appliedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  role: 'role',
+  status: 'status',
+  priority: 'priority',
+  workMode: 'workMode',
+  salary: 'salary',
+  responseTimeDays: 'responseTimeDays',
+  company: 'company.name',
+  'company.name': 'company.name',
+};
+
+/**
+ * @desc    Listar postulaciones con filtros combinados, ordenamiento dinámico y paginación
  * @route   GET /api/applications
  * @access  Public
  */
 export const getApplications = async (req, res) => {
   try {
-    const { status, priority, workMode, search } = req.query;
+    const { status, priority, workMode, search, sortBy, order } = req.query;
+
+    // Sanitización y parseo de paginación
+    let page = parseInt(req.query.page, 10);
+    if (isNaN(page) || page < 1) {
+      page = 1;
+    }
+
+    let limit = parseInt(req.query.limit, 10);
+    if (isNaN(limit) || limit < 1) {
+      limit = 10;
+    } else if (limit > 100) {
+      limit = 100;
+    }
+
+    // Configuración de ordenamiento dinámico
+    const sortField = ALLOWED_SORT_FIELDS[sortBy] || 'appliedAt';
+    const sortDirection = String(order || '').toLowerCase() === 'asc' ? 1 : -1;
+    const sortOptions = { [sortField]: sortDirection };
 
     const filter = {};
 
-    // Filtro por estado
+    // Filtro por estado (admite único o multivalor separado por comas)
     if (status) {
       if (status.includes(',')) {
         filter.status = { $in: status.split(',').map((s) => s.trim().toUpperCase()) };
@@ -119,7 +154,7 @@ export const getApplications = async (req, res) => {
       }
     }
 
-    // Filtro por prioridad
+    // Filtro por prioridad (admite único o multivalor separado por comas)
     if (priority) {
       if (priority.includes(',')) {
         filter.priority = { $in: priority.split(',').map((p) => p.trim().toUpperCase()) };
@@ -141,12 +176,33 @@ export const getApplications = async (req, res) => {
       ];
     }
 
-    const applications = await Application.find(filter).sort({ appliedAt: -1 });
+    const skip = (page - 1) * limit;
+
+    // Ejecución concurrente del conteo y la consulta segmentada
+    const [totalDocs, applications] = await Promise.all([
+      Application.countDocuments(filter),
+      Application.find(filter)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit),
+    ]);
+
+    // Cálculo de metadatos de paginación
+    const totalPages = totalDocs === 0 ? 0 : Math.ceil(totalDocs / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1 && totalDocs > 0;
 
     return res.status(200).json({
       success: true,
-      count: applications.length,
       data: applications,
+      pagination: {
+        totalDocs,
+        totalPages,
+        currentPage: page,
+        limit,
+        hasNextPage,
+        hasPrevPage,
+      },
     });
   } catch (error) {
     console.error('Error al listar postulaciones:', error);

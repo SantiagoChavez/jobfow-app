@@ -28,8 +28,8 @@ async function request(url, options = {}) {
 }
 
 /**
- * Listar postulaciones con filtros opcionales
- * @param {Object} [filters] - { status, priority, workMode, search }
+ * Listar postulaciones con filtros, ordenamiento y paginación opcionales
+ * @param {Object} [filters] - { status, priority, workMode, search, page, limit, sortBy, order }
  */
 export async function getApplications(filters = {}) {
   const params = new URLSearchParams();
@@ -37,6 +37,10 @@ export async function getApplications(filters = {}) {
   if (filters.priority) params.append('priority', filters.priority);
   if (filters.workMode) params.append('workMode', filters.workMode);
   if (filters.search) params.append('search', filters.search);
+  if (filters.page) params.append('page', filters.page);
+  if (filters.limit) params.append('limit', filters.limit);
+  if (filters.sortBy) params.append('sortBy', filters.sortBy);
+  if (filters.order) params.append('order', filters.order);
 
   const query = params.toString() ? `?${params.toString()}` : '';
   const res = await request(`/applications${query}`);
