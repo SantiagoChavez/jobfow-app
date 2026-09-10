@@ -153,4 +153,27 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Estilos y feedback visual durante arrastre (sombras profundas, rotación sutil, borde dorado y highlight de columna destino).
   - [x] Preservar clic simple para abrir el modal `ApplicationDetailModal` sin conflictos de arrastre.
 
+---
+
+## 🤖 Fase 7: Copiloto de Postulación con IA (Backend & Frontend - Tarjeta 11)
+- [x] **7.1 Integración del SDK Oficial de Google Gemini (`server/src/services/aiService.js`)**
+  - [x] Instalar paquete `@google/genai` y configurar variables de entorno `GEMINI_API_KEY` y `GEMINI_MODEL=gemini-3.5-flash-lite`.
+  - [x] Implementar servicio de extracción estructurada con fallback resiliente a `gemini-1.5-flash` en caso de error 404 del modelo.
+  - [x] Blindaje de seguridad contra desbordamiento y prompt injection mediante truncado de entrada a 6.000 caracteres.
+  - [x] Protección de tiempo de respuesta mediante timeout controlado de 12 segundos con `Promise.race`.
+  - [x] Sanitización y extracción de JSON desde bloques de código markdown (` ```json `) con valores predeterminados garantizados.
+- [x] **7.2 Endpoint de Análisis de Vacantes (`POST /api/ai/analyze-job`)**
+  - [x] Crear controlador `aiController.js` con validación de entrada mínima (15 caracteres) y compatibilidad con alias (`jobDescription`, `requirementsRaw`).
+  - [x] Crear enrutador `aiRoutes.js` y montarlo bajo `/api/ai` en `app.js`.
+  - [x] Manejo de códigos de estado HTTP semánticos: 400 (Bad Request), 502 (Bad Gateway / upstream AI error), 504 (Gateway Timeout), 500 (Internal Server Error).
+- [x] **7.3 Suite de Pruebas Automatizadas con Vitest (`server/src/tests/ai.test.js`)**
+  - [x] Configuración de mocks deterministas de clase para `GoogleGenAI` (cero llamadas de red externas en tests).
+  - [x] Cobertura de casos exitosos, payloads vacíos o cortos, timeout controlado (504), error del SDK externo (502) y fallback de modelo (9 tests pasando al 100%).
+- [x] **7.4 Capa de Cliente y UI Interactiva (`QuickAddModal.jsx` & `api.js`)**
+  - [x] Implementar función de consumo HTTP `analyzeJobWithAI` en `client/src/services/api.js`.
+  - [x] Botón interactivo *"✨ Autocompletar con IA"* en `QuickAddModal.jsx` con spinner y estado de carga (`analyzingAI`).
+  - [x] Autocompletado automático de campos del formulario (empresa, puesto, modalidad, prioridad, salario y afinidad).
+  - [x] Tarjeta visual destacada con resumen de la empresa y pitch personalizado para recruiters.
+  - [x] Botón *"📋 Copiar Pitch"* integrado con la API del portapapeles (`navigator.clipboard`) y feedback mediante toasts.
+
 

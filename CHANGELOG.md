@@ -92,6 +92,14 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Feedback visual enriquecido durante el arrastre (sombras profundas, rotación sutil, borde dorado y highlight reactivo en la columna receptora).
   - Toast de notificación visualmente diferenciado para estados de éxito y alertas de error.
 
+- **Copiloto de Postulación con IA - Google Gemini (Tarjeta 11):**
+  - Integración del SDK oficial `@google/genai` con modelo `gemini-3.5-flash-lite` (y fallback resiliente a `gemini-1.5-flash`).
+  - Servicio `aiService.js` con sanitización de prompt injection, truncado seguro a 6.000 caracteres, timeout de 12 segundos y parsing JSON tipado.
+  - Endpoint `POST /api/ai/analyze-job` con validaciones y manejo de estados HTTP 400, 502, 504 y 500.
+  - Suite de 9 pruebas automatizadas en Vitest con mocks deterministas (`server/src/tests/ai.test.js`, 100% pass).
+  - Interfaz interactiva en `QuickAddModal.jsx` con botón *"✨ Autocompletar con IA"*, feedback de carga y autocompletado de empresa, puesto, modalidad, prioridad y salario.
+  - Generador de pitch personalizado y resumen de empresa con botón de copiado rápido al portapapeles (`navigator.clipboard`).
+
 ### Planned (Próximas Tareas)
 - **Frontend Paginado y Filtros Avanzados:** Conexión de controles de paginación numérica y selector de límite en `ApplicationTable.jsx`.
 - **Autenticación y Multi-Usuario:** Soporte para cuentas individuales de desarrolladores.

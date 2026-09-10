@@ -110,6 +110,7 @@ Jobflow-app/
 * **Frontend:** React 19, Vite 8, Tailwind CSS v3, PostCSS, Autoprefixer, Heroicons.
 * **Backend:** Node.js (>= v20), Express 5, ES Modules (`"type": "module"`).
 * **Testing:** Vitest 5, Supertest 7 (Pruebas unitarias y de integración de endpoints).
+* **Inteligencia Artificial:** Google Gemini SDK (`@google/genai`), modelo `gemini-3.5-flash-lite`.
 * **Reportes:** PDFKit, PDFKit-Table (Generación vectorial en servidor).
 * **Gestor de paquetes:** `pnpm` (v11+).
 * **Base de datos:** MongoDB Atlas / Mongoose 9 (Esquema enriquecido `Application` con índices y agregaciones).
@@ -155,6 +156,7 @@ Jobflow-app/
 | `POST` | `/api/applications` | Registrar una nueva postulación con validaciones | ✅ Implementado y testeado |
 | `GET` | `/api/applications` | Listar postulaciones con paginación (`page`, `limit`), ordenamiento (`sortBy`, `order`) y filtros combinados (`status`, `priority`, `workMode`, `search`) | ✅ Implementado y testeado |
 | `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
+| `POST` | `/api/ai/analyze-job` | Extraer datos de vacantes con Google Gemini y generar pitch sugerido | ✅ Implementado y testeado |
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
 | `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación y recalcular métricas | ✅ Implementado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
