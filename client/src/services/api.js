@@ -29,7 +29,8 @@ async function request(url, options = {}) {
 
 /**
  * Listar postulaciones con filtros, ordenamiento y paginación opcionales
- * @param {Object} [filters] - { status, priority, workMode, search, page, limit, sortBy, order }
+ * @param {Object} [filters] - { status, priority, workMode, search, page, limit, sortBy, order, all }
+ * @returns {Promise<{ data: Array, pagination: Object }>}
  */
 export async function getApplications(filters = {}) {
   const params = new URLSearchParams();
@@ -38,16 +39,24 @@ export async function getApplications(filters = {}) {
   if (filters.workMode) params.append('workMode', filters.workMode);
   if (filters.search) params.append('search', filters.search);
   if (filters.page) params.append('page', filters.page);
-  // Solicitar 100 por defecto desde el cliente si no se envía paginador explícito para alimentar Kanban
-  params.append('limit', filters.limit || '100');
+  if (filters.limit) params.append('limit', filters.limit);
   if (filters.sortBy) params.append('sortBy', filters.sortBy);
   if (filters.order) params.append('order', filters.order);
+  if (filters.all) params.append('all', 'true');
 
   const query = params.toString() ? `?${params.toString()}` : '';
   const res = await request(`/applications${query}`);
-  const data = res.data || [];
-  data.pagination = res.pagination || null;
-  return data;
+  const data = Array.isArray(res.data) ? res.data : [];
+  const pagination = res.pagination || {
+    totalDocs: data.length,
+    totalPages: 1,
+    currentPage: 1,
+    limit: data.length || 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
+
+  return { data, pagination };
 }
 
 /**
@@ -98,7 +107,7 @@ export async function deleteApplication(id) {
   const res = await request(`/applications/${id}`, {
     method: 'DELETE',
   });
-  return res;
+  return res.data || res;
 }
 
 /**
