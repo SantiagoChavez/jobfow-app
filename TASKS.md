@@ -130,3 +130,14 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Pestañas *Overview*, *Timeline* y *Reclutador*.
   - [x] Formulario para registrar eventos e interacciones cronológicas (`POST /api/applications/:id/interactions`).
   - [x] Cambio ágil de estado en tiempo real.
+
+---
+
+## ⚡ Fase 5: Optimización de Rendimiento y Escalabilidad (Backend - Tarjeta 9)
+- [x] **5.1 Paginación en Servidor y Filtros Combinados (`GET /api/applications` - Tarjeta 9)**
+  - [x] Implementar paginación (`page`, `limit`) y ordenamiento dinámico (`sortBy`, `order`) en `GET /api/applications`.
+  - [x] Saneamiento seguro de query params (fallback a `page=1`, `limit=10`, límite superior de seguridad `100`, whitelist de ordenamiento).
+  - [x] Retornar DTO de metadatos de paginación (`totalDocs`, `totalPages`, `currentPage`, `limit`, `hasNextPage`, `hasPrevPage`).
+  - [x] Preservar filtros existentes (`status`, `priority`, `workMode`, `search`) sin romper compatibilidad.
+  - [x] Crear suite de tests en Vitest (`server/src/tests/pagination.test.js`) validando páginas intermedias, límites inválidos y base vacía.
+
