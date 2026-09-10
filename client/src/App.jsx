@@ -34,12 +34,12 @@ export function App() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
 
-  // Notificación toast
-  const [toastMessage, setToastMessage] = useState('');
+  // Notificación toast { message: string, type: 'success' | 'error' }
+  const [toast, setToast] = useState(null);
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3500);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
   };
 
   // Carga de datos desde la API
@@ -88,7 +88,61 @@ export function App() {
       getAnalyticsSummary().then((res) => setAnalytics(res)).catch(() => {});
     } catch (err) {
       console.error('Error al actualizar estado:', err);
-      alert(err.message || 'Error al actualizar estado');
+      showToast(err.message || 'Error al actualizar estado', 'error');
+    }
+  };
+
+  // Manejador: Drag and Drop en Tablero Kanban con UI Optimista y Rollback
+  const handleDragEnd = async (result) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const newStatus = destination.droppableId;
+    const previousStatus = source.droppableId;
+
+    if (newStatus === previousStatus) {
+      return;
+    }
+
+    // Snapshot para rollback en caso de fallo
+    const previousApplications = [...applications];
+
+    // 1. Actualización Optimista inmediata en UI
+    setApplications((prev) =>
+      prev.map((app) =>
+        app._id === draggableId ? { ...app, status: newStatus } : app
+      )
+    );
+
+    try {
+      // 2. Persistencia en backend
+      const updated = await updateApplicationStatus(draggableId, newStatus);
+
+      // 3. Sincronizar datos devueltos por backend (recalculo de responseTimeDays, etc.)
+      setApplications((prev) =>
+        prev.map((app) =>
+          app._id === draggableId ? { ...app, ...updated } : app
+        )
+      );
+
+      if (selectedApp && selectedApp._id === draggableId) {
+        setSelectedApp((prev) => ({ ...prev, ...updated }));
+      }
+
+      showToast(`Estado actualizado a ${newStatus}`, 'success');
+      getAnalyticsSummary().then((res) => setAnalytics(res)).catch(() => {});
+    } catch (err) {
+      console.error('Error al mover tarjeta:', err);
+      // 4. Rollback al snapshot previo
+      setApplications(previousApplications);
+      showToast(`Error al mover: ${err.message || 'Falló la conexión con el servidor'}`, 'error');
     }
   };
 
@@ -136,10 +190,20 @@ export function App() {
   return (
     <div className="min-h-screen bg-navy-base text-slate-100 flex flex-col selection:bg-gold-primary selection:text-navy-base">
       {/* Toast Notificación */}
-      {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 px-4 py-2.5 rounded-2xl bg-navy-highlight text-white text-xs font-bold border border-gold-primary/40 shadow-xl shadow-black/40 flex items-center gap-2 animate-bounce">
-          <span className="w-2 h-2 rounded-full bg-gold-primary" />
-          {toastMessage}
+      {toast && (
+        <div
+          className={`fixed top-4 right-4 z-50 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xl shadow-black/40 flex items-center gap-2 animate-bounce transition-all ${
+            toast.type === 'error'
+              ? 'bg-rose-950/95 text-rose-200 border border-rose-500/50'
+              : 'bg-navy-highlight text-white border border-gold-primary/40'
+          }`}
+        >
+          <span
+            className={`w-2 h-2 rounded-full ${
+              toast.type === 'error' ? 'bg-rose-400' : 'bg-gold-primary'
+            }`}
+          />
+          {toast.message}
         </div>
       )}
 
@@ -192,6 +256,7 @@ export function App() {
             onSelectApplication={(app) => setSelectedApp(app)}
             onQuickStatusChange={handleStatusChange}
             onOpenAddModal={() => setIsAddModalOpen(true)}
+            onDragEnd={handleDragEnd}
           />
         ) : (
           <ApplicationTable
