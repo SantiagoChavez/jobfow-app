@@ -281,6 +281,33 @@ describe('GET /api/applications - Paginación en Servidor, Ordenamiento y Filtro
         })
       );
     });
+
+    it('debe escapar caracteres especiales en el buscador para prevenir errores de regex y ReDoS', async () => {
+      setupQueryMock([]);
+      const countSpy = vi.spyOn(Application, 'countDocuments').mockResolvedValue(0);
+
+      const res = await request(app).get('/api/applications?search=C%2B%2B%20(Node.js)*');
+
+      expect(res.status).toBe(200);
+      expect(countSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          $or: [
+            { 'company.name': { $regex: 'C\\+\\+ \\(Node\\.js\\)\\*', $options: 'i' } },
+            { role: { $regex: 'C\\+\\+ \\(Node\\.js\\)\\*', $options: 'i' } },
+          ],
+        })
+      );
+    });
+
+    it('debe ignorar valores no primitivos en query params evitando Type Injection (NoSQL crash)', async () => {
+      setupQueryMock([]);
+      const countSpy = vi.spyOn(Application, 'countDocuments').mockResolvedValue(0);
+
+      const res = await request(app).get('/api/applications?search[$regex]=.*&status[$ne]=null');
+
+      expect(res.status).toBe(200);
+      expect(countSpy).toHaveBeenCalledWith({});
+    });
   });
 
   describe('7. Manejo de Errores de Base de Datos', () => {
