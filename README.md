@@ -158,7 +158,7 @@ Jobflow-app/
 | `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
 | `POST` | `/api/ai/analyze-job` | Extraer datos de vacantes con Google Gemini y generar pitch sugerido | ✅ Implementado y testeado |
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
-| `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación y recalcular métricas | ✅ Implementado |
+| `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación, recalcular métricas y proteger degradación involuntaria de `OFERTA` (HTTP 409) | ✅ Implementado y testeado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
 | `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual y recalcular tiempos | ✅ Implementado y testeado |
 | `GET` | `/api/analytics/summary` | Resumen de métricas consolidadas (KPIs, distribución y tiempos) | ✅ Implementado y testeado |

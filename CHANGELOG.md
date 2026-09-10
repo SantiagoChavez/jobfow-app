@@ -95,12 +95,22 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 - **Copiloto de Postulación con IA - Google Gemini (Tarjeta 11):**
   - Integración del SDK oficial `@google/genai` con modelo `gemini-3.5-flash-lite` (y fallback resiliente a `gemini-1.5-flash`).
   - Servicio `aiService.js` con sanitización de prompt injection, truncado seguro a 6.000 caracteres, timeout de 12 segundos y parsing JSON tipado.
+  - Soporte de alias contractual `keySkills` sincronizado con `extractedSkills`.
   - Endpoint `POST /api/ai/analyze-job` con validaciones y manejo de estados HTTP 400, 502, 504 y 500.
   - Suite de 9 pruebas automatizadas en Vitest con mocks deterministas (`server/src/tests/ai.test.js`, 100% pass).
   - Interfaz interactiva en `QuickAddModal.jsx` con botón *"✨ Autocompletar con IA"*, feedback de carga y autocompletado de empresa, puesto, modalidad, prioridad y salario.
   - Generador de pitch personalizado y resumen de empresa con botón de copiado rápido al portapapeles (`navigator.clipboard`).
 
+- **Resiliencia de Dominio, Seguridad NoSQL y Accesibilidad (Code Review):**
+  - Blindaje contra `NaN` en `responseTimeDays` mediante helpers puros `parseSafeDate` y `calculateResponseDays`.
+  - Protección estricta de estado: rechazo con HTTP 409 Conflict ante intentos de degradación involuntaria del estado `OFERTA` en `PATCH /api/applications/:id/status`, con soporte para bypass intencional mediante `force: true`.
+  - Whitelist de filtrado en consultas MongoDB para `status`, `priority` y `workMode`, previniendo inyección de cadenas espurias en `$in`.
+  - Límite de seguridad defensivo (`MAX_ALL_QUERY_LIMIT = 1000`) en consultas con `all=true` para prevenir sobrecarga de memoria en el servidor.
+  - Creación del hook de accesibilidad `useModalA11y` en frontend con escucha de tecla `Escape` y bloqueo de scroll de fondo (`document.body.style.overflow = 'hidden'`), integrado en todos los modales de la aplicación.
+  - Ampliación de la suite de pruebas en Vitest a 54 tests automatizados (100% pass).
+
 ### Planned (Próximas Tareas)
+- **Tarjeta 12 - Drawer de Alertas y Notificaciones en Tiempo Real:** Panel lateral deslizable (slide-over) para gestión de recordatorios y seguimientos prioritarios.
 - **Frontend Paginado y Filtros Avanzados:** Conexión de controles de paginación numérica y selector de límite en `ApplicationTable.jsx`.
 - **Autenticación y Multi-Usuario:** Soporte para cuentas individuales de desarrolladores.
 

@@ -176,4 +176,37 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Tarjeta visual destacada con resumen de la empresa y pitch personalizado para recruiters.
   - [x] Botón *"📋 Copiar Pitch"* integrado con la API del portapapeles (`navigator.clipboard`) y feedback mediante toasts.
 
+---
+
+## 🛡️ Fase 8: Resiliencia de Dominio, Accesibilidad y Refactorizaciones del Code Review
+- [x] **8.1 Blindaje contra `NaN` y Cálculos Temporales Seguros (`applicationController.js`)**
+  - [x] Implementar helpers puros `parseSafeDate` y `calculateResponseDays`.
+  - [x] Prevenir asignación de `NaN` en `responseTimeDays` cuando se reciben fechas inválidas o malformadas.
+  - [x] Añadir suite de tests automatizados validando fechas inválidas en Vitest (`interactions.test.js`).
+- [x] **8.2 Protección contra Degradación de Estados de Negocio (`updateApplicationStatus`)**
+  - [x] Prevenir degradación accidental de postulaciones en estado `OFERTA` a estados previos (`CONTACTO`, `ENTREVISTA`, `ENVIADA`).
+  - [x] Responder con código HTTP `409 Conflict` si se intenta degradar sin confirmación explícita.
+  - [x] Soportar el parámetro `force: true` para transiciones manuales forzadas por el usuario.
+  - [x] Agregar pruebas unitarias cubriendo el código de estado 409 y la confirmación forzada en Vitest.
+- [x] **8.3 Sanitización con Listas Blancas y Protección de Memoria en Consultas (`getApplications`)**
+  - [x] Restringir valores de filtros `$in` para `status`, `priority` y `workMode` mediante listas blancas (`VALID_STATUSES`, `VALID_PRIORITIES`, `VALID_WORK_MODES`).
+  - [x] Implementar tope defensivo de seguridad `MAX_ALL_QUERY_LIMIT = 1000` en peticiones con `all=true` para prevenir sobrecarga de memoria (OOM).
+- [x] **8.4 Consistencia de Contrato en Copiloto IA (`aiService.js`)**
+  - [x] Incorporar alias contractual `keySkills` mapeado a `extractedSkills` en el esquema de respuesta y normalización.
+  - [x] Añadir aserción de `keySkills` en la suite de pruebas unitarias (`ai.test.js`).
+- [x] **8.5 Hook de Accesibilidad y Control de Scroll en Modales / Drawers (`useModalA11y.js`)**
+  - [x] Crear hook reutilizable `useModalA11y` en `client/src/hooks/useModalA11y.js`.
+  - [x] Implementar cierre con tecla `Escape` y bloqueo de scroll en el fondo (`document.body.style.overflow = 'hidden'`).
+  - [x] Integrar `useModalA11y` en `QuickAddModal.jsx`, `ApplicationDetailModal.jsx` y `ReportModal.jsx`.
+
+---
+
+## 🔔 Fase 9: Drawer de Alertas y Notificaciones en Tiempo Real (Tarjeta 12 - Próxima Fase)
+- [ ] **9.1 Drawer Lateral de Recordatorios y Alertas (Slide-over UX)**
+  - [ ] Implementar componente `RemindersDrawer.jsx` accesible (focus trap, ARIA dialog, overlay animado).
+  - [ ] Agrupar alertas por urgencia (Seguimientos pendientes > 5 días, entrevistas programadas, ofertas activas).
+  - [ ] Acciones directas por tarjeta (enviar correo con `mailto:` sanitizado, abrir detalle o posponer).
+- [ ] **9.2 Integración en Header y Barra de Navegación**
+  - [ ] Botón de campana con badge de contador reactivo en `Navbar.jsx` y `BottomNav.jsx`.
+
 
