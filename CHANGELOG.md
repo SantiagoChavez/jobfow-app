@@ -81,10 +81,19 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - DTO de respuesta con metadatos limpios (`totalDocs`, `totalPages`, `currentPage`, `limit`, `hasNextPage`, `hasPrevPage`).
   - Consulta y conteo en paralelo optimizados con `Promise.all` (`countDocuments` y `find`).
   - Preservación íntegra de filtros combinados (`status` múltiple, `priority` múltiple, `workMode`, `search` regex).
-  - Suite de 15 pruebas automatizadas con Vitest y Supertest (`server/src/tests/pagination.test.js`) cubriendo límites inválidos, skips, páginas intermedias y base de datos vacía (100% pass).
+  - Suite de 17 pruebas automatizadas con Vitest y Supertest (`server/src/tests/pagination.test.js`) cubriendo límites inválidos, skips, páginas intermedias, base de datos vacía, escape de ReDoS y blindaje contra Type Injection (100% pass).
+
+- **Drag and Drop Interactivo en Tablero Kanban (Tarjeta 10):**
+  - Integración de biblioteca `@hello-pangea/dnd` (v18) compatible nativamente con React 19 y eventos táctiles móviles.
+  - Soporte de arrastre visual fluido de tarjetas entre las columnas (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`).
+  - Conexión con `PATCH /api/applications/:id/status` para persistencia en base de datos en tiempo real.
+  - Manejo de UI Optimista inmediata con rollback automático al snapshot previo en caso de error de red o backend.
+  - Recálculo automático de tiempos de respuesta (`responseTimeDays`) y refresco de analíticas (`GET /api/analytics/summary`).
+  - Feedback visual enriquecido durante el arrastre (sombras profundas, rotación sutil, borde dorado y highlight reactivo en la columna receptora).
+  - Toast de notificación visualmente diferenciado para estados de éxito y alertas de error.
 
 ### Planned (Próximas Tareas)
-- **Frontend Paginado y Filtros Avanzados:** Conexión de la paginación y ordenamiento del servidor en las vistas de tabla y tracker.
+- **Frontend Paginado y Filtros Avanzados:** Conexión de controles de paginación numérica y selector de límite en `ApplicationTable.jsx`.
 - **Autenticación y Multi-Usuario:** Soporte para cuentas individuales de desarrolladores.
 
 ---

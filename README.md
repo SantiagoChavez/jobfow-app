@@ -48,6 +48,7 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 - [x] **Dashboard analítico y tablero Tracker:** Bloque de KPIs principales, alertas de seguimiento y tablero Kanban interactivo por columnas de estado.
 - [x] **Generación de Reporte PDF semanal:** Exportación vectorial descargable con métricas resumidas y listado tabular para presentar al coach.
 - [x] **Paginación en servidor y ordenamiento dinámico:** Endpoint `GET /api/applications` con `page`, `limit`, `sortBy`, `order` y DTO de metadatos de paginación para alto volumen.
+- [x] **Drag and Drop interactivo en Kanban:** Movimiento fluido de tarjetas entre columnas con persistencia en tiempo real, UI optimista y rollback ante errores.
 
 ---
 

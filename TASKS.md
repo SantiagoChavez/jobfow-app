@@ -141,3 +141,16 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Preservar filtros existentes (`status`, `priority`, `workMode`, `search`) sin romper compatibilidad.
   - [x] Crear suite de tests en Vitest (`server/src/tests/pagination.test.js`) validando páginas intermedias, límites inválidos y base vacía.
 
+---
+
+## 🖐️ Fase 6: Interactividad Avanzada y Productividad (Frontend - Tarjeta 10)
+- [x] **6.1 Drag and Drop Interactivo en Kanban (`KanbanBoard.jsx` - Tarjeta 10)**
+  - [x] Instalar e integrar soporte de arrastre visual con `@hello-pangea/dnd` v18 en React 19.
+  - [x] Conectar evento `onDragEnd` con `PATCH /api/applications/:id/status`.
+  - [x] Implementar actualización optimista de UI inmediata para transiciones instantáneas.
+  - [x] Implementar rollback visual automático al snapshot previo en caso de fallo de red/servidor.
+  - [x] Sincronizar datos recalculados del backend (`responseTimeDays`) y refrescar métricas (`getAnalyticsSummary()`).
+  - [x] Estilos y feedback visual durante arrastre (sombras profundas, rotación sutil, borde dorado y highlight de columna destino).
+  - [x] Preservar clic simple para abrir el modal `ApplicationDetailModal` sin conflictos de arrastre.
+
+
