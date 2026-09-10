@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CloseIcon, FileTextIcon, DownloadIcon, CalendarIcon, SparklesIcon } from './Icons.jsx';
 import { downloadPdfReport } from '../services/api.js';
+import { useModalA11y } from '../hooks/useModalA11y.js';
 
 export const ReportModal = ({ isOpen, onClose }) => {
   const getDefaultDates = () => {
@@ -14,6 +15,8 @@ export const ReportModal = ({ isOpen, onClose }) => {
   const [dateRange, setDateRange] = useState(getDefaultDates());
   const [downloading, setDownloading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+
+  useModalA11y(isOpen, onClose);
 
   if (!isOpen) return null;
 

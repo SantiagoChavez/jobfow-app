@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createSafeMailto } from '../utils/mailto.js';
+import { useModalA11y } from '../hooks/useModalA11y.js';
 import {
   CloseIcon,
   BuildingIcon,
@@ -50,6 +51,8 @@ export const ApplicationDetailModal = ({
     notes: '',
   });
   const [submittingInteraction, setSubmittingInteraction] = useState(false);
+
+  useModalA11y(isOpen, onClose);
 
   if (!isOpen || !application) return null;
 

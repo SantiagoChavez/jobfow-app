@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CloseIcon, SparklesIcon, BuildingIcon, BriefcaseIcon, DollarIcon, ExternalLinkIcon } from './Icons.jsx';
 import { previewMatch, analyzeJobWithAI } from '../services/api.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { useModalA11y } from '../hooks/useModalA11y.js';
 
 export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
   const { showToast } = useToast();
@@ -28,6 +29,16 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
   const [analyzingAI, setAnalyzingAI] = useState(false);
   const [aiInsight, setAiInsight] = useState(null);
   const [copiedPitch, setCopiedPitch] = useState(false);
+
+  // Cierre accesible
+  const handleModalClose = useCallback(() => {
+    setAiInsight(null);
+    setCopiedPitch(false);
+    setErrorMsg('');
+    onClose();
+  }, [onClose]);
+
+  useModalA11y(isOpen, handleModalClose);
 
   // Manejador: Autocompletar con IA
   const handleAutofillWithAI = async () => {
@@ -110,13 +121,6 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
   }, [formData.requirementsRaw]);
 
   if (!isOpen) return null;
-
-  const handleModalClose = () => {
-    setAiInsight(null);
-    setCopiedPitch(false);
-    setErrorMsg('');
-    onClose();
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
