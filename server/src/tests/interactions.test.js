@@ -185,4 +185,18 @@ describe('POST /api/applications/:id/interactions - Registro de Interacciones y 
     expect(res.status).toBe(201);
     expect(res.body.status).toBe('OFERTA');
   });
+
+  it('Idempotencia en PATCH status: Si se actualiza al mismo estado, responder 200 sin guardar interacciones duplicadas', async () => {
+    const mockApp = createMockApplication({ status: 'CONTACTO' });
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .patch(`/api/applications/${mockApp._id}/status`)
+      .send({ status: 'CONTACTO' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toContain('ya se encuentra en estado CONTACTO');
+    expect(mockApp.save).not.toHaveBeenCalled();
+  });
 });

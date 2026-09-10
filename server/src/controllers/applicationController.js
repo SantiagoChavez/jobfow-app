@@ -178,21 +178,21 @@ export const getApplications = async (req, res) => {
       ];
     }
 
-    const skip = (page - 1) * limit;
+    const isAll = req.query.all === 'true';
+    const skip = isAll ? 0 : (page - 1) * limit;
 
     // Ejecución concurrente del conteo y la consulta segmentada
-    const [totalDocs, applications] = await Promise.all([
-      Application.countDocuments(filter),
-      Application.find(filter)
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(limit),
-    ]);
+    const countPromise = Application.countDocuments(filter);
+    const query = Application.find(filter).sort(sortOptions);
+    if (!isAll) {
+      query.skip(skip).limit(limit);
+    }
+    const [totalDocs, applications] = await Promise.all([countPromise, query]);
 
     // Cálculo de metadatos de paginación
-    const totalPages = totalDocs === 0 ? 0 : Math.ceil(totalDocs / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1 && totalDocs > 0;
+    const totalPages = isAll ? (totalDocs > 0 ? 1 : 0) : (totalDocs === 0 ? 0 : Math.ceil(totalDocs / limit));
+    const hasNextPage = isAll ? false : page < totalPages;
+    const hasPrevPage = isAll ? false : page > 1 && totalDocs > 0;
 
     return res.status(200).json({
       success: true,
@@ -200,8 +200,8 @@ export const getApplications = async (req, res) => {
       pagination: {
         totalDocs,
         totalPages,
-        currentPage: page,
-        limit,
+        currentPage: isAll ? 1 : page,
+        limit: isAll ? totalDocs : limit,
         hasNextPage,
         hasPrevPage,
       },
@@ -290,6 +290,16 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     const oldStatus = application.status;
+
+    // Guard de Idempotencia: si el estado ya es el mismo, responder 200 sin duplicar interacciones
+    if (oldStatus === normalizedStatus) {
+      return res.status(200).json({
+        success: true,
+        message: `La postulación ya se encuentra en estado ${normalizedStatus}`,
+        data: application,
+      });
+    }
+
     application.status = normalizedStatus;
 
     // Lógica analítica: si pasa a CONTACTO o ENTREVISTA y no se calculó tiempo de respuesta
@@ -362,6 +372,7 @@ export const deleteApplication = async (req, res) => {
       success: true,
       message: 'Postulación eliminada exitosamente',
       id,
+      data: { id },
     });
   } catch (error) {
     console.error(`Error al eliminar postulación ${req.params.id}:`, error);
