@@ -158,6 +158,19 @@ export async function downloadPdfReport(from, to) {
   window.URL.revokeObjectURL(downloadUrl);
 }
 
+/**
+ * Analizar descripción de empleo con IA y generar pitch de presentación
+ * @param {string} text - Texto de la oferta de empleo
+ * @param {string} [userProfile] - Perfil opcional del postulante
+ */
+export async function analyzeJobWithAI(text, userProfile) {
+  const res = await request('/ai/analyze-job', {
+    method: 'POST',
+    body: JSON.stringify({ text, userProfile }),
+  });
+  return res.data || res;
+}
+
 export default {
   getApplications,
   getApplicationById,
@@ -168,4 +181,5 @@ export default {
   getAnalyticsSummary,
   previewMatch,
   downloadPdfReport,
+  analyzeJobWithAI,
 };
