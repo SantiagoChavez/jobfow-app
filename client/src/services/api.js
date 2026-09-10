@@ -38,13 +38,16 @@ export async function getApplications(filters = {}) {
   if (filters.workMode) params.append('workMode', filters.workMode);
   if (filters.search) params.append('search', filters.search);
   if (filters.page) params.append('page', filters.page);
-  if (filters.limit) params.append('limit', filters.limit);
+  // Solicitar 100 por defecto desde el cliente si no se envía paginador explícito para alimentar Kanban
+  params.append('limit', filters.limit || '100');
   if (filters.sortBy) params.append('sortBy', filters.sortBy);
   if (filters.order) params.append('order', filters.order);
 
   const query = params.toString() ? `?${params.toString()}` : '';
   const res = await request(`/applications${query}`);
-  return res.data || [];
+  const data = res.data || [];
+  data.pagination = res.pagination || null;
+  return data;
 }
 
 /**
@@ -85,7 +88,7 @@ export async function addInteraction(id, interactionData) {
     method: 'POST',
     body: JSON.stringify(interactionData),
   });
-  return res.data;
+  return res.data || res;
 }
 
 /**
