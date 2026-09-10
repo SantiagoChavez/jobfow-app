@@ -201,6 +201,7 @@ describe('POST /api/ai/analyze-job - Copiloto de Postulación con IA', () => {
       expect(result.priority).toBe('MEDIUM');
       expect(result.matchScore).toBe(0);
       expect(result.extractedSkills).toEqual([]);
+      expect(result.keySkills).toEqual([]);
       expect(result.missingSkills).toEqual([]);
       expect(result.suggestedPitch).toBe('');
     });
