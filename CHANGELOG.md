@@ -60,10 +60,32 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Controlador `reportController.js`: Endpoint `GET /api/reports/pdf` con filtrado por rango de fechas (`from`, `to`), fallback inteligente a últimos 30 días y descarga binaria con cabeceras `Content-Type` y `Content-Disposition`.
   - Suite de pruebas con Vitest y Supertest (`server/src/tests/reports.test.js`) validando status 200, cabeceras de descarga, firma mágica `%PDF` y manejo de errores (100% pass).
 
+- **Matching y Afinidad de Habilidades Técnicas (Tarjeta 7):**
+  - Catálogo normalizado de tecnologías, frameworks y herramientas con alias del mercado (`server/src/config/skillsCatalog.js`).
+  - Servicio algorítmico de matching semántico (`server/src/services/matchService.js`) con cálculo porcentual de afinidad y desglose de skills coincidentes y faltantes.
+  - Endpoints HTTP `POST /api/applications/match-preview` y `POST /api/match/preview`.
+  - Suite de pruebas con Vitest y Supertest (`server/src/tests/match.test.js`) validando cálculo de porcentajes, normalización de alias y manejo de texto libre (100% pass).
+
+- **Frontend SPA Completo Mobile-First y Vistas UI (Tarjeta 8):**
+  - Capa de comunicación HTTP centralizada (`client/src/services/api.js`) y configuración de proxy inverso en `client/vite.config.js`.
+  - Layout responsive mobile-first con Header Navbar y BottomNav fija con acceso rápido a creación.
+  - Modal de carga rápida (`QuickAddModal.jsx`) con validación y análisis en vivo de afinidad de skills con debounce.
+  - Tablero Kanban Tracker interactivo (`KanbanBoard.jsx`) con columnas por estado y botón rápido de respuesta (*"⚡ Me respondieron"*).
+  - Tabla de postulaciones (`ApplicationTable.jsx`) con buscador dinámico, filtros por estado y acciones directas.
+  - Bloque de KPIs (`KPICards.jsx`) consumiendo analíticas consolidadas, alertas prioritarias (`UpcomingReminders.jsx`) y descarga modal de reporte PDF (`ReportModal.jsx`).
+  - Modal de detalle de postulación (`ApplicationDetailModal.jsx`) con gestión de estado, timeline cronológico y registro de interacciones.
+
+- **Paginación en Servidor y Filtros Combinados (Tarjeta 9):**
+  - Endpoint `GET /api/applications` con paginación (`page`, `limit`), ordenamiento dinámico seguro (`sortBy`, `order`) y whitelist de campos permitidos.
+  - Sanitización de parámetros con valores por defecto seguros (`page=1`, `limit=10`, tope de seguridad de 100) para evitar saturación de memoria.
+  - DTO de respuesta con metadatos limpios (`totalDocs`, `totalPages`, `currentPage`, `limit`, `hasNextPage`, `hasPrevPage`).
+  - Consulta y conteo en paralelo optimizados con `Promise.all` (`countDocuments` y `find`).
+  - Preservación íntegra de filtros combinados (`status` múltiple, `priority` múltiple, `workMode`, `search` regex).
+  - Suite de 15 pruebas automatizadas con Vitest y Supertest (`server/src/tests/pagination.test.js`) cubriendo límites inválidos, skips, páginas intermedias y base de datos vacía (100% pass).
+
 ### Planned (Próximas Tareas)
-- **Lógica Avanzada & Reportes:**
-  - Extractor avanzado de skills (`skillExtractor.js`).
-- **Frontend (`/client`):** Implementación de vistas Kanban Tracker, formulario de carga rápida y dashboard.
+- **Frontend Paginado y Filtros Avanzados:** Conexión de la paginación y ordenamiento del servidor en las vistas de tabla y tracker.
+- **Autenticación y Multi-Usuario:** Soporte para cuentas individuales de desarrolladores.
 
 ---
 

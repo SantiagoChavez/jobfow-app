@@ -41,12 +41,13 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 - [x] **Frontend inicializado con React + Vite y Tailwind CSS v3** con paleta de diseño "Deep Cobalt & Crisp Gold".
 - [x] **Estrategia de ramas Git configurada** (`main`, `pre-staging`, `dev`).
 - [x] **Persistencia con MongoDB Atlas & Mongoose (Tarjeta 2):** Conexión asíncrona configurada y esquema enriquecido `Application` con subdocumento `interactions` e índices optimizados.
-- [ ] **Formulario rápido de carga:** Registro de Empresa, Rol, URL de la oferta y texto de Requisitos.
-- [ ] **Extracción básica de skills/keywords:** Detección de tecnologías clave a partir de la descripción.
-- [ ] **Historial de interacciones:** Registro cronológico de eventos por postulación (*"Postulación enviada"*, *"Mensaje a recruiter"*, *"Respuesta recibida"*).
-- [ ] **Lógica analítica de tiempos de respuesta:** Cálculo automático en días entre la postulación y la primera respuesta del reclutador.
-- [ ] **Dashboard analítico básico:** Métricas de total enviadas, en proceso, tasa de respuesta y tiempos medios.
-- [ ] **Generación de Reporte PDF semanal:** Exportación descargable con métricas resumidas y listado de actividad para presentar al coach.
+- [x] **Formulario rápido de carga:** Registro modal ágil de Empresa, Rol, Modalidad, Prioridad, Salario, URL de la oferta y texto de Requisitos.
+- [x] **Extracción y matching semántico de skills:** Comparación algorítmica de tecnologías y porcentaje de afinidad con debounce en vivo (`match-preview`).
+- [x] **Historial de interacciones:** Registro cronológico de eventos por postulación (*"Postulación enviada"*, *"Mensaje a recruiter"*, *"Respuesta recibida"*, etc.).
+- [x] **Lógica analítica de tiempos de respuesta:** Cálculo automático en días entre la postulación y la primera respuesta del reclutador (`responseTimeDays`).
+- [x] **Dashboard analítico y tablero Tracker:** Bloque de KPIs principales, alertas de seguimiento y tablero Kanban interactivo por columnas de estado.
+- [x] **Generación de Reporte PDF semanal:** Exportación vectorial descargable con métricas resumidas y listado tabular para presentar al coach.
+- [x] **Paginación en servidor y ordenamiento dinámico:** Endpoint `GET /api/applications` con `page`, `limit`, `sortBy`, `order` y DTO de metadatos de paginación para alto volumen.
 
 ---
 
@@ -105,10 +106,12 @@ Jobflow-app/
 ```
 
 ### Stack Tecnológico
-* **Frontend:** React 19, Vite 8, Tailwind CSS v3, PostCSS, Autoprefixer.
+* **Frontend:** React 19, Vite 8, Tailwind CSS v3, PostCSS, Autoprefixer, Heroicons.
 * **Backend:** Node.js (>= v20), Express 5, ES Modules (`"type": "module"`).
+* **Testing:** Vitest 5, Supertest 7 (Pruebas unitarias y de integración de endpoints).
+* **Reportes:** PDFKit, PDFKit-Table (Generación vectorial en servidor).
 * **Gestor de paquetes:** `pnpm` (v11+).
-* **Base de datos:** MongoDB Atlas / Mongoose 9 (Conexión y modelo `Application` implementados).
+* **Base de datos:** MongoDB Atlas / Mongoose 9 (Esquema enriquecido `Application` con índices y agregaciones).
 * **Utilidades:** `cors`, `dotenv`, `nodemon` (desarrollo backend).
 
 ---
@@ -148,8 +151,9 @@ Jobflow-app/
 | Método | Ruta | Descripción | Estado |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | Chequeo de salud del servicio | ✅ Verificado (200 OK) |
-| `POST` | `/api/applications` | Registrar una nueva postulación con validaciones | ✅ Implementado |
-| `GET` | `/api/applications` | Listar postulaciones con filtros por estado y prioridad | ✅ Implementado |
+| `POST` | `/api/applications` | Registrar una nueva postulación con validaciones | ✅ Implementado y testeado |
+| `GET` | `/api/applications` | Listar postulaciones con paginación (`page`, `limit`), ordenamiento (`sortBy`, `order`) y filtros combinados (`status`, `priority`, `workMode`, `search`) | ✅ Implementado y testeado |
+| `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
 | `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación y recalcular métricas | ✅ Implementado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
