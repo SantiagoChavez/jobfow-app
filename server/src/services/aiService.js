@@ -10,6 +10,7 @@ const DEFAULT_AI_SCHEMA = {
   companySummary: '',
   matchScore: 0,
   extractedSkills: [],
+  keySkills: [],
   missingSkills: [],
   suggestedPitch: '',
 };
@@ -127,6 +128,13 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
   const validWorkModes = ['REMOTE', 'HYBRID', 'ON_SITE'];
   const validPriorities = ['LOW', 'MEDIUM', 'HIGH'];
 
+  const rawSkills = Array.isArray(parsed.extractedSkills)
+    ? parsed.extractedSkills
+    : Array.isArray(parsed.keySkills)
+    ? parsed.keySkills
+    : DEFAULT_AI_SCHEMA.extractedSkills;
+  const cleanSkills = rawSkills.map((s) => String(s).trim()).filter(Boolean);
+
   const normalized = {
     companyName: typeof parsed.companyName === 'string' ? parsed.companyName.trim() : DEFAULT_AI_SCHEMA.companyName,
     companyWebsite: typeof parsed.companyWebsite === 'string' ? parsed.companyWebsite.trim() : DEFAULT_AI_SCHEMA.companyWebsite,
@@ -144,9 +152,8 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
     matchScore: Number.isFinite(Number(parsed.matchScore))
       ? Math.min(100, Math.max(0, Math.round(Number(parsed.matchScore))))
       : DEFAULT_AI_SCHEMA.matchScore,
-    extractedSkills: Array.isArray(parsed.extractedSkills)
-      ? parsed.extractedSkills.map((s) => String(s).trim()).filter(Boolean)
-      : DEFAULT_AI_SCHEMA.extractedSkills,
+    extractedSkills: cleanSkills,
+    keySkills: cleanSkills,
     missingSkills: Array.isArray(parsed.missingSkills)
       ? parsed.missingSkills.map((s) => String(s).trim()).filter(Boolean)
       : DEFAULT_AI_SCHEMA.missingSkills,
