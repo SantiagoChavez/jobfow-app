@@ -99,6 +99,9 @@ export const createApplication = async (req, res) => {
   }
 };
 
+// Helper de escape para prevenir ReDoS y errores de sintaxis en regex de MongoDB
+const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /**
  * Lista blanca de campos permitidos para ordenamiento dinámico
  */
@@ -125,54 +128,53 @@ export const getApplications = async (req, res) => {
   try {
     const { status, priority, workMode, search, sortBy, order } = req.query;
 
-    // Sanitización y parseo de paginación
-    let page = parseInt(req.query.page, 10);
-    if (isNaN(page) || page < 1) {
-      page = 1;
-    }
+    // 1. Sanitización y parseo robusto de paginación
+    const parsedPage = parseInt(req.query.page, 10);
+    const page = Number.isInteger(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
 
-    let limit = parseInt(req.query.limit, 10);
-    if (isNaN(limit) || limit < 1) {
-      limit = 10;
-    } else if (limit > 100) {
-      limit = 100;
-    }
+    const parsedLimit = parseInt(req.query.limit, 10);
+    const limit = Number.isInteger(parsedLimit) && parsedLimit >= 1
+      ? Math.min(parsedLimit, 100)
+      : 10;
 
-    // Configuración de ordenamiento dinámico
-    const sortField = ALLOWED_SORT_FIELDS[sortBy] || 'appliedAt';
-    const sortDirection = String(order || '').toLowerCase() === 'asc' ? 1 : -1;
+    // 2. Configuración segura de ordenamiento dinámico
+    const sortField = ALLOWED_SORT_FIELDS[typeof sortBy === 'string' ? sortBy : ''] || 'appliedAt';
+    const sortDirection = typeof order === 'string' && order.toLowerCase() === 'asc' ? 1 : -1;
     const sortOptions = { [sortField]: sortDirection };
 
     const filter = {};
 
-    // Filtro por estado (admite único o multivalor separado por comas)
-    if (status) {
-      if (status.includes(',')) {
-        filter.status = { $in: status.split(',').map((s) => s.trim().toUpperCase()) };
-      } else {
-        filter.status = status.trim().toUpperCase();
+    // 3. Filtro por estado (Blindado contra Type Injection)
+    if (typeof status === 'string' && status.trim()) {
+      const statuses = status.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
+      if (statuses.length > 1) {
+        filter.status = { $in: statuses };
+      } else if (statuses.length === 1) {
+        filter.status = statuses[0];
       }
     }
 
-    // Filtro por prioridad (admite único o multivalor separado por comas)
-    if (priority) {
-      if (priority.includes(',')) {
-        filter.priority = { $in: priority.split(',').map((p) => p.trim().toUpperCase()) };
-      } else {
-        filter.priority = priority.trim().toUpperCase();
+    // 4. Filtro por prioridad (Blindado contra Type Injection)
+    if (typeof priority === 'string' && priority.trim()) {
+      const priorities = priority.split(',').map((p) => p.trim().toUpperCase()).filter(Boolean);
+      if (priorities.length > 1) {
+        filter.priority = { $in: priorities };
+      } else if (priorities.length === 1) {
+        filter.priority = priorities[0];
       }
     }
 
-    // Filtro opcional por modalidad
-    if (workMode) {
+    // 5. Filtro opcional por modalidad
+    if (typeof workMode === 'string' && workMode.trim()) {
       filter.workMode = workMode.trim().toUpperCase();
     }
 
-    // Búsqueda por nombre de empresa o rol
-    if (search && search.trim()) {
+    // 6. Búsqueda textual segura por empresa o rol (Sanitizada contra ReDoS)
+    if (typeof search === 'string' && search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
       filter.$or = [
-        { 'company.name': { $regex: search.trim(), $options: 'i' } },
-        { role: { $regex: search.trim(), $options: 'i' } },
+        { 'company.name': { $regex: safeSearch, $options: 'i' } },
+        { role: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
@@ -446,7 +448,13 @@ export const addInteraction = async (req, res) => {
     // Guardar cambios en persistencia
     await application.save();
 
-    return res.status(201).json(application);
+    const appObj = application.toObject ? application.toObject() : application;
+
+    return res.status(201).json({
+      success: true,
+      data: application,
+      ...appObj,
+    });
   } catch (error) {
     console.error(`Error al registrar interacción en postulación ${req.params.id}:`, error);
     return res.status(500).json({
