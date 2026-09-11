@@ -201,12 +201,21 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-## 🔔 Fase 9: Drawer de Alertas y Notificaciones en Tiempo Real (Tarjeta 12 - Próxima Fase)
-- [ ] **9.1 Drawer Lateral de Recordatorios y Alertas (Slide-over UX)**
-  - [ ] Implementar componente `RemindersDrawer.jsx` accesible (focus trap, ARIA dialog, overlay animado).
-  - [ ] Agrupar alertas por urgencia (Seguimientos pendientes > 5 días, entrevistas programadas, ofertas activas).
-  - [ ] Acciones directas por tarjeta (enviar correo con `mailto:` sanitizado, abrir detalle o posponer).
-- [ ] **9.2 Integración en Header y Barra de Navegación**
-  - [ ] Botón de campana con badge de contador reactivo en `Navbar.jsx` y `BottomNav.jsx`.
+## 🔔 Fase 9: Drawer de Alertas, Toast Global y Paginación en Servidor (Tarjeta 12 - Completada)
+- [x] **9.1 Refactorización y Refinamiento del Contexto Global Toast (`ToastContext.jsx`)**
+  - [x] Proveedor global accesible y hook `useToast()` con soporte para `success`, `error` e `info`.
+  - [x] Integración de `useToast` en `App.jsx`, `QuickAddModal.jsx` y `ReportModal.jsx`.
+- [x] **9.2 Drawer Lateral de Recordatorios y Alertas (Slide-over UX - `RemindersDrawer.jsx`)**
+  - [x] Implementar componente `RemindersDrawer.jsx` accesible (cierre con `Escape`, bloqueo de scroll con `useModalA11y`, `role="dialog"`, overlay animado).
+  - [x] Filtros dinámicos por nivel de criticidad (Todos, Urgentes &gt; 5 días, Entrevistas, Contacto).
+  - [x] Botón de acción rápida con trigger `mailto:` sanitizado vía `createSafeMailto` para contactar reclutadores.
+  - [x] Botón de acción secundaria para abrir el detalle de la postulación.
+- [x] **9.3 Integración en Header y Navegación**
+  - [x] Botón de campana con badge de contador reactivo en `Navbar.jsx` que abre el Drawer de Alertas.
+  - [x] Enlace directo de apertura rápida en el widget `UpcomingReminders.jsx`.
+- [x] **9.4 Controles Interactivos de Paginación en Servidor (`ApplicationTable.jsx`)**
+  - [x] Barra interactiva al pie con `< Anterior`, botones numéricos de página y `Siguiente >`.
+  - [x] Texto informativo dinámico: "Mostrando página X de Y (Z postulaciones en total)".
+  - [x] Gestión de estado `currentPage` y consumo de `GET /api/applications?page=X` en `App.jsx` sin recargar la aplicación.
 
 
