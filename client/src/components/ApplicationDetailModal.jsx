@@ -3,16 +3,11 @@ import { createSafeMailto } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import {
   CloseIcon,
-  BuildingIcon,
-  BriefcaseIcon,
-  CalendarIcon,
   ClockIcon,
   DollarIcon,
   ExternalLinkIcon,
   UserIcon,
   MailIcon,
-  MessageIcon,
-  CheckCircleIcon,
   SparklesIcon,
   TrashIcon,
 } from './Icons.jsx';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CloseIcon, SparklesIcon, BuildingIcon, BriefcaseIcon, DollarIcon, ExternalLinkIcon } from './Icons.jsx';
+import { CloseIcon, SparklesIcon, BriefcaseIcon } from './Icons.jsx';
 import { previewMatch, analyzeJobWithAI } from '../services/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useModalA11y } from '../hooks/useModalA11y.js';
@@ -58,8 +58,11 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         role: data.role || prev.role,
         workMode: data.workMode || prev.workMode,
         priority: data.priority || prev.priority,
-        salary: data.salary != null ? String(data.salary) : prev.salary,
+        salary: data.salary ? String(data.salary) : prev.salary,
+        companySummary: data.companySummary || prev.companySummary,
       }));
+
+      setAiInsight(data);
 
       if (data.extractedSkills?.length || data.missingSkills?.length || data.matchScore > 0) {
         setMatchData({
@@ -69,23 +72,16 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         });
       }
 
-      if (data.companySummary || data.suggestedPitch) {
-        setAiInsight({
-          companySummary: data.companySummary,
-          suggestedPitch: data.suggestedPitch,
-        });
-      }
-
-      showToast('¡Vacante analizada y formulario autocompletado con éxito!');
+      showToast('¡Datos extraídos y pitch generado con IA!', 'success');
     } catch (err) {
       console.error('Error al analizar con IA:', err);
-      showToast(err.message || 'Error al conectar con el Copiloto IA', 'error');
+      showToast(err.message || 'Error al invocar el análisis de IA', 'error');
     } finally {
       setAnalyzingAI(false);
     }
   };
 
-  // Manejador: Copiar Pitch de presentación
+  // Manejador: Copiar Pitch Sugerido
   const handleCopyPitch = async () => {
     if (!aiInsight?.suggestedPitch) return;
     try {
@@ -93,7 +89,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
       setCopiedPitch(true);
       showToast('Pitch de presentación copiado al portapapeles');
       setTimeout(() => setCopiedPitch(false), 2200);
-    } catch (err) {
+    } catch {
       showToast('No se pudo copiar al portapapeles', 'error');
     }
   };
@@ -101,7 +97,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
   // Debounced análisis de afinidad de skills
   useEffect(() => {
     if (!formData.requirementsRaw || formData.requirementsRaw.trim().length < 5) {
-      setMatchData(null);
+      setMatchData((prev) => (prev !== null ? null : prev));
       return;
     }
 

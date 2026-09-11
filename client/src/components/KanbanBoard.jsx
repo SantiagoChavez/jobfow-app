@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { BuildingIcon, ClockIcon, SparklesIcon, CheckCircleIcon } from './Icons.jsx';
+import { ClockIcon, SparklesIcon } from './Icons.jsx';
 
 const COLUMNS = [
   {

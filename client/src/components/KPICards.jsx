@@ -1,5 +1,5 @@
 import React from 'react';
-import { BriefcaseIcon, MessageIcon, CheckCircleIcon, SparklesIcon, ClockIcon } from './Icons.jsx';
+import { BriefcaseIcon, MessageIcon, CheckCircleIcon, SparklesIcon } from './Icons.jsx';
 
 export const KPICards = ({ analytics, loading }) => {
   const kpis = analytics?.kpis || {
