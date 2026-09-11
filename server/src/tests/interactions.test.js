@@ -185,4 +185,64 @@ describe('POST /api/applications/:id/interactions - Registro de Interacciones y 
     expect(res.status).toBe(201);
     expect(res.body.status).toBe('OFERTA');
   });
+
+  it('Idempotencia en PATCH status: Si se actualiza al mismo estado, responder 200 sin guardar interacciones duplicadas', async () => {
+    const mockApp = createMockApplication({ status: 'CONTACTO' });
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .patch(`/api/applications/${mockApp._id}/status`)
+      .send({ status: 'CONTACTO' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toContain('ya se encuentra en estado CONTACTO');
+    expect(mockApp.save).not.toHaveBeenCalled();
+  });
+
+  it('Protección de estado OFERTA en PATCH status: Debe responder 409 Conflict si se intenta degradar a CONTACTO sin force', async () => {
+    const mockApp = createMockApplication({ status: 'OFERTA' });
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .patch(`/api/applications/${mockApp._id}/status`)
+      .send({ status: 'CONTACTO' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('No es posible degradar una postulación con OFERTA');
+    expect(mockApp.save).not.toHaveBeenCalled();
+  });
+
+  it('Permitir transición desde OFERTA si se incluye force: true en PATCH status', async () => {
+    const mockApp = createMockApplication({ status: 'OFERTA' });
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .patch(`/api/applications/${mockApp._id}/status`)
+      .send({ status: 'CONTACTO', force: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(mockApp.status).toBe('CONTACTO');
+    expect(mockApp.save).toHaveBeenCalled();
+  });
+
+  it('Prevención de NaN: Si se envía fecha inválida, debe calcular responseTimeDays de forma segura', async () => {
+    const mockApp = createMockApplication({
+      status: 'ENVIADA',
+      appliedAt: new Date(Date.now() - 5 * 86400000),
+      responseTimeDays: null,
+    });
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .patch(`/api/applications/${mockApp._id}/status`)
+      .send({ status: 'CONTACTO', date: 'fecha-totalmente-invalida' });
+
+    expect(res.status).toBe(200);
+    expect(mockApp.responseTimeDays).not.toBeNaN();
+    expect(typeof mockApp.responseTimeDays).toBe('number');
+    expect(mockApp.responseTimeDays).toBe(5);
+  });
 });

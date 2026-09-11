@@ -130,3 +130,92 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Pestañas *Overview*, *Timeline* y *Reclutador*.
   - [x] Formulario para registrar eventos e interacciones cronológicas (`POST /api/applications/:id/interactions`).
   - [x] Cambio ágil de estado en tiempo real.
+
+---
+
+## ⚡ Fase 5: Optimización de Rendimiento y Escalabilidad (Backend - Tarjeta 9)
+- [x] **5.1 Paginación en Servidor y Filtros Combinados (`GET /api/applications` - Tarjeta 9)**
+  - [x] Implementar paginación (`page`, `limit`) y ordenamiento dinámico (`sortBy`, `order`) en `GET /api/applications`.
+  - [x] Saneamiento seguro de query params (fallback a `page=1`, `limit=10`, límite superior de seguridad `100`, whitelist de ordenamiento).
+  - [x] Retornar DTO de metadatos de paginación (`totalDocs`, `totalPages`, `currentPage`, `limit`, `hasNextPage`, `hasPrevPage`).
+  - [x] Preservar filtros existentes (`status`, `priority`, `workMode`, `search`) sin romper compatibilidad.
+  - [x] Crear suite de tests en Vitest (`server/src/tests/pagination.test.js`) validando páginas intermedias, límites inválidos y base vacía.
+
+---
+
+## 🖐️ Fase 6: Interactividad Avanzada y Productividad (Frontend - Tarjeta 10)
+- [x] **6.1 Drag and Drop Interactivo en Kanban (`KanbanBoard.jsx` - Tarjeta 10)**
+  - [x] Instalar e integrar soporte de arrastre visual con `@hello-pangea/dnd` v18 en React 19.
+  - [x] Conectar evento `onDragEnd` con `PATCH /api/applications/:id/status`.
+  - [x] Implementar actualización optimista de UI inmediata para transiciones instantáneas.
+  - [x] Implementar rollback visual automático al snapshot previo en caso de fallo de red/servidor.
+  - [x] Sincronizar datos recalculados del backend (`responseTimeDays`) y refrescar métricas (`getAnalyticsSummary()`).
+  - [x] Estilos y feedback visual durante arrastre (sombras profundas, rotación sutil, borde dorado y highlight de columna destino).
+  - [x] Preservar clic simple para abrir el modal `ApplicationDetailModal` sin conflictos de arrastre.
+
+---
+
+## 🤖 Fase 7: Copiloto de Postulación con IA (Backend & Frontend - Tarjeta 11)
+- [x] **7.1 Integración del SDK Oficial de Google Gemini (`server/src/services/aiService.js`)**
+  - [x] Instalar paquete `@google/genai` y configurar variables de entorno `GEMINI_API_KEY` y `GEMINI_MODEL=gemini-3.5-flash-lite`.
+  - [x] Implementar servicio de extracción estructurada con fallback resiliente a `gemini-1.5-flash` en caso de error 404 del modelo.
+  - [x] Blindaje de seguridad contra desbordamiento y prompt injection mediante truncado de entrada a 6.000 caracteres.
+  - [x] Protección de tiempo de respuesta mediante timeout controlado de 12 segundos con `Promise.race`.
+  - [x] Sanitización y extracción de JSON desde bloques de código markdown (` ```json `) con valores predeterminados garantizados.
+- [x] **7.2 Endpoint de Análisis de Vacantes (`POST /api/ai/analyze-job`)**
+  - [x] Crear controlador `aiController.js` con validación de entrada mínima (15 caracteres) y compatibilidad con alias (`jobDescription`, `requirementsRaw`).
+  - [x] Crear enrutador `aiRoutes.js` y montarlo bajo `/api/ai` en `app.js`.
+  - [x] Manejo de códigos de estado HTTP semánticos: 400 (Bad Request), 502 (Bad Gateway / upstream AI error), 504 (Gateway Timeout), 500 (Internal Server Error).
+- [x] **7.3 Suite de Pruebas Automatizadas con Vitest (`server/src/tests/ai.test.js`)**
+  - [x] Configuración de mocks deterministas de clase para `GoogleGenAI` (cero llamadas de red externas en tests).
+  - [x] Cobertura de casos exitosos, payloads vacíos o cortos, timeout controlado (504), error del SDK externo (502) y fallback de modelo (9 tests pasando al 100%).
+- [x] **7.4 Capa de Cliente y UI Interactiva (`QuickAddModal.jsx` & `api.js`)**
+  - [x] Implementar función de consumo HTTP `analyzeJobWithAI` en `client/src/services/api.js`.
+  - [x] Botón interactivo *"✨ Autocompletar con IA"* en `QuickAddModal.jsx` con spinner y estado de carga (`analyzingAI`).
+  - [x] Autocompletado automático de campos del formulario (empresa, puesto, modalidad, prioridad, salario y afinidad).
+  - [x] Tarjeta visual destacada con resumen de la empresa y pitch personalizado para recruiters.
+  - [x] Botón *"📋 Copiar Pitch"* integrado con la API del portapapeles (`navigator.clipboard`) y feedback mediante toasts.
+
+---
+
+## 🛡️ Fase 8: Resiliencia de Dominio, Accesibilidad y Refactorizaciones del Code Review
+- [x] **8.1 Blindaje contra `NaN` y Cálculos Temporales Seguros (`applicationController.js`)**
+  - [x] Implementar helpers puros `parseSafeDate` y `calculateResponseDays`.
+  - [x] Prevenir asignación de `NaN` en `responseTimeDays` cuando se reciben fechas inválidas o malformadas.
+  - [x] Añadir suite de tests automatizados validando fechas inválidas en Vitest (`interactions.test.js`).
+- [x] **8.2 Protección contra Degradación de Estados de Negocio (`updateApplicationStatus`)**
+  - [x] Prevenir degradación accidental de postulaciones en estado `OFERTA` a estados previos (`CONTACTO`, `ENTREVISTA`, `ENVIADA`).
+  - [x] Responder con código HTTP `409 Conflict` si se intenta degradar sin confirmación explícita.
+  - [x] Soportar el parámetro `force: true` para transiciones manuales forzadas por el usuario.
+  - [x] Agregar pruebas unitarias cubriendo el código de estado 409 y la confirmación forzada en Vitest.
+- [x] **8.3 Sanitización con Listas Blancas y Protección de Memoria en Consultas (`getApplications`)**
+  - [x] Restringir valores de filtros `$in` para `status`, `priority` y `workMode` mediante listas blancas (`VALID_STATUSES`, `VALID_PRIORITIES`, `VALID_WORK_MODES`).
+  - [x] Implementar tope defensivo de seguridad `MAX_ALL_QUERY_LIMIT = 1000` en peticiones con `all=true` para prevenir sobrecarga de memoria (OOM).
+- [x] **8.4 Consistencia de Contrato en Copiloto IA (`aiService.js`)**
+  - [x] Incorporar alias contractual `keySkills` mapeado a `extractedSkills` en el esquema de respuesta y normalización.
+  - [x] Añadir aserción de `keySkills` en la suite de pruebas unitarias (`ai.test.js`).
+- [x] **8.5 Hook de Accesibilidad y Control de Scroll en Modales / Drawers (`useModalA11y.js`)**
+  - [x] Crear hook reutilizable `useModalA11y` en `client/src/hooks/useModalA11y.js`.
+  - [x] Implementar cierre con tecla `Escape` y bloqueo de scroll en el fondo (`document.body.style.overflow = 'hidden'`).
+  - [x] Integrar `useModalA11y` en `QuickAddModal.jsx`, `ApplicationDetailModal.jsx` y `ReportModal.jsx`.
+
+---
+
+## 🔔 Fase 9: Drawer de Alertas, Toast Global y Paginación en Servidor (Tarjeta 12 - Completada)
+- [x] **9.1 Refactorización y Refinamiento del Contexto Global Toast (`ToastContext.jsx`)**
+  - [x] Proveedor global accesible y hook `useToast()` con soporte para `success`, `error` e `info`.
+  - [x] Integración de `useToast` en `App.jsx`, `QuickAddModal.jsx` y `ReportModal.jsx`.
+- [x] **9.2 Drawer Lateral de Recordatorios y Alertas (Slide-over UX - `RemindersDrawer.jsx`)**
+  - [x] Implementar componente `RemindersDrawer.jsx` accesible (cierre con `Escape`, bloqueo de scroll con `useModalA11y`, `role="dialog"`, overlay animado).
+  - [x] Filtros dinámicos por nivel de criticidad (Todos, Urgentes &gt; 5 días, Entrevistas, Contacto).
+  - [x] Botón de acción rápida con trigger `mailto:` sanitizado vía `createSafeMailto` para contactar reclutadores.
+  - [x] Botón de acción secundaria para abrir el detalle de la postulación.
+- [x] **9.3 Integración en Header y Navegación**
+  - [x] Botón de campana con badge de contador reactivo en `Navbar.jsx` que abre el Drawer de Alertas.
+  - [x] Enlace directo de apertura rápida en el widget `UpcomingReminders.jsx`.
+- [x] **9.4 Controles Interactivos de Paginación en Servidor (`ApplicationTable.jsx`)**
+  - [x] Barra interactiva al pie con `< Anterior`, botones numéricos de página y `Siguiente >`.
+  - [x] Texto informativo dinámico: "Mostrando página X de Y (Z postulaciones en total)".
+  - [x] Gestión de estado `currentPage` y consumo de `GET /api/applications?page=X` en `App.jsx` sin recargar la aplicación.
+
+

@@ -12,6 +12,8 @@ import { previewMatch } from '../controllers/matchController.js';
 const router = Router();
 
 // Rutas base: /api/applications
+// POST: Crear postulación
+// GET: Listar postulaciones con soporte de paginación (?page, ?limit), ordenamiento (?sortBy, ?order) y filtros (?status, ?priority, ?workMode, ?search)
 router.route('/')
   .post(createApplication)
   .get(getApplications);

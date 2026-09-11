@@ -1,6 +1,31 @@
 import mongoose from 'mongoose';
 import Application from '../models/Application.js';
 
+// Constantes de Dominio y Enums
+const VALID_STATUSES = ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'RECHAZADA', 'OFERTA'];
+const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'];
+const VALID_WORK_MODES = ['REMOTE', 'HYBRID', 'ON_SITE'];
+const MAX_ALL_QUERY_LIMIT = 1000; // Tope defensivo para evitar OOM
+
+/**
+ * Sanitiza y valida una fecha asegurando no generar Invalid Date / NaN
+ */
+const parseSafeDate = (inputDate) => {
+  if (!inputDate) return new Date();
+  const d = new Date(inputDate);
+  return Number.isNaN(d.getTime()) ? new Date() : d;
+};
+
+/**
+ * Calcula diferencia positiva en días enteros sin producir NaN
+ */
+const calculateResponseDays = (fromDate, toDate) => {
+  const start = parseSafeDate(fromDate).getTime();
+  const end = parseSafeDate(toDate).getTime();
+  const diffMs = Math.max(0, end - start);
+  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+};
+
 /**
  * @desc    Crear una nueva postulación
  * @route   POST /api/applications
@@ -39,10 +64,12 @@ export const createApplication = async (req, res) => {
       });
     }
 
+    const safeAppliedAt = parseSafeDate(appliedAt);
+
     // Interacción inicial automática
     const initialInteraction = {
       type: 'POSTULACION_ENVIADA',
-      date: appliedAt ? new Date(appliedAt) : new Date(),
+      date: safeAppliedAt,
       notes: notes && typeof notes === 'string' && notes.trim()
         ? notes.trim()
         : 'Postulación inicial registrada',
@@ -55,9 +82,15 @@ export const createApplication = async (req, res) => {
         industry: company.industry ? company.industry.trim() : undefined,
       },
       role: role.trim(),
-      status: status || 'ENVIADA',
-      priority: priority || 'MEDIUM',
-      workMode: workMode || 'REMOTE',
+      status: typeof status === 'string' && VALID_STATUSES.includes(status.trim().toUpperCase())
+        ? status.trim().toUpperCase()
+        : 'ENVIADA',
+      priority: typeof priority === 'string' && VALID_PRIORITIES.includes(priority.trim().toUpperCase())
+        ? priority.trim().toUpperCase()
+        : 'MEDIUM',
+      workMode: typeof workMode === 'string' && VALID_WORK_MODES.includes(workMode.trim().toUpperCase())
+        ? workMode.trim().toUpperCase()
+        : 'REMOTE',
       salary: salary != null ? String(salary).trim() : undefined,
       experienceLevel: experienceLevel != null ? String(experienceLevel).trim() : undefined,
       recruiter: recruiter
@@ -71,7 +104,7 @@ export const createApplication = async (req, res) => {
       extractedSkills: Array.isArray(extractedSkills)
         ? extractedSkills.map((s) => (typeof s === 'string' ? s.trim() : s)).filter(Boolean)
         : [],
-      appliedAt: appliedAt ? new Date(appliedAt) : new Date(),
+      appliedAt: safeAppliedAt,
       interactions: [initialInteraction],
     };
 
@@ -99,54 +132,127 @@ export const createApplication = async (req, res) => {
   }
 };
 
+// Helper de escape para prevenir ReDoS y errores de sintaxis en regex de MongoDB
+const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /**
- * @desc    Listar todas las postulaciones con filtros por estado y prioridad
+ * Lista blanca de campos permitidos para ordenamiento dinámico
+ */
+const ALLOWED_SORT_FIELDS = {
+  appliedAt: 'appliedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  role: 'role',
+  status: 'status',
+  priority: 'priority',
+  workMode: 'workMode',
+  salary: 'salary',
+  responseTimeDays: 'responseTimeDays',
+  company: 'company.name',
+  'company.name': 'company.name',
+};
+
+/**
+ * @desc    Listar postulaciones con filtros combinados, ordenamiento dinámico y paginación
  * @route   GET /api/applications
  * @access  Public
  */
 export const getApplications = async (req, res) => {
   try {
-    const { status, priority, workMode, search } = req.query;
+    const { status, priority, workMode, search, sortBy, order } = req.query;
+
+    // 1. Sanitización y parseo robusto de paginación
+    const parsedPage = parseInt(req.query.page, 10);
+    const page = Number.isInteger(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+
+    const parsedLimit = parseInt(req.query.limit, 10);
+    const limit = Number.isInteger(parsedLimit) && parsedLimit >= 1
+      ? Math.min(parsedLimit, 100)
+      : 10;
+
+    // 2. Configuración segura de ordenamiento dinámico
+    const sortField = ALLOWED_SORT_FIELDS[typeof sortBy === 'string' ? sortBy : ''] || 'appliedAt';
+    const sortDirection = typeof order === 'string' && order.toLowerCase() === 'asc' ? 1 : -1;
+    const sortOptions = { [sortField]: sortDirection };
 
     const filter = {};
 
-    // Filtro por estado
-    if (status) {
-      if (status.includes(',')) {
-        filter.status = { $in: status.split(',').map((s) => s.trim().toUpperCase()) };
-      } else {
-        filter.status = status.trim().toUpperCase();
+    // 3. Filtro por estado con Whitelist estricta
+    if (typeof status === 'string' && status.trim()) {
+      const statuses = status
+        .split(',')
+        .map((s) => s.trim().toUpperCase())
+        .filter((s) => VALID_STATUSES.includes(s));
+
+      if (statuses.length > 1) {
+        filter.status = { $in: statuses };
+      } else if (statuses.length === 1) {
+        filter.status = statuses[0];
       }
     }
 
-    // Filtro por prioridad
-    if (priority) {
-      if (priority.includes(',')) {
-        filter.priority = { $in: priority.split(',').map((p) => p.trim().toUpperCase()) };
-      } else {
-        filter.priority = priority.trim().toUpperCase();
+    // 4. Filtro por prioridad con Whitelist estricta
+    if (typeof priority === 'string' && priority.trim()) {
+      const priorities = priority
+        .split(',')
+        .map((p) => p.trim().toUpperCase())
+        .filter((p) => VALID_PRIORITIES.includes(p));
+
+      if (priorities.length > 1) {
+        filter.priority = { $in: priorities };
+      } else if (priorities.length === 1) {
+        filter.priority = priorities[0];
       }
     }
 
-    // Filtro opcional por modalidad
-    if (workMode) {
-      filter.workMode = workMode.trim().toUpperCase();
+    // 5. Filtro opcional por modalidad con Whitelist
+    if (typeof workMode === 'string' && workMode.trim()) {
+      const mode = workMode.trim().toUpperCase();
+      if (VALID_WORK_MODES.includes(mode)) {
+        filter.workMode = mode;
+      }
     }
 
-    // Búsqueda por nombre de empresa o rol
-    if (search && search.trim()) {
+    // 6. Búsqueda textual segura por empresa o rol (Sanitizada contra ReDoS)
+    if (typeof search === 'string' && search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
       filter.$or = [
-        { 'company.name': { $regex: search.trim(), $options: 'i' } },
-        { role: { $regex: search.trim(), $options: 'i' } },
+        { 'company.name': { $regex: safeSearch, $options: 'i' } },
+        { role: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
-    const applications = await Application.find(filter).sort({ appliedAt: -1 });
+    const isAll = req.query.all === 'true';
+    const skip = isAll ? 0 : (page - 1) * limit;
+
+    // Ejecución concurrente del conteo y la consulta segmentada
+    const countPromise = Application.countDocuments(filter);
+    const query = Application.find(filter).sort(sortOptions);
+    if (isAll) {
+      // Blindaje de seguridad: evita saturar memoria en colecciones masivas
+      query.limit(MAX_ALL_QUERY_LIMIT);
+    } else {
+      query.skip(skip).limit(limit);
+    }
+    const [totalDocs, applications] = await Promise.all([countPromise, query]);
+
+    // Cálculo de metadatos de paginación
+    const effectiveLimit = isAll ? Math.min(totalDocs, MAX_ALL_QUERY_LIMIT) : limit;
+    const totalPages = isAll ? (totalDocs > 0 ? 1 : 0) : (totalDocs === 0 ? 0 : Math.ceil(totalDocs / limit));
+    const hasNextPage = isAll ? false : page < totalPages;
+    const hasPrevPage = isAll ? false : page > 1 && totalDocs > 0;
 
     return res.status(200).json({
       success: true,
-      count: applications.length,
       data: applications,
+      pagination: {
+        totalDocs,
+        totalPages,
+        currentPage: isAll ? 1 : page,
+        limit: effectiveLimit,
+        hasNextPage,
+        hasPrevPage,
+      },
     });
   } catch (error) {
     console.error('Error al listar postulaciones:', error);
@@ -196,14 +302,14 @@ export const getApplicationById = async (req, res) => {
 };
 
 /**
- * @desc    Actualizar el estado de una postulación
+ * @desc    Actualizar el estado de una postulación con protección de degradación
  * @route   PATCH /api/applications/:id/status
  * @access  Public
  */
 export const updateApplicationStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, notes, date } = req.body;
+    const { status, notes, date, force } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -212,11 +318,10 @@ export const updateApplicationStatus = async (req, res) => {
       });
     }
 
-    const validStatuses = ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'RECHAZADA', 'OFERTA'];
-    if (!status || typeof status !== 'string' || !validStatuses.includes(status.trim().toUpperCase())) {
+    if (!status || typeof status !== 'string' || !VALID_STATUSES.includes(status.trim().toUpperCase())) {
       return res.status(400).json({
         success: false,
-        message: `Estado inválido o no proporcionado. Valores permitidos: ${validStatuses.join(', ')}`,
+        message: `Estado inválido o no proporcionado. Valores permitidos: ${VALID_STATUSES.join(', ')}`,
       });
     }
 
@@ -232,16 +337,33 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     const oldStatus = application.status;
+
+    // Guard de Idempotencia: si el estado ya es el mismo, responder 200 sin duplicar interacciones
+    if (oldStatus === normalizedStatus) {
+      return res.status(200).json({
+        success: true,
+        message: `La postulación ya se encuentra en estado ${normalizedStatus}`,
+        data: application,
+      });
+    }
+
+    // Regla de Dominio: Evitar degradación accidental de OFERTA a estados inferiores
+    if (oldStatus === 'OFERTA' && normalizedStatus !== 'RECHAZADA' && !force) {
+      return res.status(409).json({
+        success: false,
+        message: 'No es posible degradar una postulación con OFERTA a un estado previo sin confirmación explícita (force: true).',
+      });
+    }
+
     application.status = normalizedStatus;
+    const targetDate = parseSafeDate(date);
 
     // Lógica analítica: si pasa a CONTACTO o ENTREVISTA y no se calculó tiempo de respuesta
     if (
       (normalizedStatus === 'CONTACTO' || normalizedStatus === 'ENTREVISTA') &&
       application.responseTimeDays === null
     ) {
-      const targetDate = date ? new Date(date) : new Date();
-      const diffMs = Math.max(0, targetDate.getTime() - new Date(application.appliedAt).getTime());
-      application.responseTimeDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      application.responseTimeDays = calculateResponseDays(application.appliedAt, targetDate);
     }
 
     // Registrar interacción correspondiente al cambio de estado
@@ -253,7 +375,7 @@ export const updateApplicationStatus = async (req, res) => {
 
     application.interactions.push({
       type: interactionType,
-      date: date ? new Date(date) : new Date(),
+      date: targetDate,
       notes: notes && typeof notes === 'string' && notes.trim()
         ? notes.trim()
         : `Estado actualizado de ${oldStatus} a ${normalizedStatus}`,
@@ -304,6 +426,7 @@ export const deleteApplication = async (req, res) => {
       success: true,
       message: 'Postulación eliminada exitosamente',
       id,
+      data: { id },
     });
   } catch (error) {
     console.error(`Error al eliminar postulación ${req.params.id}:`, error);
@@ -312,7 +435,9 @@ export const deleteApplication = async (req, res) => {
       message: 'Error interno del servidor al eliminar la postulación',
     });
   }
-};/**
+};
+
+/**
  * @desc    Registrar una interacción en una postulación y calcular tiempos de respuesta
  * @route   POST /api/applications/:id/interactions
  * @access  Public
@@ -360,8 +485,8 @@ export const addInteraction = async (req, res) => {
       });
     }
 
-    // Crear la interacción con fallback de fecha
-    const interactionDate = date ? new Date(date) : new Date();
+    // Crear la interacción con fallback de fecha seguro (sin NaN)
+    const interactionDate = parseSafeDate(date);
     const interaction = {
       type,
       date: interactionDate,
@@ -374,8 +499,7 @@ export const addInteraction = async (req, res) => {
     // LÓGICA DE NEGOCIO:
     // 1. Si es RESPUESTA_RECIBIDA y aún no se calculó tiempo de respuesta
     if (type === 'RESPUESTA_RECIBIDA' && application.responseTimeDays === null) {
-      const diffTime = Math.max(0, interactionDate.getTime() - new Date(application.appliedAt).getTime());
-      application.responseTimeDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      application.responseTimeDays = calculateResponseDays(application.appliedAt, interactionDate);
 
       if (application.status === 'ENVIADA') {
         application.status = 'CONTACTO';
@@ -390,7 +514,13 @@ export const addInteraction = async (req, res) => {
     // Guardar cambios en persistencia
     await application.save();
 
-    return res.status(201).json(application);
+    const appObj = application.toObject ? application.toObject() : application;
+
+    return res.status(201).json({
+      success: true,
+      data: application,
+      ...appObj,
+    });
   } catch (error) {
     console.error(`Error al registrar interacción en postulación ${req.params.id}:`, error);
     return res.status(500).json({

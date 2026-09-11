@@ -8,18 +8,19 @@ import PDFDocument from 'pdfkit-table';
  * @returns {Promise<Buffer>} - Buffer binario del documento PDF generado
  */
 export const generateApplicationsPdfReport = async (applications = [], metrics = {}, dateRange = {}) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const doc = new PDFDocument({
-        margin: 40,
-        size: 'A4',
-        bufferPages: true,
-      });
+  const doc = new PDFDocument({
+    margin: 40,
+    size: 'A4',
+    bufferPages: true,
+  });
 
-      const buffers = [];
-      doc.on('data', (chunk) => buffers.push(chunk));
-      doc.on('end', () => resolve(Buffer.concat(buffers)));
-      doc.on('error', (err) => reject(err));
+  const buffers = [];
+  doc.on('data', (chunk) => buffers.push(chunk));
+
+  const bufferPromise = new Promise((resolve, reject) => {
+    doc.on('end', () => resolve(Buffer.concat(buffers)));
+    doc.on('error', (err) => reject(err));
+  });
 
       const pageWidth = doc.page.width;
       const contentWidth = pageWidth - 80;
@@ -163,9 +164,6 @@ export const generateApplicationsPdfReport = async (applications = [], metrics =
         doc.page.margins.bottom = oldBottomMargin;
       }
 
-      doc.end();
-    } catch (err) {
-      reject(err);
-    }
-  });
+  doc.end();
+  return bufferPromise;
 };

@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { CloseIcon, SparklesIcon, BuildingIcon, BriefcaseIcon, DollarIcon, ExternalLinkIcon } from './Icons.jsx';
-import { previewMatch } from '../services/api.js';
+import React, { useState, useEffect, useCallback } from 'react';
+import { CloseIcon, SparklesIcon, BriefcaseIcon } from './Icons.jsx';
+import { previewMatch, analyzeJobWithAI } from '../services/api.js';
+import { useToast } from '../context/ToastContext.jsx';
+import { useModalA11y } from '../hooks/useModalA11y.js';
 
 export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
+  const { showToast } = useToast();
+
   const [formData, setFormData] = useState({
     companyName: '',
     companyWebsite: '',
@@ -21,10 +25,79 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
   const [analyzingMatch, setAnalyzingMatch] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Estados para Copiloto IA (Tarjeta 11)
+  const [analyzingAI, setAnalyzingAI] = useState(false);
+  const [aiInsight, setAiInsight] = useState(null);
+  const [copiedPitch, setCopiedPitch] = useState(false);
+
+  // Cierre accesible
+  const handleModalClose = useCallback(() => {
+    setAiInsight(null);
+    setCopiedPitch(false);
+    setErrorMsg('');
+    onClose();
+  }, [onClose]);
+
+  useModalA11y(isOpen, handleModalClose);
+
+  // Manejador: Autocompletar con IA
+  const handleAutofillWithAI = async () => {
+    if (!formData.requirementsRaw || formData.requirementsRaw.trim().length < 15) {
+      showToast('Pega al menos 15 caracteres en la descripción para analizar con IA', 'error');
+      return;
+    }
+
+    try {
+      setAnalyzingAI(true);
+      const data = await analyzeJobWithAI(formData.requirementsRaw);
+
+      setFormData((prev) => ({
+        ...prev,
+        companyName: data.companyName || prev.companyName,
+        companyWebsite: data.companyWebsite || prev.companyWebsite,
+        role: data.role || prev.role,
+        workMode: data.workMode || prev.workMode,
+        priority: data.priority || prev.priority,
+        salary: data.salary ? String(data.salary) : prev.salary,
+        companySummary: data.companySummary || prev.companySummary,
+      }));
+
+      setAiInsight(data);
+
+      if (data.extractedSkills?.length || data.missingSkills?.length || data.matchScore > 0) {
+        setMatchData({
+          matchScore: data.matchScore,
+          matchedSkills: data.extractedSkills || [],
+          missingSkills: data.missingSkills || [],
+        });
+      }
+
+      showToast('¡Datos extraídos y pitch generado con IA!', 'success');
+    } catch (err) {
+      console.error('Error al analizar con IA:', err);
+      showToast(err.message || 'Error al invocar el análisis de IA', 'error');
+    } finally {
+      setAnalyzingAI(false);
+    }
+  };
+
+  // Manejador: Copiar Pitch Sugerido
+  const handleCopyPitch = async () => {
+    if (!aiInsight?.suggestedPitch) return;
+    try {
+      await navigator.clipboard.writeText(aiInsight.suggestedPitch);
+      setCopiedPitch(true);
+      showToast('Pitch de presentación copiado al portapapeles');
+      setTimeout(() => setCopiedPitch(false), 2200);
+    } catch {
+      showToast('No se pudo copiar al portapapeles', 'error');
+    }
+  };
+
   // Debounced análisis de afinidad de skills
   useEffect(() => {
     if (!formData.requirementsRaw || formData.requirementsRaw.trim().length < 5) {
-      setMatchData(null);
+      setMatchData((prev) => (prev !== null ? null : prev));
       return;
     }
 
@@ -94,6 +167,8 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         requirementsRaw: '',
       });
       setMatchData(null);
+      setAiInsight(null);
+      setCopiedPitch(false);
       onClose();
     } catch (err) {
       setErrorMsg(err.message || 'Error al guardar la postulación');
@@ -117,7 +192,8 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
             </div>
           </div>
           <button
-            onClick={onClose}
+            type="button"
+            onClick={handleModalClose}
             className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <CloseIcon className="w-5 h-5" />
@@ -220,23 +296,35 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
             />
           </div>
 
-          {/* Fila 4: Requisitos Raw con Análisis en Vivo */}
+          {/* Fila 4: Requisitos Raw con Análisis en Vivo y Copiloto IA */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
                 Descripción / Requisitos Técnicos
               </label>
-              {analyzingMatch && (
-                <span className="text-[10px] text-sky-tech animate-pulse flex items-center gap-1 font-semibold">
-                  <SparklesIcon className="w-3 h-3" /> Analizando afinidad...
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {analyzingMatch && (
+                  <span className="text-[10px] text-sky-tech animate-pulse flex items-center gap-1 font-semibold">
+                    <SparklesIcon className="w-3 h-3" /> Analizando afinidad...
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={handleAutofillWithAI}
+                  disabled={analyzingAI || !formData.requirementsRaw.trim()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-gold-primary to-amber-400 text-navy-base hover:brightness-110 active:scale-95 transition-all shadow-sm shadow-gold-primary/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+                  title="Extraer datos con IA y autocompletar formulario"
+                >
+                  <SparklesIcon className={`w-3.5 h-3.5 ${analyzingAI ? 'animate-spin' : ''}`} />
+                  {analyzingAI ? 'Analizando con IA...' : '✨ Autocompletar con IA'}
+                </button>
+              </div>
             </div>
             <textarea
-              rows={3}
+              rows={4}
               value={formData.requirementsRaw}
               onChange={(e) => setFormData({ ...formData, requirementsRaw: e.target.value })}
-              placeholder="Pega aquí los requerimientos de la oferta (ej: Node.js, React, Docker, PostgreSQL) para ver la afinidad con tu perfil..."
+              placeholder="Pega aquí la descripción u oferta de empleo completa. Luego haz clic en '✨ Autocompletar con IA' para rellenar los datos automáticamente..."
               className="w-full bg-navy-base border border-slate-700/90 rounded-xl p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-primary transition-colors resize-none"
             />
 
@@ -282,13 +370,62 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 </div>
               </div>
             )}
+
+            {/* Tarjeta de Resumen y Pitch Generado por IA */}
+            {aiInsight && (
+              <div className="mt-3 p-3.5 rounded-2xl bg-gradient-to-br from-navy-base to-slate-900 border border-gold-primary/30 shadow-lg shadow-black/40 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-gold-primary flex items-center gap-1.5">
+                    <SparklesIcon className="w-4 h-4 text-gold-primary" />
+                    Copiloto IA: Pitch & Resumen
+                  </span>
+                  {aiInsight.suggestedPitch && (
+                    <button
+                      type="button"
+                      onClick={handleCopyPitch}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 hover:border-gold-primary/50 transition-colors"
+                    >
+                      {copiedPitch ? (
+                        <>
+                          <span className="text-emerald-400">✓</span> ¡Pitch Copiado!
+                        </>
+                      ) : (
+                        <>
+                          <span>📋</span> Copiar Pitch
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {aiInsight.companySummary && (
+                  <div className="text-xs text-slate-300 bg-slate-900/70 p-2.5 rounded-xl border border-slate-800">
+                    <span className="font-bold text-slate-400 block text-[10px] uppercase tracking-wider mb-1">
+                      🏢 Resumen de la Empresa
+                    </span>
+                    {aiInsight.companySummary}
+                  </div>
+                )}
+
+                {aiInsight.suggestedPitch && (
+                  <div className="text-xs text-slate-200 bg-navy-base/80 p-2.5 rounded-xl border border-gold-primary/20">
+                    <span className="font-bold text-gold-primary block text-[10px] uppercase tracking-wider mb-1">
+                      💬 Pitch de Contacto Sugerido para Recruiters
+                    </span>
+                    <p className="italic text-slate-300 leading-relaxed font-sans">
+                      "{aiInsight.suggestedPitch}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Botones */}
+          {/* Botones de acción */}
           <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleModalClose}
               className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             >
               Cancelar

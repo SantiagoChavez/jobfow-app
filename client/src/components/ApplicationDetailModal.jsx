@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
+import { createSafeMailto } from '../utils/mailto.js';
+import { useModalA11y } from '../hooks/useModalA11y.js';
 import {
   CloseIcon,
-  BuildingIcon,
-  BriefcaseIcon,
-  CalendarIcon,
   ClockIcon,
   DollarIcon,
   ExternalLinkIcon,
   UserIcon,
   MailIcon,
-  MessageIcon,
-  CheckCircleIcon,
   SparklesIcon,
   TrashIcon,
 } from './Icons.jsx';
@@ -49,6 +46,8 @@ export const ApplicationDetailModal = ({
     notes: '',
   });
   const [submittingInteraction, setSubmittingInteraction] = useState(false);
+
+  useModalA11y(isOpen, onClose);
 
   if (!isOpen || !application) return null;
 
@@ -376,7 +375,10 @@ export const ApplicationDetailModal = ({
                         <span>{application.recruiter.email}</span>
                       </div>
                       <a
-                        href={`mailto:${application.recruiter.email}`}
+                        href={createSafeMailto({
+                          email: application.recruiter.email,
+                          subject: `Seguimiento de postulación: ${application.role} - ${application.company?.name || ''}`,
+                        })}
                         className="px-3 py-1 rounded-lg text-xs font-bold bg-sky-500/10 text-sky-tech hover:bg-sky-500/20 border border-sky-500/30 transition-all"
                       >
                         Enviar Correo

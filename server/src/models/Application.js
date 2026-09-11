@@ -120,6 +120,7 @@ const applicationSchema = new Schema(
 // Índices para optimizar reportes y búsquedas
 applicationSchema.index({ status: 1, appliedAt: -1 });
 applicationSchema.index({ priority: 1 });
+applicationSchema.index({ workMode: 1 });
 applicationSchema.index({ 'company.name': 1 });
 applicationSchema.index({ responseTimeDays: 1, 'company.name': 1 });
 

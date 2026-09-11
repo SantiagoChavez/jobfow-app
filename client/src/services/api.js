@@ -3,7 +3,12 @@
  * Conexión centralizada con el backend (/api)
  */
 
-const API_BASE = '/api';
+const rawApiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.trim() : '';
+const API_BASE = rawApiUrl
+  ? (rawApiUrl.replace(/\/+$/, '').endsWith('/api')
+      ? rawApiUrl.replace(/\/+$/, '')
+      : `${rawApiUrl.replace(/\/+$/, '')}/api`)
+  : '/api';
 
 /**
  * Helper para peticiones JSON con manejo de errores uniforme
@@ -28,8 +33,9 @@ async function request(url, options = {}) {
 }
 
 /**
- * Listar postulaciones con filtros opcionales
- * @param {Object} [filters] - { status, priority, workMode, search }
+ * Listar postulaciones con filtros, ordenamiento y paginación opcionales
+ * @param {Object} [filters] - { status, priority, workMode, search, page, limit, sortBy, order, all }
+ * @returns {Promise<{ data: Array, pagination: Object }>}
  */
 export async function getApplications(filters = {}) {
   const params = new URLSearchParams();
@@ -37,10 +43,25 @@ export async function getApplications(filters = {}) {
   if (filters.priority) params.append('priority', filters.priority);
   if (filters.workMode) params.append('workMode', filters.workMode);
   if (filters.search) params.append('search', filters.search);
+  if (filters.page) params.append('page', filters.page);
+  if (filters.limit) params.append('limit', filters.limit);
+  if (filters.sortBy) params.append('sortBy', filters.sortBy);
+  if (filters.order) params.append('order', filters.order);
+  if (filters.all) params.append('all', 'true');
 
   const query = params.toString() ? `?${params.toString()}` : '';
   const res = await request(`/applications${query}`);
-  return res.data || [];
+  const data = Array.isArray(res.data) ? res.data : [];
+  const pagination = res.pagination || {
+    totalDocs: data.length,
+    totalPages: 1,
+    currentPage: 1,
+    limit: data.length || 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
+
+  return { data, pagination };
 }
 
 /**
@@ -63,12 +84,22 @@ export async function createApplication(applicationData) {
 }
 
 /**
- * Actualizar estado de una postulación
+ * Actualizar estado de una postulación con soporte para confirmación forzada (force), notas y fecha
+ * @param {string} id - ID de la postulación
+ * @param {string} status - Nuevo estado
+ * @param {Object} [options] - Opciones adicionales: { force, notes, date }
  */
-export async function updateApplicationStatus(id, status) {
+export async function updateApplicationStatus(id, status, options = {}) {
+  const payload = {
+    status,
+    ...(options.force ? { force: true } : {}),
+    ...(options.notes ? { notes: options.notes } : {}),
+    ...(options.date ? { date: options.date } : {}),
+  };
+
   const res = await request(`/applications/${id}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   });
   return res.data;
 }
@@ -81,7 +112,7 @@ export async function addInteraction(id, interactionData) {
     method: 'POST',
     body: JSON.stringify(interactionData),
   });
-  return res.data;
+  return res.data || res;
 }
 
 /**
@@ -91,7 +122,7 @@ export async function deleteApplication(id) {
   const res = await request(`/applications/${id}`, {
     method: 'DELETE',
   });
-  return res;
+  return res.data || res;
 }
 
 /**
@@ -142,6 +173,19 @@ export async function downloadPdfReport(from, to) {
   window.URL.revokeObjectURL(downloadUrl);
 }
 
+/**
+ * Analizar descripción de empleo con IA y generar pitch de presentación
+ * @param {string} text - Texto de la oferta de empleo
+ * @param {string} [userProfile] - Perfil opcional del postulante
+ */
+export async function analyzeJobWithAI(text, userProfile) {
+  const res = await request('/ai/analyze-job', {
+    method: 'POST',
+    body: JSON.stringify({ text, userProfile }),
+  });
+  return res.data || res;
+}
+
 export default {
   getApplications,
   getApplicationById,
@@ -152,4 +196,5 @@ export default {
   getAnalyticsSummary,
   previewMatch,
   downloadPdfReport,
+  analyzeJobWithAI,
 };

@@ -1,7 +1,11 @@
 import React from 'react';
-import { ClockIcon, SparklesIcon, CalendarIcon, ChevronRightIcon } from './Icons.jsx';
+import { ClockIcon, CalendarIcon, ChevronRightIcon } from './Icons.jsx';
 
-export const UpcomingReminders = ({ applications, onSelectApplication }) => {
+export const UpcomingReminders = ({
+  applications = [],
+  onSelectApplication,
+  onOpenReminders,
+}) => {
   // Postulaciones activas que requieren seguimiento
   const activeApps = applications.filter((app) =>
     ['ENVIADA', 'CONTACTO', 'ENTREVISTA'].includes(app.status)
@@ -53,9 +57,20 @@ export const UpcomingReminders = ({ applications, onSelectApplication }) => {
             Seguimientos y Alertas Clave
           </h4>
         </div>
-        <span className="text-[11px] text-slate-400 font-medium">
-          {reminders.length} prioritarios
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] text-slate-400 font-medium">
+            {reminders.length} prioritarios
+          </span>
+          {onOpenReminders && (
+            <button
+              onClick={onOpenReminders}
+              className="text-xs font-bold text-sky-tech hover:text-gold-primary transition-colors flex items-center gap-0.5"
+            >
+              <span>Ver panel</span>
+              <ChevronRightIcon className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

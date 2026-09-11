@@ -4,6 +4,7 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import matchRoutes from './routes/matchRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/match', matchRoutes);
+app.use('/api/ai', aiRoutes);
 
 export default app;

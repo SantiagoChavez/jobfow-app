@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { CloseIcon, FileTextIcon, DownloadIcon, CalendarIcon, SparklesIcon } from './Icons.jsx';
+import { CloseIcon, FileTextIcon, DownloadIcon, SparklesIcon } from './Icons.jsx';
 import { downloadPdfReport } from '../services/api.js';
+import { useModalA11y } from '../hooks/useModalA11y.js';
+import { useToast } from '../context/ToastContext.jsx';
 
 export const ReportModal = ({ isOpen, onClose }) => {
+  const { showToast } = useToast();
   const getDefaultDates = () => {
     const to = new Date().toISOString().split('T')[0];
     const fromDate = new Date();
@@ -14,6 +17,8 @@ export const ReportModal = ({ isOpen, onClose }) => {
   const [dateRange, setDateRange] = useState(getDefaultDates());
   const [downloading, setDownloading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+
+  useModalA11y(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -32,12 +37,15 @@ export const ReportModal = ({ isOpen, onClose }) => {
       setStatusMessage('Generando reporte PDF vectorial...');
       await downloadPdfReport(dateRange.from, dateRange.to);
       setStatusMessage('¡Descarga completada con éxito!');
+      showToast('Reporte PDF descargado con éxito', 'success');
       setTimeout(() => {
         setStatusMessage('');
         onClose();
       }, 1200);
     } catch (err) {
-      setStatusMessage(`Error: ${err.message}`);
+      const errorMsg = err.message || 'Error al generar el reporte';
+      setStatusMessage(`Error: ${errorMsg}`);
+      showToast(errorMsg, 'error');
     } finally {
       setDownloading(false);
     }

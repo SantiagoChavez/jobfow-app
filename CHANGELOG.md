@@ -60,10 +60,59 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Controlador `reportController.js`: Endpoint `GET /api/reports/pdf` con filtrado por rango de fechas (`from`, `to`), fallback inteligente a últimos 30 días y descarga binaria con cabeceras `Content-Type` y `Content-Disposition`.
   - Suite de pruebas con Vitest y Supertest (`server/src/tests/reports.test.js`) validando status 200, cabeceras de descarga, firma mágica `%PDF` y manejo de errores (100% pass).
 
+- **Matching y Afinidad de Habilidades Técnicas (Tarjeta 7):**
+  - Catálogo normalizado de tecnologías, frameworks y herramientas con alias del mercado (`server/src/config/skillsCatalog.js`).
+  - Servicio algorítmico de matching semántico (`server/src/services/matchService.js`) con cálculo porcentual de afinidad y desglose de skills coincidentes y faltantes.
+  - Endpoints HTTP `POST /api/applications/match-preview` y `POST /api/match/preview`.
+  - Suite de pruebas con Vitest y Supertest (`server/src/tests/match.test.js`) validando cálculo de porcentajes, normalización de alias y manejo de texto libre (100% pass).
+
+- **Frontend SPA Completo Mobile-First y Vistas UI (Tarjeta 8):**
+  - Capa de comunicación HTTP centralizada (`client/src/services/api.js`) y configuración de proxy inverso en `client/vite.config.js`.
+  - Layout responsive mobile-first con Header Navbar y BottomNav fija con acceso rápido a creación.
+  - Modal de carga rápida (`QuickAddModal.jsx`) con validación y análisis en vivo de afinidad de skills con debounce.
+  - Tablero Kanban Tracker interactivo (`KanbanBoard.jsx`) con columnas por estado y botón rápido de respuesta (*"⚡ Me respondieron"*).
+  - Tabla de postulaciones (`ApplicationTable.jsx`) con buscador dinámico, filtros por estado y acciones directas.
+  - Bloque de KPIs (`KPICards.jsx`) consumiendo analíticas consolidadas, alertas prioritarias (`UpcomingReminders.jsx`) y descarga modal de reporte PDF (`ReportModal.jsx`).
+  - Modal de detalle de postulación (`ApplicationDetailModal.jsx`) con gestión de estado, timeline cronológico y registro de interacciones.
+
+- **Paginación en Servidor y Filtros Combinados (Tarjeta 9):**
+  - Endpoint `GET /api/applications` con paginación (`page`, `limit`), ordenamiento dinámico seguro (`sortBy`, `order`) y whitelist de campos permitidos.
+  - Sanitización de parámetros con valores por defecto seguros (`page=1`, `limit=10`, tope de seguridad de 100) para evitar saturación de memoria.
+  - DTO de respuesta con metadatos limpios (`totalDocs`, `totalPages`, `currentPage`, `limit`, `hasNextPage`, `hasPrevPage`).
+  - Consulta y conteo en paralelo optimizados con `Promise.all` (`countDocuments` y `find`).
+  - Preservación íntegra de filtros combinados (`status` múltiple, `priority` múltiple, `workMode`, `search` regex).
+  - Suite de 17 pruebas automatizadas con Vitest y Supertest (`server/src/tests/pagination.test.js`) cubriendo límites inválidos, skips, páginas intermedias, base de datos vacía, escape de ReDoS y blindaje contra Type Injection (100% pass).
+
+- **Drag and Drop Interactivo en Tablero Kanban (Tarjeta 10):**
+  - Integración de biblioteca `@hello-pangea/dnd` (v18) compatible nativamente con React 19 y eventos táctiles móviles.
+  - Soporte de arrastre visual fluido de tarjetas entre las columnas (`ENVIADA`, `CONTACTO`, `ENTREVISTA`, `OFERTA`, `RECHAZADA`).
+  - Conexión con `PATCH /api/applications/:id/status` para persistencia en base de datos en tiempo real.
+  - Manejo de UI Optimista inmediata con rollback automático al snapshot previo en caso de error de red o backend.
+  - Recálculo automático de tiempos de respuesta (`responseTimeDays`) y refresco de analíticas (`GET /api/analytics/summary`).
+  - Feedback visual enriquecido durante el arrastre (sombras profundas, rotación sutil, borde dorado y highlight reactivo en la columna receptora).
+  - Toast de notificación visualmente diferenciado para estados de éxito y alertas de error.
+
+- **Copiloto de Postulación con IA - Google Gemini (Tarjeta 11):**
+  - Integración del SDK oficial `@google/genai` con modelo `gemini-3.5-flash-lite` (y fallback resiliente a `gemini-1.5-flash`).
+  - Servicio `aiService.js` con sanitización de prompt injection, truncado seguro a 6.000 caracteres, timeout de 12 segundos y parsing JSON tipado.
+  - Soporte de alias contractual `keySkills` sincronizado con `extractedSkills`.
+  - Endpoint `POST /api/ai/analyze-job` con validaciones y manejo de estados HTTP 400, 502, 504 y 500.
+  - Suite de 9 pruebas automatizadas en Vitest con mocks deterministas (`server/src/tests/ai.test.js`, 100% pass).
+  - Interfaz interactiva en `QuickAddModal.jsx` con botón *"✨ Autocompletar con IA"*, feedback de carga y autocompletado de empresa, puesto, modalidad, prioridad y salario.
+  - Generador de pitch personalizado y resumen de empresa con botón de copiado rápido al portapapeles (`navigator.clipboard`).
+
+- **Resiliencia de Dominio, Seguridad NoSQL y Accesibilidad (Code Review):**
+  - Blindaje contra `NaN` en `responseTimeDays` mediante helpers puros `parseSafeDate` y `calculateResponseDays`.
+  - Protección estricta de estado: rechazo con HTTP 409 Conflict ante intentos de degradación involuntaria del estado `OFERTA` en `PATCH /api/applications/:id/status`, con soporte para bypass intencional mediante `force: true`.
+  - Whitelist de filtrado en consultas MongoDB para `status`, `priority` y `workMode`, previniendo inyección de cadenas espurias en `$in`.
+  - Límite de seguridad defensivo (`MAX_ALL_QUERY_LIMIT = 1000`) en consultas con `all=true` para prevenir sobrecarga de memoria en el servidor.
+  - Creación del hook de accesibilidad `useModalA11y` en frontend con escucha de tecla `Escape` y bloqueo de scroll de fondo (`document.body.style.overflow = 'hidden'`), integrado en todos los modales de la aplicación.
+  - Ampliación de la suite de pruebas en Vitest a 54 tests automatizados (100% pass).
+
 ### Planned (Próximas Tareas)
-- **Lógica Avanzada & Reportes:**
-  - Extractor avanzado de skills (`skillExtractor.js`).
-- **Frontend (`/client`):** Implementación de vistas Kanban Tracker, formulario de carga rápida y dashboard.
+- **Tarjeta 12 - Drawer de Alertas y Notificaciones en Tiempo Real:** Panel lateral deslizable (slide-over) para gestión de recordatorios y seguimientos prioritarios.
+- **Frontend Paginado y Filtros Avanzados:** Conexión de controles de paginación numérica y selector de límite en `ApplicationTable.jsx`.
+- **Autenticación y Multi-Usuario:** Soporte para cuentas individuales de desarrolladores.
 
 ---
 
