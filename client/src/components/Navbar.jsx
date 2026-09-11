@@ -1,7 +1,14 @@
 import React from 'react';
-import { RadarIcon, PlusIcon, FileTextIcon, BarChartIcon, KanbanIcon, TableIcon } from './Icons.jsx';
+import { RadarIcon, PlusIcon, FileTextIcon, KanbanIcon, TableIcon, BellIcon } from './Icons.jsx';
 
-export const Navbar = ({ currentView, setCurrentView, onOpenAddModal, onOpenReportModal }) => {
+export const Navbar = ({
+  currentView,
+  setCurrentView,
+  onOpenAddModal,
+  onOpenReportModal,
+  remindersCount = 0,
+  onOpenReminders,
+}) => {
   return (
     <header className="sticky top-0 z-30 bg-navy-base/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3 transition-colors">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
@@ -63,6 +70,21 @@ export const Navbar = ({ currentView, setCurrentView, onOpenAddModal, onOpenRepo
 
         {/* Acciones Rápidas */}
         <div className="flex items-center gap-2.5">
+          {/* Botón de Campana / Alertas y Seguimientos */}
+          <button
+            onClick={onOpenReminders}
+            className="relative p-2 rounded-xl bg-navy-surface border border-slate-700/80 text-slate-300 hover:text-gold-primary hover:border-gold-primary/50 hover:bg-navy-highlight transition-all"
+            title="Ver seguimientos y alertas prioritarias"
+            aria-label="Abrir panel de recordatorios"
+          >
+            <BellIcon className="w-5 h-5" />
+            {remindersCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-navy-base animate-pulse">
+                {remindersCount > 9 ? '9+' : remindersCount}
+              </span>
+            )}
+          </button>
+
           <button
             onClick={onOpenReportModal}
             className="md:hidden p-2 rounded-xl bg-navy-surface border border-slate-700/80 text-sky-tech hover:bg-navy-highlight transition-all"
