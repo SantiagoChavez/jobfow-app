@@ -3,7 +3,12 @@
  * Conexión centralizada con el backend (/api)
  */
 
-const API_BASE = '/api';
+const rawApiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.trim() : '';
+const API_BASE = rawApiUrl
+  ? (rawApiUrl.replace(/\/+$/, '').endsWith('/api')
+      ? rawApiUrl.replace(/\/+$/, '')
+      : `${rawApiUrl.replace(/\/+$/, '')}/api`)
+  : '/api';
 
 /**
  * Helper para peticiones JSON con manejo de errores uniforme
@@ -79,12 +84,22 @@ export async function createApplication(applicationData) {
 }
 
 /**
- * Actualizar estado de una postulación
+ * Actualizar estado de una postulación con soporte para confirmación forzada (force), notas y fecha
+ * @param {string} id - ID de la postulación
+ * @param {string} status - Nuevo estado
+ * @param {Object} [options] - Opciones adicionales: { force, notes, date }
  */
-export async function updateApplicationStatus(id, status) {
+export async function updateApplicationStatus(id, status, options = {}) {
+  const payload = {
+    status,
+    ...(options.force ? { force: true } : {}),
+    ...(options.notes ? { notes: options.notes } : {}),
+    ...(options.date ? { date: options.date } : {}),
+  };
+
   const res = await request(`/applications/${id}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   });
   return res.data;
 }
