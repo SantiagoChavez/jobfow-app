@@ -39,8 +39,13 @@ export const analyzeJobPosting = async (rawText, userProfile = '') => {
     throw new Error('El texto de la vacante es obligatorio para el análisis.');
   }
 
-  // 1. Truncado de seguridad a un máximo de 6000 caracteres
-  const sanitizedText = rawText.slice(0, 6000).trim();
+  // 1. Truncado de seguridad y neutralización de delimitadores para blindar contexto
+  const sanitizedText = rawText.slice(0, 6000).replace(/"""/g, "'''").trim();
+  const sanitizedProfile = typeof userProfile === 'string'
+    ? userProfile.slice(0, 2000).replace(/"""/g, "'''").trim()
+    : '';
+
+  const fallbackProfile = 'Desarrollador Full Stack con experiencia en Node.js, Express, React, MongoDB, TypeScript y PostgreSQL.';
 
   const prompt = `
 Eres un Copiloto Senior de Búsqueda Laboral y Reclutamiento Técnico para la plataforma JobFlow.
@@ -48,7 +53,7 @@ Tu objetivo es analizar minuciosamente la siguiente descripción de vacante de e
 
 Perfil del Postulante:
 """
-${userProfile || 'Desarrollador Full Stack con experiencia en Node.js, Express, React, MongoDB, TypeScript y PostgreSQL.'}
+${sanitizedProfile || fallbackProfile}
 """
 
 Oferta Laboral:
@@ -104,10 +109,12 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
   try {
     response = await generateWithTimeout(primaryModel);
   } catch (err) {
-    // Si el modelo específico falla por no estar disponible, reintentar con gemini-1.5-flash de respaldo
-    if (primaryModel !== 'gemini-1.5-flash' && (err.status === 404 || err.message?.includes('not found') || err.message?.includes('404'))) {
-      console.warn(`[AI Service] Modelo ${primaryModel} no disponible, intentando con gemini-1.5-flash de respaldo...`);
-      response = await generateWithTimeout('gemini-1.5-flash');
+    // Si el modelo específico falla por no estar disponible, reintentar con modelo alternativo de respaldo
+    const isModelNotFound = err.status === 404 || err.message?.includes('not found') || err.message?.includes('404');
+    if (isModelNotFound) {
+      const fallbackModel = primaryModel === 'gemini-1.5-flash' ? 'gemini-1.5-flash-latest' : 'gemini-1.5-flash';
+      console.warn(`[AI Service] Modelo ${primaryModel} no disponible, intentando con ${fallbackModel} de respaldo...`);
+      response = await generateWithTimeout(fallbackModel);
     } else {
       throw err;
     }
