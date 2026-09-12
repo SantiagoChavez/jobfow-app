@@ -308,4 +308,67 @@ describe('Sistema de Autenticación y Autorización (/api/auth & Middleware prot
       expect(res.body.message).toContain('token no proporcionado');
     });
   });
+
+  describe('6. Actualización de Preferencia de Tema (PATCH /api/auth/theme)', () => {
+    it('debe actualizar el tema exitosamente a light (200)', async () => {
+      const token = generateToken(mockUserId);
+
+      const mockUserDoc = {
+        _id: mockUserId,
+        theme: 'dark',
+        save: vi.fn().mockResolvedValue(true),
+      };
+
+      // Mock para middleware protect
+      vi.spyOn(User, 'findById')
+        .mockReturnValueOnce({
+          select: vi.fn().mockResolvedValue(mockUserDoc),
+        })
+        // Mock para updateTheme
+        .mockResolvedValueOnce(mockUserDoc);
+
+      const res = await request(app)
+        .patch('/api/auth/theme')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ theme: 'light' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.theme).toBe('light');
+      expect(mockUserDoc.theme).toBe('light');
+      expect(mockUserDoc.save).toHaveBeenCalled();
+    });
+
+    it('debe responder 400 Bad Request si el tema es inválido', async () => {
+      const token = generateToken(mockUserId);
+
+      const mockUserDoc = {
+        _id: mockUserId,
+        theme: 'dark',
+      };
+
+      vi.spyOn(User, 'findById').mockReturnValueOnce({
+        select: vi.fn().mockResolvedValue(mockUserDoc),
+      });
+
+      const res = await request(app)
+        .patch('/api/auth/theme')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ theme: 'neon_pink' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain("El tema debe ser 'dark' o 'light'");
+    });
+
+    it('debe denegar acceso 401 si no se envía token', async () => {
+      const res = await request(app)
+        .patch('/api/auth/theme')
+        .send({ theme: 'light' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+    });
+  });
 });
+

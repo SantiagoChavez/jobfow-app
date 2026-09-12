@@ -4,6 +4,7 @@ import {
   loginUser,
   googleAuthUser,
   getMe,
+  updateTheme,
 } from '../controllers/authController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 
@@ -14,7 +15,8 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/google', googleAuthUser);
 
-// Ruta privada para verificar sesión activa y perfil
+// Rutas privadas para perfil y preferencias
 router.get('/me', protect, getMe);
+router.patch('/theme', protect, updateTheme);
 
 export default router;

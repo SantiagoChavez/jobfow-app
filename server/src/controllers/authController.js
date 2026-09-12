@@ -256,3 +256,45 @@ export const getMe = async (req, res) => {
     user: req.user,
   });
 };
+
+/**
+ * @desc    Actualizar la preferencia de tema visual del usuario ('dark' | 'light')
+ * @route   PATCH /api/auth/theme
+ * @access  Private (requiere protect)
+ */
+export const updateTheme = async (req, res) => {
+  try {
+    const { theme } = req.body;
+
+    if (!theme || !['dark', 'light'].includes(theme)) {
+      return res.status(400).json({
+        success: false,
+        message: "El tema debe ser 'dark' o 'light'",
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado',
+      });
+    }
+
+    user.theme = theme;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Preferencia de tema actualizada a ${theme}`,
+      theme: user.theme,
+    });
+  } catch (error) {
+    console.error('Error al actualizar tema del usuario:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al actualizar tema',
+    });
+  }
+};
+
