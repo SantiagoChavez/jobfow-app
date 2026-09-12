@@ -1,7 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
+import mongoose from 'mongoose';
 import app from '../app.js';
 import Application from '../models/Application.js';
+
+const mockUserId = new mongoose.Types.ObjectId('650000000000000000000001');
+
+vi.mock('../middlewares/authMiddleware.js', () => ({
+  protect: (req, _res, next) => {
+    req.user = {
+      _id: mockUserId,
+      name: 'Test User',
+      email: 'test@jobflow.dev',
+    };
+    next();
+  },
+}));
 
 describe('GET /api/reports/pdf - Generación y Descarga de Reportes PDF', () => {
   beforeEach(() => {

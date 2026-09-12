@@ -9,6 +9,17 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+### Added
+- **Centralización y Reestructuración de Documentación en Carpeta `/docs`:**
+  - Traslado de toda la documentación del proyecto (`GUIA_USUARIO.md`, `TASKS.md`, `Guia-Rapida-Jobflow.pdf`, `Manual-de-Usuario-Jobflow.pdf`, `Planificacion de jobflow.pdf`, `modelo para jobflow.pdf`, `jobflow-reporte-demo.pdf`) al nuevo directorio centralizado `docs/`, preservando exclusivamente `README.md` y `CHANGELOG.md` en la raíz.
+  - Creación del índice maestro `docs/README.md` con tabla descriptiva de manuales, especificaciones y comandos para generar documentos PDF.
+  - Actualización de los scripts de generación server-side `server/scripts/generateFriendlyGuidePdf.js` y `server/scripts/generateManualPdf.js` para compilar directamente sobre `docs/`.
+  - Ajuste de `.gitignore` para permitir el rastreo de PDFs en `!docs/*.pdf`.
+  - Actualización de la guía de usuario (`docs/GUIA_USUARIO.md`) con las nuevas secciones de autenticación multiusuario/Google OAuth y switch de tema dual armónico.
+- **Correcciones de Code Review e Integración Resiliente:**
+  - Intercepción y manejo reactivo de error HTTP 401 en descarga de reportes PDF (`downloadPdfReport` en `client/src/services/api.js`), eliminando el token expirado de `localStorage` y disparando el evento global `jobflow:unauthorized`.
+  - Sincronización inteligente de tema en `ThemeContext.jsx`: respeto prioritario de la preferencia activa local del usuario en `localStorage` ante un login/registro reciente, sincronizándola contra la base de datos (`PATCH /api/auth/theme`).
+
 ### Changed
 - **Renombrado integral del proyecto a Jobflow:**
   - Actualización de nombres de paquetes (`jobflow-server`, `jobflow-client`) y endpoint `/health` (`Jobflow API`).
@@ -124,6 +135,27 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Paginación interactiva en `ApplicationTable.jsx`: barra numérica al pie con navegación `< Anterior`, botones de página, elipsis (`...`) y `Siguiente >`, desacoplada del estado global de Kanban.
   - Badge reactivo y disparador de campana en `Navbar.jsx` con contador en vivo de alertas pendientes.
   - Stack counter en `useModalA11y.js` para mantener el bloqueo de scroll (`overflow: hidden`) al abrir modales anidados sobre el drawer.
+
+- **Sistema de Autenticación, Registro y Google OAuth (Tarjeta 13):**
+  - Modelo `User` en Mongoose (`server/src/models/User.js`) con campos `name`, `email` único, `password` hasheado con `bcryptjs`, `avatar`, `googleId` con índice sparse, `theme` y timestamps.
+  - Métodos criptográficos: `matchPassword` con `bcrypt.compare`, hook `pre('save')` para hasheo con salt de 10 rondas y transformación `toJSON` para excluir hash de contraseñas.
+  - Vinculación y aislamiento de datos: asociación de postulaciones en `Application.js` con `user: { type: ObjectId, ref: 'User' }`, índices compuestos `{ user: 1, appliedAt: -1 }` y `{ user: 1, status: 1 }`.
+  - Scoping de consultas por usuario en `applicationController.js`, pipeline de analíticas en `analyticsController.js` y reportes en `reportController.js`.
+  - Rutas y controladores de auth (`POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/google`, `GET /api/auth/me`).
+  - Middleware de protección Express `protect` (`server/src/middlewares/authMiddleware.js`) para validar tokens Bearer JWT y salvaguardar endpoints privados.
+  - Integración de Google OAuth con `google-auth-library` para verificar ID tokens federados.
+  - Suite automatizada en Vitest (`server/src/tests/auth.test.js`) con 17 pruebas unitarias y de integración (72 tests pasando al 100%).
+  - Frontend: `AuthContext.jsx` para gestión global de sesión, persistencia de token en `localStorage` e inyección automática en `client/src/services/api.js`.
+  - Componente modal `AuthModal.jsx`: accesible vía `useModalA11y`, con selector de pestañas (Iniciar Sesión / Registro), botón "Continuar con Google", validación en tiempo real y feedback visual de errores.
+  - Menú de perfil y logout en `Navbar.jsx`: avatar con foto/iniciales, menú desplegable con datos de cuenta, botón de cerrar sesión y notificación toast.
+  - Vista landing / bienvenida en `App.jsx` para usuarios no autenticados, protegiendo los datos privados del usuario.
+
+- **Modo Claro Armónico & Switch de Tema Dual (Tarjeta 14):**
+  - **Paleta de Diseño Armónica (Tailwind & CSS Tokens):** Configuración de `darkMode: 'class'` en `client/tailwind.config.js` y variables semánticas en `client/src/index.css`. Sustitución de blanco estridente plano por base suave hielo/slate (`#f1f5f9` / `#e2e8f0`), tarjetas perladas (`#ffffff` / `#f8fafc`) con bordes sutiles (`#cbd5e1`), tipografía Deep Cobalt & Slate (`#0f172a`, `#1e293b`) de alto contraste (WCAG AAA) y acentos ámbar cálido (`#b45309` / `#d97706`).
+  - **Sincronización en Backend:** Endpoint `PATCH /api/auth/theme` con validación de valores (`'dark' | 'light'`) y persistencia en MongoDB (`User.theme`). Suite automatizada en Vitest con 3 pruebas para actualización de tema (75/75 tests en total pasando).
+  - **Contexto Global (`ThemeContext.jsx`):** Jerarquía de resolución inteligente (perfil de usuario > `localStorage` > `prefers-color-scheme` > `'dark'`), conmutación inmediata de clases `.dark` / `.light` en `document.documentElement` y hook `useTheme()`.
+  - **Switch Interactivo (`ThemeToggle.jsx`):** Botón accesible en `Navbar.jsx` con micro-animación SVG de rotación suave entre iconos `SunIcon` y `MoonIcon`.
+  - **Adaptación Visual Exhaustiva:** Aplicación de variantes `dark:` en toda la aplicación: `Navbar`, `App`, `KPICards`, `KanbanBoard` (columnas y tarjetas), `ApplicationTable` (filas alternadas y controles numéricos de paginación), `ViewToggle`, `UpcomingReminders`, `QuickAddModal`, `ApplicationDetailModal`, `ReportModal`, `RemindersDrawer`, `AuthModal` y `BottomNav`.
 
 - **Despliegue Full-Stack en la Nube y DevOps:**
   - Configuración de SPA rewrites en Vercel (`client/vercel.json`) para prevenir errores 404 en recargas.

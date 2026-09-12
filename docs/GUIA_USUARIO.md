@@ -10,6 +10,8 @@
 Buscar trabajo suele ser agotador y desorganizado: decenas de avisos en LinkedIn, correos que se pierden, empresas que no responden y dudas sobre qué dijiste en cada postulación.
 
 **Jobflow transforma esa experiencia en un proceso simple y motivador:**
+- 🔒 **Tu Espacio Privado y Seguro:** Registro tradicional o acceso con 1-click mediante **Google OAuth**, manteniendo tus postulaciones y métricas 100% privadas.
+- 🌓 **Modo Claro & Modo Oscuro Armónico:** Switch instantáneo para adaptar la pantalla a cualquier momento del día sin cansar la vista.
 - 📌 **Tablero Visual (Kanban):** Ves el avance de cada postulación como si fueran notas adhesivas en un pizarrón.
 - 🤖 **Copiloto con Inteligencia Artificial:** Pega cualquier aviso de trabajo y la IA completa los datos por ti y redacta un **mensaje de presentación personalizado** listo para enviar.
 - 🔔 **Recordatorios Inteligentes:** Te avisa si una empresa lleva más de 5 días sin responderte para que envíes un mensaje de seguimiento con 1 solo clic.
@@ -17,9 +19,18 @@ Buscar trabajo suele ser agotador y desorganizado: decenas de avisos en LinkedIn
 
 ---
 
-## 🚀 Guía en 5 Pasos Sencillos
+## 🚀 Guía Paso a Paso
 
-### Paso 1: Conoce tu Tablero de Oportunidades
+### Paso 1: Tu Cuenta Privada (1-Click Google o Email)
+Tus oportunidades de trabajo y métricas son confidenciales. Por eso, Jobflow cuenta con un sistema de usuarios dedicado:
+
+1. Al ingresar a la plataforma, haz clic en **"Ingresar"** en la barra superior.
+2. Puedes ingresar al instante con el botón **"Continuar con Google"** o registrarte con tu correo electrónico y una contraseña segura.
+3. Una vez dentro, verás tu avatar o iniciales en el menú superior. Todas las postulaciones que cargues estarán vinculadas únicamente a tu cuenta.
+
+---
+
+### Paso 2: Conoce tu Tablero de Oportunidades
 Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que representan el camino de tu postulación:
 
 1. 📤 **Postulado:** Empleos a los que ya enviaste tu CV y estás esperando contacto.
@@ -32,7 +43,7 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
 
 ---
 
-### Paso 2: Agregar una Postulación en Segundos con IA
+### Paso 3: Agregar una Postulación en Segundos con IA
 ¿Viste una oferta en LinkedIn, Zonajobs, Indeed o Computrabajo? No pierdas tiempo llenando formularios largos a mano.
 
 1. Haz clic en el botón dorado **"+ Nueva Postulación"** (arriba a la derecha).
@@ -48,7 +59,7 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
 
 ---
 
-### Paso 3: Consultar y Copiar tu Pitch Guardado en Cualquier Momento
+### Paso 4: Consultar y Copiar tu Pitch Guardado en Cualquier Momento
 A veces una empresa te contacta días o semanas después de que te postulaste y ya no recuerdas exactamente qué decía la vacante ni cómo presentarte.
 
 1. En el tablero o en la tabla, haz un clic sobre la tarjeta de la empresa.
@@ -59,7 +70,7 @@ A veces una empresa te contacta días o semanas después de que te postulaste y 
 
 ---
 
-### Paso 4: Campana de Alertas y Seguimiento sin Estrés
+### Paso 5: Campana de Alertas y Seguimiento sin Estrés
 Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las empresas donde te postulaste.
 
 - En la barra superior verás una **Campana con un número** que indica cuántas oportunidades necesitan tu atención.
@@ -69,13 +80,22 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 
 ---
 
-### Paso 5: Vista de Tabla y Descarga de Reportes
+### Paso 6: Vista de Tabla y Descarga de Reportes
 - Si prefieres ver tus postulaciones como una planilla ordenada, haz clic en la pestaña **"Lista"**.
   - Puedes filtrar por empresa, rol, estado o prioridad.
   - Al pie de la tabla cuentas con paginación para navegar de forma cómoda y rápida.
 - Para descargar tu progreso, haz clic en **"Descargar Reporte"**:
   - Puedes seleccionar el rango de fechas que deseas evaluar.
   - Jobflow generará un documento PDF con tus estadísticas, porcentaje de respuesta y el detalle de tus postulaciones.
+
+---
+
+### Paso 7: Personaliza tu Experiencia (Modo Claro & Oscuro)
+Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trabajar de día o de noche sin fatiga visual:
+
+- En la barra superior, busca el **botón de Sol / Luna**.
+- Al presionarlo, conmutarás instantáneamente entre el elegante tema nocturno **Deep Cobalt** y el suave **Modo Claro Armónico** (base hielo/slate descansada para los ojos).
+- Tu elección se guarda automáticamente en tu navegador y en tu perfil de usuario, para que siempre encuentres la interfaz como más te gusta.
 
 ---
 

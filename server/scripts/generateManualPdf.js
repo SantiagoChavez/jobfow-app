@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const outputPath = path.resolve(__dirname, '../../Manual-de-Usuario-Jobflow.pdf');
+const outputPath = path.resolve(__dirname, '../../docs/Manual-de-Usuario-Jobflow.pdf');
 
 async function generateManual() {
   const doc = new PDFDocument({
