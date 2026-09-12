@@ -255,28 +255,29 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-## 🌓 Fase 12: Modo Claro Armónico y Switch de Tema Dual (Tarjeta Trello 14 - Pendiente)
-- [ ] **12.1 Definición de la Paleta Light Armónica (Tailwind & CSS Tokens)**
-  - [ ] Definir tokens de color para evitar el blanco puro estridente (`#ffffff`) y mantener la identidad Deep Cobalt & Gold:
+## 🌓 Fase 12: Modo Claro Armónico y Switch de Tema Dual (Tarjeta Trello 14 - Completada)
+- [x] **12.1 Definición de la Paleta Light Armónica (Tailwind & CSS Tokens)**
+  - [x] Definir tokens de color para evitar el blanco puro estridente (`#ffffff`) y mantener la identidad Deep Cobalt & Gold:
     - Fondo base suave: Tono hielo / slate refinado (`#f1f5f9` / `#e2e8f0` sutil).
     - Superficies de tarjetas y modales: Blanco perlado cálido (`#ffffff` / `#f8fafc`) con sombras suaves y bordes cobalto tenues (`#cbd5e1`).
     - Tipografía y títulos: Azul cobalto profundo y slate de alto contraste (`#0f172a`, `#1e293b`).
     - Acentos de marca: Dorado ámbar de alto contraste sobre fondo claro (`#b45309` / `#d97706`) y azul técnico (`#0284c7`).
-  - [ ] Configurar estrategia `darkMode: 'class'` en `client/tailwind.config.js` y variables CSS semánticas en `client/src/index.css`.
-- [ ] **12.2 Componente Switch de Tema Interactivo (`ThemeToggle.jsx`)**
-  - [ ] Diseñar botón toggle fluido con iconos animados de Sol (modo claro) y Luna (modo oscuro).
-  - [ ] Ubicar el switch en `Navbar.jsx` accesible tanto en desktop como en dispositivos móviles.
-  - [ ] Transiciones CSS suaves entre paletas (`transition-colors duration-200`).
-- [ ] **12.3 Contexto de Tema y Persistencia (`ThemeContext.jsx`)**
-  - [ ] Hook `useTheme()` para conmutación de estado entre `'dark'` y `'light'`.
-  - [ ] Detección automática de preferencia del sistema operativo (`window.matchMedia('(prefers-color-scheme: dark)')`).
-  - [ ] Persistencia inmediata en `localStorage` (`jobflow_theme`).
-  - [ ] Sincronización automática con la preferencia guardada en el perfil del usuario autenticado (`User.theme`).
-- [ ] **12.4 Adaptación Visual Integral de Componentes**
-  - [ ] Tablero Kanban (`KanbanBoard.jsx`): columnas con fondos tintados suaves y tarjetas con contraste nítido.
-  - [ ] Tabla de Postulaciones (`ApplicationTable.jsx`): filas alternadas y encabezados contrastados.
-  - [ ] Métricas y KPIs (`MetricsSummary.jsx`): tarjetas estadísticas con bordes sutiles y textos oscuros legibles.
-  - [ ] Modales y Drawer (`QuickAddModal`, `ApplicationDetailModal`, `ReportModal`, `RemindersDrawer`): adaptación completa sin perder la jerarquía visual.
+  - [x] Configurar estrategia `darkMode: 'class'` en `client/tailwind.config.js` y variables CSS semánticas en `client/src/index.css`.
+- [x] **12.2 Componente Switch de Tema Interactivo (`ThemeToggle.jsx`)**
+  - [x] Diseñar botón toggle fluido con iconos animados de Sol (modo claro) y Luna (modo oscuro).
+  - [x] Ubicar el switch en `Navbar.jsx` accesible tanto en desktop como en dispositivos móviles.
+  - [x] Transiciones CSS suaves entre paletas (`transition-colors duration-200`).
+- [x] **12.3 Contexto de Tema y Persistencia (`ThemeContext.jsx`)**
+  - [x] Hook `useTheme()` para conmutación de estado entre `'dark'` y `'light'`.
+  - [x] Detección automática de preferencia del sistema operativo (`window.matchMedia('(prefers-color-scheme: dark)')`).
+  - [x] Persistencia inmediata en `localStorage` (`jobflow_theme`).
+  - [x] Sincronización automática con la preferencia guardada en el perfil del usuario autenticado (`User.theme`) vía endpoint `PATCH /api/auth/theme`.
+- [x] **12.4 Adaptación Visual Integral de Componentes**
+  - [x] Tablero Kanban (`KanbanBoard.jsx`): columnas con fondos tintados suaves y tarjetas con contraste nítido.
+  - [x] Tabla de Postulaciones (`ApplicationTable.jsx`): filas alternadas y encabezados contrastados.
+  - [x] Métricas y KPIs (`KPICards.jsx`): tarjetas estadísticas con bordes sutiles y textos oscuros legibles.
+  - [x] Modales y Drawer (`QuickAddModal`, `ApplicationDetailModal`, `ReportModal`, `RemindersDrawer`, `AuthModal`): adaptación completa sin perder la jerarquía visual.
+  - [x] Barra de navegación móvil (`BottomNav.jsx`), banner de recordatorios (`UpcomingReminders.jsx`) y barra de búsqueda/filtros (`ViewToggle.jsx`).
 
 
 

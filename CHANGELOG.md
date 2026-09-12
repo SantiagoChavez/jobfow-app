@@ -139,6 +139,13 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Menú de perfil y logout en `Navbar.jsx`: avatar con foto/iniciales, menú desplegable con datos de cuenta, botón de cerrar sesión y notificación toast.
   - Vista landing / bienvenida en `App.jsx` para usuarios no autenticados, protegiendo los datos privados del usuario.
 
+- **Modo Claro Armónico & Switch de Tema Dual (Tarjeta 14):**
+  - **Paleta de Diseño Armónica (Tailwind & CSS Tokens):** Configuración de `darkMode: 'class'` en `client/tailwind.config.js` y variables semánticas en `client/src/index.css`. Sustitución de blanco estridente plano por base suave hielo/slate (`#f1f5f9` / `#e2e8f0`), tarjetas perladas (`#ffffff` / `#f8fafc`) con bordes sutiles (`#cbd5e1`), tipografía Deep Cobalt & Slate (`#0f172a`, `#1e293b`) de alto contraste (WCAG AAA) y acentos ámbar cálido (`#b45309` / `#d97706`).
+  - **Sincronización en Backend:** Endpoint `PATCH /api/auth/theme` con validación de valores (`'dark' | 'light'`) y persistencia en MongoDB (`User.theme`). Suite automatizada en Vitest con 3 pruebas para actualización de tema (75/75 tests en total pasando).
+  - **Contexto Global (`ThemeContext.jsx`):** Jerarquía de resolución inteligente (perfil de usuario > `localStorage` > `prefers-color-scheme` > `'dark'`), conmutación inmediata de clases `.dark` / `.light` en `document.documentElement` y hook `useTheme()`.
+  - **Switch Interactivo (`ThemeToggle.jsx`):** Botón accesible en `Navbar.jsx` con micro-animación SVG de rotación suave entre iconos `SunIcon` y `MoonIcon`.
+  - **Adaptación Visual Exhaustiva:** Aplicación de variantes `dark:` en toda la aplicación: `Navbar`, `App`, `KPICards`, `KanbanBoard` (columnas y tarjetas), `ApplicationTable` (filas alternadas y controles numéricos de paginación), `ViewToggle`, `UpcomingReminders`, `QuickAddModal`, `ApplicationDetailModal`, `ReportModal`, `RemindersDrawer`, `AuthModal` y `BottomNav`.
+
 - **Despliegue Full-Stack en la Nube y DevOps:**
   - Configuración de SPA rewrites en Vercel (`client/vercel.json`) para prevenir errores 404 en recargas.
   - Creación del blueprint declarativo de Render (`render.yaml`) con comandos de build, start y health check.
