@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createSafeMailto } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
+import { useToast } from '../context/ToastContext.jsx';
 import {
   CloseIcon,
   ClockIcon,
@@ -9,6 +10,8 @@ import {
   UserIcon,
   MailIcon,
   SparklesIcon,
+  BuildingIcon,
+  CheckCircleIcon,
   TrashIcon,
 } from './Icons.jsx';
 
@@ -37,7 +40,9 @@ export const ApplicationDetailModal = ({
   onAddInteraction,
   onDelete,
 }) => {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'timeline' | 'recruiter'
+  const [copiedPitch, setCopiedPitch] = useState(false);
 
   // Estado del formulario de nueva interacción
   const [interactionForm, setInteractionForm] = useState({
@@ -48,6 +53,18 @@ export const ApplicationDetailModal = ({
   const [submittingInteraction, setSubmittingInteraction] = useState(false);
 
   useModalA11y(isOpen, onClose);
+
+  const handleCopyDetailPitch = async () => {
+    if (!application?.suggestedPitch) return;
+    try {
+      await navigator.clipboard.writeText(application.suggestedPitch);
+      setCopiedPitch(true);
+      showToast('¡Pitch de presentación copiado al portapapeles!', 'success');
+      setTimeout(() => setCopiedPitch(false), 2200);
+    } catch {
+      showToast('No se pudo copiar al portapapeles', 'error');
+    }
+  };
 
   if (!isOpen || !application) return null;
 
@@ -161,6 +178,12 @@ export const ApplicationDetailModal = ({
                 Respuesta en {application.responseTimeDays} días
               </span>
             )}
+            {application.matchScore != null && (
+              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-sky-500/15 text-sky-tech border border-sky-500/30 flex items-center gap-1">
+                <SparklesIcon className="w-3 h-3 text-sky-tech" />
+                Match {application.matchScore}%
+              </span>
+            )}
           </div>
 
           {/* Navegación por Pestañas */}
@@ -206,6 +229,49 @@ export const ApplicationDetailModal = ({
           {/* 1. OVERVIEW */}
           {activeTab === 'overview' && (
             <div className="space-y-4">
+              {/* Pitch de Presentación Personalizado (si fue generado) */}
+              {application.suggestedPitch && (
+                <div className="p-4 rounded-2xl bg-navy-base/90 border border-gold-primary/30 shadow-lg shadow-black/20 space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-gold-primary">
+                      <SparklesIcon className="w-4 h-4 text-gold-primary" />
+                      <span>Pitch de Presentación Personalizado (IA)</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyDetailPitch}
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-gold-primary/20 hover:bg-gold-primary/30 text-gold-primary border border-gold-primary/40 transition-all flex items-center gap-1 active:scale-95"
+                      title="Copiar pitch al portapapeles"
+                    >
+                      {copiedPitch ? (
+                        <>
+                          <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>¡Copiado!</span>
+                        </>
+                      ) : (
+                        <span>Copiar Pitch</span>
+                      )}
+                    </button>
+                  </div>
+                  <div className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-sans bg-navy-surface/80 p-3.5 rounded-xl border border-slate-700/70 select-text">
+                    {application.suggestedPitch}
+                  </div>
+                </div>
+              )}
+
+              {/* Resumen de la Empresa (si fue generado) */}
+              {application.companySummary && (
+                <div className="p-3.5 rounded-2xl bg-sky-950/30 border border-sky-500/30 space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-sky-tech">
+                    <BuildingIcon className="w-3.5 h-3.5" />
+                    <span>Sobre la Empresa</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {application.companySummary}
+                  </p>
+                </div>
+              )}
+
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
                   Descripción y Requisitos Técnicos

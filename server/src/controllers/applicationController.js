@@ -47,6 +47,9 @@ export const createApplication = async (req, res) => {
       extractedSkills,
       appliedAt,
       notes,
+      suggestedPitch,
+      companySummary,
+      matchScore,
     } = req.body;
 
     // Validación de campos requeridos
@@ -104,6 +107,15 @@ export const createApplication = async (req, res) => {
       extractedSkills: Array.isArray(extractedSkills)
         ? extractedSkills.map((s) => (typeof s === 'string' ? s.trim() : s)).filter(Boolean)
         : [],
+      suggestedPitch: typeof suggestedPitch === 'string' && suggestedPitch.trim()
+        ? suggestedPitch.trim()
+        : undefined,
+      companySummary: typeof companySummary === 'string' && companySummary.trim()
+        ? companySummary.trim()
+        : undefined,
+      matchScore: typeof matchScore === 'number' && !Number.isNaN(matchScore)
+        ? matchScore
+        : undefined,
       appliedAt: safeAppliedAt,
       interactions: [initialInteraction],
     };

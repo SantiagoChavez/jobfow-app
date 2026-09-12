@@ -100,6 +100,12 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Suite de 9 pruebas automatizadas en Vitest con mocks deterministas (`server/src/tests/ai.test.js`, 100% pass).
   - Interfaz interactiva en `QuickAddModal.jsx` con botón *"✨ Autocompletar con IA"*, feedback de carga y autocompletado de empresa, puesto, modalidad, prioridad y salario.
   - Generador de pitch personalizado y resumen de empresa con botón de copiado rápido al portapapeles (`navigator.clipboard`).
+  - **Persistencia y Visualización del Pitch IA:**
+    - Almacenamiento persistente de `suggestedPitch`, `companySummary` y `matchScore` en el modelo de base de datos `Application` (`server/src/models/Application.js`) y controlador `createApplication`.
+    - Soporte para edición interactiva del pitch en `QuickAddModal.jsx` previo al guardado.
+    - Visualización destacada en `ApplicationDetailModal.jsx` con bloque estético Deep Cobalt & Gold, copiado al portapapeles con 1-click y notificación toast.
+    - Visualización de la tarjeta de resumen de empresa y badge de afinidad técnica (Match Score) en el detalle.
+    - Ampliación de la suite de pruebas unitarias a 55 tests (100% pass).
 
 - **Resiliencia de Dominio, Seguridad NoSQL y Accesibilidad (Code Review):**
   - Blindaje contra `NaN` en `responseTimeDays` mediante helpers puros `parseSafeDate` y `calculateResponseDays`.

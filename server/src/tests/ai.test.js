@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
+import Application from '../models/Application.js';
 import * as aiService from '../services/aiService.js';
 import { GoogleGenAI } from '@google/genai';
 
@@ -206,4 +207,42 @@ describe('POST /api/ai/analyze-job - Copiloto de Postulación con IA', () => {
       expect(result.suggestedPitch).toBe('');
     });
   });
+
+  describe('Persistencia de Pitch y Resumen de IA en POST /api/applications', () => {
+    it('Debe persistir suggestedPitch, companySummary y matchScore al guardar una postulación', async () => {
+      const mockCreatedApp = {
+        _id: 'app-123',
+        company: { name: 'Globant', website: 'https://globant.com' },
+        role: 'Backend Developer',
+        suggestedPitch: 'Hola, soy Santiago, Full Stack Dev orientado a backend...',
+        companySummary: 'Empresa multinacional de tecnología.',
+        matchScore: 92,
+        status: 'ENVIADA',
+      };
+      const createSpy = vi.spyOn(Application, 'create').mockResolvedValue(mockCreatedApp);
+
+      const res = await request(app)
+        .post('/api/applications')
+        .send({
+          company: { name: 'Globant', website: 'https://globant.com' },
+          role: 'Backend Developer',
+          suggestedPitch: 'Hola, soy Santiago, Full Stack Dev orientado a backend...',
+          companySummary: 'Empresa multinacional de tecnología.',
+          matchScore: 92,
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(createSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          suggestedPitch: 'Hola, soy Santiago, Full Stack Dev orientado a backend...',
+          companySummary: 'Empresa multinacional de tecnología.',
+          matchScore: 92,
+        })
+      );
+      expect(res.body.data.suggestedPitch).toContain('Santiago');
+      expect(res.body.data.matchScore).toBe(92);
+    });
+  });
 });
+

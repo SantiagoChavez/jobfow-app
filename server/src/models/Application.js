@@ -111,6 +111,18 @@ const applicationSchema = new Schema(
       type: Number,
       default: null,
     },
+    suggestedPitch: {
+      type: String,
+      trim: true,
+    },
+    companySummary: {
+      type: String,
+      trim: true,
+    },
+    matchScore: {
+      type: Number,
+      default: null,
+    },
   },
   {
     timestamps: true,

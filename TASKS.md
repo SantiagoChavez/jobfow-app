@@ -218,4 +218,17 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Texto informativo dinámico: "Mostrando página X de Y (Z postulaciones en total)".
   - [x] Gestión de estado `currentPage` y consumo de `GET /api/applications?page=X` en `App.jsx` sin recargar la aplicación.
 
+---
+
+## 🤖 Fase 10: Persistencia de Pitch IA y Experiencia de Contacto
+- [x] **10.1 Persistencia de Pitch y Resumen de Empresa en Base de Datos**
+  - [x] Agregar campos `suggestedPitch`, `companySummary` y `matchScore` al esquema Mongoose de `Application.js`.
+  - [x] Adaptar controlador `createApplication` para guardar `suggestedPitch`, `companySummary` y `matchScore` en MongoDB.
+  - [x] Prueba de integración automatizada en Vitest (`ai.test.js`) para verificar la persistencia de datos de IA.
+- [x] **10.2 Experiencia de Usuario: Edición y Copiado en Frontend**
+  - [x] Soporte para personalización y edición del pitch sugerido en `QuickAddModal.jsx` antes del guardado.
+  - [x] Visualización del pitch guardado en `ApplicationDetailModal.jsx` (pestaña General / Overview).
+  - [x] Botón de copiado con 1-click al portapapeles (`navigator.clipboard`) y notificación toast de éxito.
+  - [x] Visualización de resumen de empresa (`companySummary`) y badge de afinidad técnica (`matchScore`).
+
 

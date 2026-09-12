@@ -18,6 +18,8 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
     recruiterName: '',
     recruiterEmail: '',
     requirementsRaw: '',
+    companySummary: '',
+    suggestedPitch: '',
   });
 
   const [saving, setSaving] = useState(false);
@@ -60,6 +62,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         priority: data.priority || prev.priority,
         salary: data.salary ? String(data.salary) : prev.salary,
         companySummary: data.companySummary || prev.companySummary,
+        suggestedPitch: data.suggestedPitch || prev.suggestedPitch,
       }));
 
       setAiInsight(data);
@@ -83,9 +86,10 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
 
   // Manejador: Copiar Pitch Sugerido
   const handleCopyPitch = async () => {
-    if (!aiInsight?.suggestedPitch) return;
+    const pitchText = formData.suggestedPitch || aiInsight?.suggestedPitch;
+    if (!pitchText) return;
     try {
-      await navigator.clipboard.writeText(aiInsight.suggestedPitch);
+      await navigator.clipboard.writeText(pitchText);
       setCopiedPitch(true);
       showToast('Pitch de presentación copiado al portapapeles');
       setTimeout(() => setCopiedPitch(false), 2200);
@@ -151,6 +155,9 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
           : undefined,
         requirementsRaw: formData.requirementsRaw.trim() || undefined,
         extractedSkills: matchData?.matchedSkills || [],
+        suggestedPitch: (formData.suggestedPitch ? formData.suggestedPitch.trim() : aiInsight?.suggestedPitch) || undefined,
+        companySummary: (formData.companySummary ? formData.companySummary.trim() : aiInsight?.companySummary) || undefined,
+        matchScore: matchData?.matchScore != null ? matchData.matchScore : undefined,
       });
 
       // Reset y cerrar
@@ -165,10 +172,11 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         recruiterName: '',
         recruiterEmail: '',
         requirementsRaw: '',
+        companySummary: '',
+        suggestedPitch: '',
       });
-      setMatchData(null);
       setAiInsight(null);
-      setCopiedPitch(false);
+      setMatchData(null);
       onClose();
     } catch (err) {
       setErrorMsg(err.message || 'Error al guardar la postulación');
@@ -408,13 +416,20 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 )}
 
                 {aiInsight.suggestedPitch && (
-                  <div className="text-xs text-slate-200 bg-navy-base/80 p-2.5 rounded-xl border border-gold-primary/20">
-                    <span className="font-bold text-gold-primary block text-[10px] uppercase tracking-wider mb-1">
-                      💬 Pitch de Contacto Sugerido para Recruiters
-                    </span>
-                    <p className="italic text-slate-300 leading-relaxed font-sans">
-                      "{aiInsight.suggestedPitch}"
-                    </p>
+                  <div className="text-xs text-slate-200 bg-navy-base/80 p-2.5 rounded-xl border border-gold-primary/20 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-gold-primary block text-[10px] uppercase tracking-wider">
+                        💬 Pitch de Contacto Sugerido para Recruiters
+                      </span>
+                      <span className="text-[10px] text-slate-400">Personalizable</span>
+                    </div>
+                    <textarea
+                      rows={4}
+                      value={formData.suggestedPitch !== undefined && formData.suggestedPitch !== '' ? formData.suggestedPitch : aiInsight.suggestedPitch}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, suggestedPitch: e.target.value }))}
+                      className="w-full text-xs text-slate-200 bg-navy-surface/90 p-2.5 rounded-xl border border-slate-700/80 focus:border-gold-primary focus:outline-none leading-relaxed font-sans resize-y select-text"
+                      placeholder="Escribe o ajusta tu pitch aquí..."
+                    />
                   </div>
                 )}
               </div>
