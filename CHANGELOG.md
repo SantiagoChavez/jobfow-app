@@ -106,6 +106,9 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
     - Visualización destacada en `ApplicationDetailModal.jsx` con bloque estético Deep Cobalt & Gold, copiado al portapapeles con 1-click y notificación toast.
     - Visualización de la tarjeta de resumen de empresa y badge de afinidad técnica (Match Score) en el detalle.
     - Ampliación de la suite de pruebas unitarias a 55 tests (100% pass).
+  - **Guía Rápida e Intuitiva para Usuarios No Técnicos:**
+    - Creación del documento accesible `GUIA_USUARIO.md` con explicación amigable en 5 pasos sencillos, consejos para entrevistas y beneficios del Copiloto IA sin tecnicismos.
+    - Generación de la guía vectorial en PDF `Guia-Rapida-Jobflow.pdf` con paleta Deep Cobalt & Gold mediante `server/scripts/generateFriendlyGuidePdf.js`.
 
 - **Resiliencia de Dominio, Seguridad NoSQL y Accesibilidad (Code Review):**
   - Blindaje contra `NaN` en `responseTimeDays` mediante helpers puros `parseSafeDate` y `calculateResponseDays`.

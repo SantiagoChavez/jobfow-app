@@ -39,6 +39,7 @@ Thumbs.db
 # Documents and generated reports
 *.pdf
 !Manual-de-Usuario-Jobflow.pdf
+!Guia-Rapida-Jobflow.pdf
 
 # Repomix outputs
 repomix-output.*

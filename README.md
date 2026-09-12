@@ -20,6 +20,7 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 | **Base de Datos** | MongoDB Atlas | Cluster M0 (AWS `sa-east-1` / `us-east-1`) | 🟢 Conectado |
 | **Copiloto IA** | Google Gemini | Modelo `gemini-3.5-flash-lite` | 🟢 Activo |
 | **Manual de Usuario** | Documento PDF | [Manual-de-Usuario-Jobflow.pdf](Manual-de-Usuario-Jobflow.pdf) | 📘 Guía Oficial (4 Págs) |
+| **Guía Rápida (No Dev)** | PDF & Markdown | [Guia-Rapida-Jobflow.pdf](Guia-Rapida-Jobflow.pdf) / [GUIA_USUARIO.md](GUIA_USUARIO.md) | 💡 Guía Visual e Intuitiva |
 
 ---
 
