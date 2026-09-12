@@ -19,12 +19,14 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 | **Endpoint de Salud** | Render | [https://jobfow-api.onrender.com/health](https://jobfow-api.onrender.com/health) | 🟢 200 OK |
 | **Base de Datos** | MongoDB Atlas | Cluster M0 (AWS `sa-east-1` / `us-east-1`) | 🟢 Conectado |
 | **Copiloto IA** | Google Gemini | Modelo `gemini-3.5-flash-lite` | 🟢 Activo |
+| **Manual de Usuario** | Documento PDF | [Manual-de-Usuario-Jobflow.pdf](Manual-de-Usuario-Jobflow.pdf) | 📘 Guía Oficial (4 Págs) |
 
 ---
 
 ## 📋 Tabla de Contenidos
 
 - [Enlaces de Ejecución (Demo en Vivo)](#-enlaces-de-ejecución-demo-en-vivo)
+- [Manual de Usuario & Guía de IA (PDF)](#-manual-de-usuario--especificación-del-copiloto-de-ia)
 - [Problema & Visión del Producto](#-problema--visión-del-producto)
 - [Características del MVP](#-características-del-mvp)
 - [Arquitectura del Proyecto](#-arquitectura-del-proyecto)
@@ -36,6 +38,21 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 - [Instalación y Puesta en Marcha](#-instalación-y-puesta-en-marcha)
 - [Scripts Disponibles](#-scripts-disponibles)
 - [Roadmap de Tareas](#-roadmap-de-tareas)
+
+---
+
+## 📖 Manual de Usuario & Especificación del Copiloto de IA
+
+El proyecto cuenta con un **Manual de Usuario oficial en formato PDF vectorial** ([`Manual-de-Usuario-Jobflow.pdf`](Manual-de-Usuario-Jobflow.pdf)) diseñado para postulantes, coaches y evaluadores técnicos.
+
+### 🧠 ¿Qué acciones realiza la Inteligencia Artificial (Google Gemini)?
+Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin procesar de cualquier oferta de empleo y hacer clic en **`✨ Autocompletar con IA`**, el modelo `gemini-3.5-flash-lite` ejecuta 5 acciones cognitivas en paralelo:
+
+1. **Extracción y Normalización de Campos**: Identifica y extrae automáticamente la *Empresa*, *Puesto / Rol*, *Modalidad laboral* (`REMOTE`, `HYBRID`, `ONSITE`), *Nivel de Prioridad* y el *Salario estimado en USD*, completando el formulario al instante.
+2. **Cálculo de Afinidad Técnica (`matchScore`)**: Evalúa del 0 al 100% la compatibilidad entre los requisitos de la vacante y el stack del postulante.
+3. **Detección de Brechas de Conocimiento (Gap Analysis)**: Identifica las habilidades que dominás (`extractedSkills`) y lista las tecnologías secundarias o deseables a repasar antes de la entrevista técnica (`missingSkills`).
+4. **Resumen Ejecutivo de la Compañía**: Redacta una síntesis de 2 oraciones sobre el modelo de negocio, industria y cultura de la empresa para que el candidato llegue informado a la primera llamada.
+5. **Generador de Pitch de Presentación Personalizado**: Redacta un mensaje persuasivo de 3 a 4 líneas listo para copiar con un clic y enviar directamente al reclutador por LinkedIn o correo.
 
 ---
 
