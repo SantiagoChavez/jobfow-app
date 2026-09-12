@@ -52,7 +52,7 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 2. **Cálculo de Afinidad Técnica (`matchScore`)**: Evalúa del 0 al 100% la compatibilidad entre los requisitos de la vacante y el stack del postulante.
 3. **Detección de Brechas de Conocimiento (Gap Analysis)**: Identifica las habilidades que dominás (`extractedSkills`) y lista las tecnologías secundarias o deseables a repasar antes de la entrevista técnica (`missingSkills`).
 4. **Resumen Ejecutivo de la Compañía**: Redacta una síntesis de 2 oraciones sobre el modelo de negocio, industria y cultura de la empresa para que el candidato llegue informado a la primera llamada.
-5. **Generador de Pitch de Presentación Personalizado**: Redacta un mensaje persuasivo de 3 a 4 líneas listo para copiar con un clic y enviar directamente al reclutador por LinkedIn o correo.
+5. **Generador de Pitch de Presentación Personalizado**: Adapta la plantilla oficial del candidato (reconversión IT, versatilidad multidisciplinaria, formación académica en UTN y Soy Henry, y enlaces directos a sus perfiles de GitHub y LinkedIn) al contexto específico de la vacante, listo para enviar al reclutador con 1 clic.
 
 ---
 

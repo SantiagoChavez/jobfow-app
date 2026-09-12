@@ -273,9 +273,9 @@ async function generateManual() {
     425,
     75,
     'Accion 5: Redaccion de Pitch de Contacto Personalizado (Icebreaker)',
-    'Redacta un mensaje persuasivo de 3 a 4 lineas listo para enviar al reclutador por mensaje directo de LinkedIn o correo electronico. ' +
-    'Destaca tu afinidad con el puesto, menciona tu experiencia relevante y propone una conversacion breve. ' +
-    'La interfaz incluye un boton para copiar el pitch al portapapeles en 1 solo clic.',
+    'Adapta la plantilla oficial de Santiago al rol y empresa detectados: conserva su identidad de reconversion IT, ' +
+    'su versatilidad por experiencia previa, su formacion en UTN y Soy Henry, e incluye sus enlaces a GitHub y LinkedIn. ' +
+    'Genera un mensaje calido y persuasivo con boton para copiar al portapapeles en 1 solo clic.',
     colors.goldDark,
     '#FEFCE8'
   );

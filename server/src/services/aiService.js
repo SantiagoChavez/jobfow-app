@@ -45,7 +45,19 @@ export const analyzeJobPosting = async (rawText, userProfile = '') => {
     ? userProfile.slice(0, 2000).replace(/"""/g, "'''").trim()
     : '';
 
-  const fallbackProfile = 'Desarrollador Full Stack con experiencia en Node.js, Express, React, MongoDB, TypeScript y PostgreSQL.';
+  const githubUrl = process.env.CANDIDATE_GITHUB_URL || 'https://github.com/SantiagoChavez';
+  const linkedinUrl = process.env.CANDIDATE_LINKEDIN_URL || 'https://www.linkedin.com/in/santiago-chavez';
+
+  const fallbackProfile = `Santiago es Desarrollador Full Stack orientado a Backend, reconvirtiéndose al mundo IT con formación formal en la Tecnicatura Universitaria en Programación (UTN) y Bootcamp Soy Henry. Posee amplia experiencia previa en otros campos que le permite aportar versatilidad, pragmatismo, proactividad y compromiso. Stack técnico: Node.js, Express, MongoDB, JavaScript, React, Git y diseño de APIs REST.
+Perfiles:
+- GitHub: ${githubUrl}
+- LinkedIn: ${linkedinUrl}`;
+
+  const basePitchTemplate = `Hola, espero tenga un excelente día.
+Soy Santiago, Full Stack Dev orientado a backend, reconvirtiéndome al mundo IT y me interesaría ser parte de su equipo. Mi extensa experiencia en otros campos me permite brindar versatilidad y pragmatismo al equipo. La proactividad y compromiso son mi sello de profesionalidad y responsabilidad para todo lo que emprendo; también me gusta estar en constante capacitación: soy egresado de la Tecnicatura Universitaria en Programación de UTN y del bootcamp Soy Henry y continúo aprendiendo. Los invito a explorar mis proyectos en los enlaces que adjunto:
+• GitHub: ${githubUrl}
+• LinkedIn: ${linkedinUrl}
+Espero noticias positivas y desde ya muy agradecido por leerme; que tenga una muy buena semana.`;
 
   const prompt = `
 Eres un Copiloto Senior de Búsqueda Laboral y Reclutamiento Técnico para la plataforma JobFlow.
@@ -54,6 +66,11 @@ Tu objetivo es analizar minuciosamente la siguiente descripción de vacante de e
 Perfil del Postulante:
 """
 ${sanitizedProfile || fallbackProfile}
+"""
+
+Plantilla Base del Postulante para el Pitch de Contacto:
+"""
+${basePitchTemplate}
 """
 
 Oferta Laboral:
@@ -73,7 +90,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
   "matchScore": número entero del 0 al 100 evaluando la afinidad entre los requisitos de la vacante y el perfil del postulante,
   "extractedSkills": ["array de strings con las tecnologías y habilidades requeridas por la empresa"],
   "missingSkills": ["array de strings con tecnologías secundarias o deseables que el postulante podría necesitar reforzar"],
-  "suggestedPitch": "Mensaje personalizado y persuasivo de 3 a 4 líneas para que el candidato se presente directamente ante el recruiter por LinkedIn o correo."
+  "suggestedPitch": "Adaptación sutil y contextualizada de la Plantilla Base del Postulante para la empresa y rol detectados. DEBES conservar fielmente la identidad de Santiago, su reconversión al mundo IT, su versatilidad por experiencia previa en otros campos, su formación en UTN y Soy Henry, y los enlaces directos a GitHub (${githubUrl}) y LinkedIn (${linkedinUrl}), sin alterar sustancialmente la estructura original del mensaje."
 }
 `;
 
