@@ -11,12 +11,16 @@ const API_BASE = rawApiUrl
   : '/api';
 
 /**
- * Helper para peticiones JSON con manejo de errores uniforme
+ * Helper para peticiones JSON con manejo de errores uniforme e inyección automática de JWT
  */
 async function request(url, options = {}) {
+  const token = localStorage.getItem('jobflow_token');
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
   const res = await fetch(`${API_BASE}${url}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders,
       ...options.headers,
     },
     ...options,
@@ -25,6 +29,14 @@ async function request(url, options = {}) {
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
+    // Si la sesión expiró o fue invalidada por el backend
+    if (res.status === 401 && token) {
+      localStorage.removeItem('jobflow_token');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('jobflow:unauthorized'));
+      }
+    }
+
     const errorMsg = data.message || data.error || `Error HTTP ${res.status}`;
     throw new Error(errorMsg);
   }
@@ -155,7 +167,14 @@ export async function downloadPdfReport(from, to) {
   if (to) params.append('to', to);
 
   const query = params.toString() ? `?${params.toString()}` : '';
-  const response = await fetch(`${API_BASE}/reports/pdf${query}`);
+  const token = localStorage.getItem('jobflow_token');
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
+  const response = await fetch(`${API_BASE}/reports/pdf${query}`, {
+    headers: {
+      ...authHeaders,
+    },
+  });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -186,6 +205,50 @@ export async function analyzeJobWithAI(text, userProfile) {
   return res.data || res;
 }
 
+/**
+ * Iniciar sesión tradicional con email y contraseña
+ * @param {{ email: string, password: string }} credentials
+ * @returns {Promise<{ success: boolean, token: string, user: Object }>}
+ */
+export async function loginUser(credentials) {
+  return await request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  });
+}
+
+/**
+ * Registrar nuevo usuario con nombre, email y contraseña
+ * @param {{ name: string, email: string, password: string }} userData
+ * @returns {Promise<{ success: boolean, token: string, user: Object }>}
+ */
+export async function registerUser(userData) {
+  return await request('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(userData),
+  });
+}
+
+/**
+ * Autenticación federada con Google OAuth (Google Identity Services)
+ * @param {{ credential: string }} googleData
+ * @returns {Promise<{ success: boolean, token: string, user: Object }>}
+ */
+export async function googleAuthUser(googleData) {
+  return await request('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify(googleData),
+  });
+}
+
+/**
+ * Obtener perfil del usuario autenticado actual
+ * @returns {Promise<{ success: boolean, user: Object }>}
+ */
+export async function getMe() {
+  return await request('/auth/me');
+}
+
 export default {
   getApplications,
   getApplicationById,
@@ -197,4 +260,8 @@ export default {
   previewMatch,
   downloadPdfReport,
   analyzeJobWithAI,
+  loginUser,
+  registerUser,
+  googleAuthUser,
+  getMe,
 };
