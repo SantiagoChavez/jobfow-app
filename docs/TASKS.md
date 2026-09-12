@@ -279,5 +279,15 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Modales y Drawer (`QuickAddModal`, `ApplicationDetailModal`, `ReportModal`, `RemindersDrawer`, `AuthModal`): adaptación completa sin perder la jerarquía visual.
   - [x] Barra de navegación móvil (`BottomNav.jsx`), banner de recordatorios (`UpcomingReminders.jsx`) y barra de búsqueda/filtros (`ViewToggle.jsx`).
 
+---
 
-
+## 📚 Fase 13: Reestructuración y Centralización de Documentación (Completada)
+- [x] **13.1 Centralización de Documentos en Carpeta `docs/`**
+  - [x] Trasladar guías y especificaciones (`GUIA_USUARIO.md`, `TASKS.md`, `Guia-Rapida-Jobflow.pdf`, `Manual-de-Usuario-Jobflow.pdf`, `Planificacion de jobflow.pdf`, `modelo para jobflow.pdf`, `jobflow-reporte-demo.pdf`) a `/docs`.
+  - [x] Mantener únicamente `README.md` y `CHANGELOG.md` en la raíz del repositorio.
+  - [x] Crear índice general de documentación `docs/README.md` con enlaces relativos y guías de compilación.
+- [x] **13.2 Actualización de Enlaces e Infraestructura de Documentación**
+  - [x] Actualizar rutas de salida de generadores de PDF en `server/scripts/generateFriendlyGuidePdf.js` y `server/scripts/generateManualPdf.js` hacia `docs/`.
+  - [x] Ajustar excepciones en `.gitignore` para versionar PDFs de documentación en `docs/*.pdf`.
+  - [x] Actualizar todos los enlaces relativos en `README.md`, `CHANGELOG.md` y `docs/GUIA_USUARIO.md`.
+  - [x] Actualizar guía de usuario con flujos de autenticación / Google OAuth y conmutador de tema dual (Sol/Luna).
