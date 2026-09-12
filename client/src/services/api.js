@@ -177,6 +177,13 @@ export async function downloadPdfReport(from, to) {
   });
 
   if (!response.ok) {
+    if (response.status === 401 && token) {
+      localStorage.removeItem('jobflow_token');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('jobflow:unauthorized'));
+      }
+    }
+
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || errorData.error || 'Error al generar el reporte PDF');
   }
