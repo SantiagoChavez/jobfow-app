@@ -16,37 +16,37 @@ export const KPICards = ({ analytics, loading }) => {
       title: 'Postulaciones',
       value: kpis.totalApplications,
       subtitle: 'Enviadas en total',
-      icon: <BriefcaseIcon className="w-5 h-5 text-sky-tech" />,
-      borderColor: 'border-sky-500/20',
-      bgColor: 'bg-sky-500/10',
-      valueColor: 'text-white',
+      icon: <BriefcaseIcon className="w-5 h-5 text-sky-600 dark:text-sky-tech" />,
+      borderColor: 'border-slate-200 dark:border-sky-500/20',
+      bgColor: 'bg-sky-50 dark:bg-sky-500/10',
+      valueColor: 'text-slate-900 dark:text-white',
     },
     {
       title: 'Entrevistas',
       value: kpis.totalInterviews,
       subtitle: 'En curso / Realizadas',
-      icon: <MessageIcon className="w-5 h-5 text-gold-primary" />,
-      borderColor: 'border-gold-primary/20',
-      bgColor: 'bg-gold-primary/10',
-      valueColor: 'text-gold-primary',
+      icon: <MessageIcon className="w-5 h-5 text-amber-600 dark:text-gold-primary" />,
+      borderColor: 'border-slate-200 dark:border-gold-primary/20',
+      bgColor: 'bg-amber-50 dark:bg-gold-primary/10',
+      valueColor: 'text-amber-600 dark:text-gold-primary',
     },
     {
       title: 'Ofertas Recibidas',
       value: kpis.totalOffers,
       subtitle: 'Propuestas formales',
-      icon: <CheckCircleIcon className="w-5 h-5 text-emerald-400" />,
-      borderColor: 'border-emerald-500/20',
-      bgColor: 'bg-emerald-500/10',
-      valueColor: 'text-emerald-400',
+      icon: <CheckCircleIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
+      borderColor: 'border-slate-200 dark:border-emerald-500/20',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
+      valueColor: 'text-emerald-600 dark:text-emerald-400',
     },
     {
       title: 'Tasa de Respuesta',
       value: `${kpis.responseRate}%`,
       subtitle: avgResponseDays != null ? `Avg: ~${avgResponseDays} días` : 'Feedback de empresas',
-      icon: <SparklesIcon className="w-5 h-5 text-purple-400" />,
-      borderColor: 'border-purple-500/20',
-      bgColor: 'bg-purple-500/10',
-      valueColor: 'text-purple-300',
+      icon: <SparklesIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />,
+      borderColor: 'border-slate-200 dark:border-purple-500/20',
+      bgColor: 'bg-purple-50 dark:bg-purple-500/10',
+      valueColor: 'text-purple-600 dark:text-purple-300',
     },
   ];
 
@@ -55,10 +55,10 @@ export const KPICards = ({ analytics, loading }) => {
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className={`p-4 rounded-2xl bg-navy-surface/90 border ${card.borderColor} backdrop-blur-sm shadow-sm transition-all duration-200 hover:border-slate-600/60 hover:-translate-y-0.5`}
+          className={`p-4 rounded-2xl bg-white dark:bg-navy-surface/90 border ${card.borderColor} backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-600/60 hover:-translate-y-0.5`}
         >
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               {card.title}
             </span>
             <div className={`p-2 rounded-xl ${card.bgColor}`}>
@@ -70,7 +70,7 @@ export const KPICards = ({ analytics, loading }) => {
               {loading ? '...' : card.value}
             </h3>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1 font-medium">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1 font-semibold">
             {card.subtitle}
           </p>
         </div>

@@ -186,23 +186,23 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy-base/80 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-navy-surface rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/60 overflow-hidden my-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-navy-base/80 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-navy-surface rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-2xl shadow-slate-900/20 dark:shadow-black/60 overflow-hidden my-6 transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-navy-base/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-navy-base/60">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-gold-primary/10 border border-gold-primary/30 text-gold-primary">
+            <div className="p-2 rounded-xl bg-amber-500/10 dark:bg-gold-primary/10 border border-amber-500/30 dark:border-gold-primary/30 text-amber-600 dark:text-gold-primary">
               <BriefcaseIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Nueva Postulación</h3>
-              <p className="text-xs text-slate-400">Registra una vacante para monitoreo y seguimiento</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Nueva Postulación</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Registra una vacante para monitoreo y seguimiento</p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleModalClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <CloseIcon className="w-5 h-5" />
           </button>
@@ -211,7 +211,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold">
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-300 text-xs font-semibold">
               {errorMsg}
             </div>
           )}
@@ -219,7 +219,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
           {/* Fila 1: Empresa & Puesto */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Empresa *
               </label>
               <input
@@ -228,11 +228,11 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 value={formData.companyName}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                 placeholder="Ej: Mercado Libre, Globant..."
-                className="w-full bg-navy-base border border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-primary transition-colors"
+                className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Puesto / Rol *
               </label>
               <input
@@ -241,7 +241,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 placeholder="Ej: Fullstack Engineer, Backend Dev..."
-                className="w-full bg-navy-base border border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-primary transition-colors"
+                className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors"
               />
             </div>
           </div>
@@ -249,13 +249,13 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
           {/* Fila 2: Modalidad & Prioridad & Salario */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Modalidad
               </label>
               <select
                 value={formData.workMode}
                 onChange={(e) => setFormData({ ...formData, workMode: e.target.value })}
-                className="w-full bg-navy-base border border-slate-700/90 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-gold-primary transition-colors cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors cursor-pointer"
               >
                 <option value="REMOTE">Remoto</option>
                 <option value="HYBRID">Híbrido</option>
@@ -263,13 +263,13 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Prioridad
               </label>
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                className="w-full bg-navy-base border border-slate-700/90 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-gold-primary transition-colors cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors cursor-pointer"
               >
                 <option value="HIGH">Alta 🔥</option>
                 <option value="MEDIUM">Media ⚡</option>
@@ -277,7 +277,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Salario Estimado (USD)
               </label>
               <input
@@ -285,14 +285,14 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 value={formData.salary}
                 onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                 placeholder="Ej: 3500"
-                className="w-full bg-navy-base border border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-primary transition-colors"
+                className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors"
               />
             </div>
           </div>
 
           {/* Fila 3: URL de la Oferta */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
               URL de la Vacante
             </label>
             <input
@@ -300,19 +300,19 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
               value={formData.jobUrl}
               onChange={(e) => setFormData({ ...formData, jobUrl: e.target.value })}
               placeholder="https://linkedin.com/jobs/view/..."
-              className="w-full bg-navy-base border border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-primary transition-colors"
+              className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors"
             />
           </div>
 
           {/* Fila 4: Requisitos Raw con Análisis en Vivo y Copiloto IA */}
           <div>
             <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Descripción / Requisitos Técnicos
               </label>
               <div className="flex items-center gap-2">
                 {analyzingMatch && (
-                  <span className="text-[10px] text-sky-tech animate-pulse flex items-center gap-1 font-semibold">
+                  <span className="text-[10px] text-sky-600 dark:text-sky-tech animate-pulse flex items-center gap-1 font-semibold">
                     <SparklesIcon className="w-3 h-3" /> Analizando afinidad...
                   </span>
                 )}
@@ -320,7 +320,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                   type="button"
                   onClick={handleAutofillWithAI}
                   disabled={analyzingAI || !formData.requirementsRaw.trim()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-gold-primary to-amber-400 text-navy-base hover:brightness-110 active:scale-95 transition-all shadow-sm shadow-gold-primary/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-400 dark:from-gold-primary dark:to-amber-400 text-slate-950 dark:text-navy-base hover:brightness-105 active:scale-95 transition-all shadow-sm shadow-amber-500/20 dark:shadow-gold-primary/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
                   title="Extraer datos con IA y autocompletar formulario"
                 >
                   <SparklesIcon className={`w-3.5 h-3.5 ${analyzingAI ? 'animate-spin' : ''}`} />
@@ -333,24 +333,24 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
               value={formData.requirementsRaw}
               onChange={(e) => setFormData({ ...formData, requirementsRaw: e.target.value })}
               placeholder="Pega aquí la descripción u oferta de empleo completa. Luego haz clic en '✨ Autocompletar con IA' para rellenar los datos automáticamente..."
-              className="w-full bg-navy-base border border-slate-700/90 rounded-xl p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-primary transition-colors resize-none"
+              className="w-full bg-slate-50 dark:bg-navy-base border border-slate-300 dark:border-slate-700/90 rounded-xl p-3 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary transition-colors resize-none"
             />
 
             {/* Badge y Tags de Afinidad en Vivo */}
             {matchData && (
-              <div className="mt-2.5 p-3 rounded-xl bg-navy-base/90 border border-slate-700/80">
+              <div className="mt-2.5 p-3 rounded-xl bg-slate-50 dark:bg-navy-base/90 border border-slate-200 dark:border-slate-700/80">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                    <SparklesIcon className="w-3.5 h-3.5 text-gold-primary" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <SparklesIcon className="w-3.5 h-3.5 text-amber-600 dark:text-gold-primary" />
                     Afinidad con tu Perfil:
                   </span>
                   <span
                     className={`text-xs font-black px-2 py-0.5 rounded-full border ${
                       matchData.matchScore >= 70
-                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                        ? 'bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/40'
                         : matchData.matchScore >= 40
-                        ? 'bg-gold-primary/20 text-gold-primary border-gold-primary/40'
-                        : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                        ? 'bg-amber-500/15 dark:bg-gold-primary/20 text-amber-700 dark:text-gold-primary border-amber-500/40 dark:border-gold-primary/40'
+                        : 'bg-rose-500/15 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/40'
                     }`}
                   >
                     {matchData.matchScore}% Coincidencia
@@ -362,7 +362,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                   {matchData.matchedSkills?.map((skill, i) => (
                     <span
                       key={i}
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
                     >
                       ✓ {skill}
                     </span>
@@ -370,7 +370,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                   {matchData.missingSkills?.map((skill, i) => (
                     <span
                       key={i}
-                      className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700"
+                      className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border border-slate-300 dark:border-slate-700"
                     >
                       + {skill}
                     </span>
@@ -381,21 +381,21 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
 
             {/* Tarjeta de Resumen y Pitch Generado por IA */}
             {aiInsight && (
-              <div className="mt-3 p-3.5 rounded-2xl bg-gradient-to-br from-navy-base to-slate-900 border border-gold-primary/30 shadow-lg shadow-black/40 space-y-3">
+              <div className="mt-3 p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/70 via-white to-slate-50 dark:from-navy-base dark:to-slate-900 border border-amber-500/30 dark:border-gold-primary/30 shadow-md shadow-slate-900/5 dark:shadow-black/40 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-gold-primary flex items-center gap-1.5">
-                    <SparklesIcon className="w-4 h-4 text-gold-primary" />
+                  <span className="text-xs font-black text-amber-700 dark:text-gold-primary flex items-center gap-1.5">
+                    <SparklesIcon className="w-4 h-4 text-amber-600 dark:text-gold-primary" />
                     Copiloto IA: Pitch & Resumen
                   </span>
                   {aiInsight.suggestedPitch && (
                     <button
                       type="button"
                       onClick={handleCopyPitch}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 hover:border-gold-primary/50 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-700 hover:border-amber-500 dark:hover:border-gold-primary/50 transition-colors shadow-sm"
                     >
                       {copiedPitch ? (
                         <>
-                          <span className="text-emerald-400">✓</span> ¡Pitch Copiado!
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> ¡Pitch Copiado!
                         </>
                       ) : (
                         <>
@@ -407,8 +407,8 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 </div>
 
                 {aiInsight.companySummary && (
-                  <div className="text-xs text-slate-300 bg-slate-900/70 p-2.5 rounded-xl border border-slate-800">
-                    <span className="font-bold text-slate-400 block text-[10px] uppercase tracking-wider mb-1">
+                  <div className="text-xs text-slate-700 dark:text-slate-300 bg-white/90 dark:bg-slate-900/70 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 block text-[10px] uppercase tracking-wider mb-1">
                       🏢 Resumen de la Empresa
                     </span>
                     {aiInsight.companySummary}
@@ -416,18 +416,18 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
                 )}
 
                 {aiInsight.suggestedPitch && (
-                  <div className="text-xs text-slate-200 bg-navy-base/80 p-2.5 rounded-xl border border-gold-primary/20 space-y-1.5">
+                  <div className="text-xs text-slate-800 dark:text-slate-200 bg-white/90 dark:bg-navy-base/80 p-2.5 rounded-xl border border-amber-500/20 dark:border-gold-primary/20 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-gold-primary block text-[10px] uppercase tracking-wider">
+                      <span className="font-bold text-amber-700 dark:text-gold-primary block text-[10px] uppercase tracking-wider">
                         💬 Pitch de Contacto Sugerido para Recruiters
                       </span>
-                      <span className="text-[10px] text-slate-400">Personalizable</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Personalizable</span>
                     </div>
                     <textarea
                       rows={4}
                       value={formData.suggestedPitch !== undefined && formData.suggestedPitch !== '' ? formData.suggestedPitch : aiInsight.suggestedPitch}
                       onChange={(e) => setFormData((prev) => ({ ...prev, suggestedPitch: e.target.value }))}
-                      className="w-full text-xs text-slate-200 bg-navy-surface/90 p-2.5 rounded-xl border border-slate-700/80 focus:border-gold-primary focus:outline-none leading-relaxed font-sans resize-y select-text"
+                      className="w-full text-xs text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-navy-surface/90 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700/80 focus:border-amber-500 dark:focus:border-gold-primary focus:outline-none leading-relaxed font-sans resize-y select-text"
                       placeholder="Escribe o ajusta tu pitch aquí..."
                     />
                   </div>
@@ -437,18 +437,18 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
           </div>
 
           {/* Botones de acción */}
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={handleModalClose}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 rounded-xl text-xs font-black bg-gold-primary hover:bg-gold-light text-navy-base transition-all shadow-md shadow-gold-primary/20 disabled:opacity-50"
+              className="px-5 py-2 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 dark:text-navy-base transition-all shadow-md shadow-amber-500/20 dark:shadow-gold-primary/20 disabled:opacity-50"
             >
               {saving ? 'Guardando...' : 'Guardar Postulación'}
             </button>

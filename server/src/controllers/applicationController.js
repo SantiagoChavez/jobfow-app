@@ -118,6 +118,7 @@ export const createApplication = async (req, res) => {
         : undefined,
       appliedAt: safeAppliedAt,
       interactions: [initialInteraction],
+      user: req.user ? req.user._id : undefined,
     };
 
     const newApplication = await Application.create(applicationData);
@@ -167,7 +168,7 @@ const ALLOWED_SORT_FIELDS = {
 /**
  * @desc    Listar postulaciones con filtros combinados, ordenamiento dinámico y paginación
  * @route   GET /api/applications
- * @access  Public
+ * @access  Private (requiere protect)
  */
 export const getApplications = async (req, res) => {
   try {
@@ -188,6 +189,11 @@ export const getApplications = async (req, res) => {
     const sortOptions = { [sortField]: sortDirection };
 
     const filter = {};
+
+    // Filtrar por el usuario autenticado
+    if (req.user?._id) {
+      filter.user = req.user._id;
+    }
 
     // 3. Filtro por estado con Whitelist estricta
     if (typeof status === 'string' && status.trim()) {
@@ -293,7 +299,10 @@ export const getApplicationById = async (req, res) => {
 
     const application = await Application.findById(id);
 
-    if (!application) {
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
       return res.status(404).json({
         success: false,
         message: 'Postulación no encontrada',
@@ -316,7 +325,7 @@ export const getApplicationById = async (req, res) => {
 /**
  * @desc    Actualizar el estado de una postulación con protección de degradación
  * @route   PATCH /api/applications/:id/status
- * @access  Public
+ * @access  Private (requiere protect)
  */
 export const updateApplicationStatus = async (req, res) => {
   try {
@@ -341,7 +350,10 @@ export const updateApplicationStatus = async (req, res) => {
 
     const application = await Application.findById(id);
 
-    if (!application) {
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
       return res.status(404).json({
         success: false,
         message: 'Postulación no encontrada',
@@ -412,7 +424,7 @@ export const updateApplicationStatus = async (req, res) => {
 /**
  * @desc    Eliminar una postulación por ID
  * @route   DELETE /api/applications/:id
- * @access  Public
+ * @access  Private (requiere protect)
  */
 export const deleteApplication = async (req, res) => {
   try {
@@ -425,14 +437,19 @@ export const deleteApplication = async (req, res) => {
       });
     }
 
-    const application = await Application.findByIdAndDelete(id);
+    const application = await Application.findById(id);
 
-    if (!application) {
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
       return res.status(404).json({
         success: false,
         message: 'Postulación no encontrada',
       });
     }
+
+    await Application.findByIdAndDelete(id);
 
     return res.status(200).json({
       success: true,
@@ -452,7 +469,7 @@ export const deleteApplication = async (req, res) => {
 /**
  * @desc    Registrar una interacción en una postulación y calcular tiempos de respuesta
  * @route   POST /api/applications/:id/interactions
- * @access  Public
+ * @access  Private (requiere protect)
  */
 export const addInteraction = async (req, res) => {
   try {
@@ -489,7 +506,10 @@ export const addInteraction = async (req, res) => {
     // Buscar la postulación por ID
     const application = await Application.findById(id);
 
-    if (!application) {
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
       return res.status(404).json({
         success: false,
         error: 'Postulación no encontrada',

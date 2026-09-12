@@ -123,6 +123,12 @@ const applicationSchema = new Schema(
       type: Number,
       default: null,
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'El usuario propietario es obligatorio'],
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -130,6 +136,8 @@ const applicationSchema = new Schema(
 );
 
 // Índices para optimizar reportes y búsquedas
+applicationSchema.index({ user: 1, appliedAt: -1 });
+applicationSchema.index({ user: 1, status: 1 });
 applicationSchema.index({ status: 1, appliedAt: -1 });
 applicationSchema.index({ priority: 1 });
 applicationSchema.index({ workMode: 1 });

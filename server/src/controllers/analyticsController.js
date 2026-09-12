@@ -3,13 +3,21 @@ import Application from '../models/Application.js';
 /**
  * @desc    Obtener métricas y analíticas consolidadas mediante Aggregation Pipeline de MongoDB
  * @route   GET /api/analytics/summary
- * @access  Public
+ * @access  Private (requiere protect)
  */
 export const getAnalyticsSummary = async (req, res) => {
   try {
-    const [result] = await Application.aggregate([
-      {
-        $facet: {
+    const pipeline = [];
+
+    // Filtrar métricas únicamente para el usuario autenticado
+    if (req.user?._id) {
+      pipeline.push({
+        $match: { user: req.user._id },
+      });
+    }
+
+    pipeline.push({
+      $facet: {
           // Pipeline 1: Métricas KPI Principales
           kpiMetrics: [
             {
@@ -110,8 +118,9 @@ export const getAnalyticsSummary = async (req, res) => {
             },
           ],
         },
-      },
-    ]);
+      });
+
+    const [result] = await Application.aggregate(pipeline);
 
     // 1. Extraer y procesar KPIs
     const kpiData = result?.kpiMetrics?.[0] || {};

@@ -4,6 +4,19 @@ import mongoose from 'mongoose';
 import app from '../app.js';
 import Application from '../models/Application.js';
 
+const mockUserId = new mongoose.Types.ObjectId('650000000000000000000001');
+
+vi.mock('../middlewares/authMiddleware.js', () => ({
+  protect: (req, _res, next) => {
+    req.user = {
+      _id: mockUserId,
+      name: 'Test User',
+      email: 'test@jobflow.dev',
+    };
+    next();
+  },
+}));
+
 describe('POST /api/applications/:id/interactions - Registro de Interacciones y Cálculo de Tiempos', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -13,6 +26,7 @@ describe('POST /api/applications/:id/interactions - Registro de Interacciones y 
     const appliedAt = overrides.appliedAt || new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
     const appDoc = new Application({
       _id: new mongoose.Types.ObjectId(),
+      user: mockUserId,
       company: { name: 'Empresa Test', website: 'https://test.com' },
       role: 'Backend Developer',
       status: 'ENVIADA',

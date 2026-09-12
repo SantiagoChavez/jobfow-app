@@ -19,8 +19,9 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 | **Endpoint de Salud** | Render | [https://jobfow-api.onrender.com/health](https://jobfow-api.onrender.com/health) | 🟢 200 OK |
 | **Base de Datos** | MongoDB Atlas | Cluster M0 (AWS `sa-east-1` / `us-east-1`) | 🟢 Conectado |
 | **Copiloto IA** | Google Gemini | Modelo `gemini-3.5-flash-lite` | 🟢 Activo |
-| **Manual de Usuario** | Documento PDF | [Manual-de-Usuario-Jobflow.pdf](Manual-de-Usuario-Jobflow.pdf) | 📘 Guía Oficial (4 Págs) |
-| **Guía Rápida (No Dev)** | PDF & Markdown | [Guia-Rapida-Jobflow.pdf](Guia-Rapida-Jobflow.pdf) / [GUIA_USUARIO.md](GUIA_USUARIO.md) | 💡 Guía Visual e Intuitiva |
+| **Manual de Usuario** | Documento PDF | [Manual-de-Usuario-Jobflow.pdf](docs/Manual-de-Usuario-Jobflow.pdf) | 📘 Guía Oficial (4 Págs) |
+| **Guía Rápida (No Dev)** | PDF & Markdown | [Guia-Rapida-Jobflow.pdf](docs/Guia-Rapida-Jobflow.pdf) / [GUIA_USUARIO.md](docs/GUIA_USUARIO.md) | 💡 Guía Visual e Intuitiva |
+| **Centro de Documentación** | Directorio Docs | [Carpeta docs/](docs/) | 📚 Docs, Guías & Specs |
 
 ---
 
@@ -44,7 +45,7 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 
 ## 📖 Manual de Usuario & Especificación del Copiloto de IA
 
-El proyecto cuenta con un **Manual de Usuario oficial en formato PDF vectorial** ([`Manual-de-Usuario-Jobflow.pdf`](Manual-de-Usuario-Jobflow.pdf)) diseñado para postulantes, coaches y evaluadores técnicos.
+El proyecto cuenta con un **Manual de Usuario oficial en formato PDF vectorial** ([`Manual-de-Usuario-Jobflow.pdf`](docs/Manual-de-Usuario-Jobflow.pdf)) diseñado para postulantes, coaches y evaluadores técnicos.
 
 ### 🧠 ¿Qué acciones realiza la Inteligencia Artificial (Google Gemini)?
 Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin procesar de cualquier oferta de empleo y hacer clic en **`✨ Autocompletar con IA`**, el modelo `gemini-3.5-flash-lite` ejecuta 5 acciones cognitivas en paralelo:
@@ -83,6 +84,8 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 - [x] **Copiloto de IA con Google Gemini (Tarjeta 11):** Extracción estructurada de vacantes con `POST /api/ai/analyze-job`, sueldo estimado, cálculo de afinidad técnica (`matchScore`), skills faltantes y generación de pitch de contacto.
 - [x] **Drawer de Seguimientos y Alertas Clave (Tarjeta 12):** Slide-over accesible (`RemindersDrawer`) con filtro de criticidad, trigger seguro `mailto:` y badge reactivo en Navbar.
 - [x] **Toast Global y Paginación Interactiva en Tabla (Tarjeta 12):** Contexto global `ToastContext` reutilizable y botonera numérica interactiva en pie de tabla.
+- [x] **Autenticación Multiusuario y Google OAuth (Tarjeta 13):** Registro tradicional con bcrypt y JWT, inicio de sesión 1-click mediante Google Identity Services (`@google-auth-library`), persistencia de sesión segura y aislamiento de postulaciones por cuenta de usuario.
+- [x] **Modo Claro Armónico & Switch Dual (Tarjeta 14):** Selector de tema interactivo Sol/Luna en Navbar, paleta híbrida descansada (ice/slate con acentos dorados y cobalto), persistencia en `localStorage` y sincronización con perfil de usuario (`PATCH /api/auth/theme`).
 - [x] **Despliegue Full-Stack en la Nube (DevOps):** Frontend en Vercel con SPA routing (`vercel.json`), Backend en Render (`render.yaml`) y Base de Datos en MongoDB Atlas M0.
 
 ---
@@ -99,15 +102,20 @@ El proyecto sigue un flujo de ramificación ordenado para garantizar estabilidad
 
 ## 🎨 Diseño y Modelo de Referencia
 
-El diseño de la interfaz se basa en el documento de especificación visual `modelo para jobflow.pdf`, adoptando el sistema estético **"Deep Cobalt & Crisp Gold"**:
+El diseño de la interfaz se basa en el documento de especificación visual [`modelo para jobflow.pdf`](docs/modelo%20para%20jobflow.pdf), adoptando el sistema estético **"Deep Cobalt & Crisp Gold"** con soporte completo para Tema Dual (Oscuro / Claro Armónico):
 
-* **Paleta cromática base:**
+* **Paleta Modo Oscuro (Deep Cobalt):**
   * Fondo principal: `#0B1329` (`bg-navy-base`)
   * Superficies y tarjetas: `#172554` (`bg-navy-surface`)
   * Resaltados: `#1E3A8A` (`bg-navy-highlight`)
   * Acentos dorados primarios: `#FACC15` (`text-gold-primary`)
   * Variantes doradas: `#FEF08A` (light) y `#CA8A04` (dark)
   * Acentos técnicos: `#38BDF8` (`sky-tech`) y `#93C5FD` (`ice-blue`)
+* **Paleta Modo Claro Armónico:**
+  * Fondo base: Tono hielo / slate descansado (`#f1f5f9` / `#e2e8f0`)
+  * Superficies y tarjetas: Blanco perlado cálido (`#ffffff` / `#f8fafc`) con sombras suaves y bordes cobalto tenues (`#cbd5e1`)
+  * Tipografía y títulos: Azul cobalto profundo y slate de alto contraste (`#0f172a`, `#1e293b`)
+  * Acentos de marca: Dorado ámbar cálido (`#b45309` / `#d97706`) y azul técnico (`#0284c7`)
 * **Vistas proyectadas en el modelo:**
   * **Dashboard:** Tarjetas resumen (Postulaciones, Entrevistas, Ofertas, Tasa de respuesta), gráfico de actividad y postulaciones por estado.
   * **Tablero Tracker (Kanban):** Columnas de estado (*Guardadas*, *Aplicadas*, *Entrevista*, *Oferta*, *Rechazada*).
@@ -120,35 +128,53 @@ El diseño de la interfaz se basa en el documento de especificación visual `mod
 
 ```text
 Jobflow-app/
-├── client/                     # Frontend SPA (React 19, Vite, Tailwind CSS)
+├── client/                     # Frontend SPA (React 19, Vite, Tailwind CSS v3)
 │   ├── src/
+│   │   ├── assets/             # Banners e identidades visuales
+│   │   ├── components/         # Modales, vistas, Kanban, Drawer y AuthModal
+│   │   ├── context/            # AuthContext, ThemeContext, ToastContext
+│   │   ├── hooks/              # useModalA11y y custom hooks
+│   │   ├── services/           # Cliente API centralizado (api.js con JWT)
+│   │   ├── utils/              # Generador seguro mailto y helpers
 │   │   ├── App.jsx             # Componente raíz
-│   │   ├── index.css           # Directivas Tailwind y estilos globales
+│   │   ├── index.css           # Directivas Tailwind y diseño dual
 │   │   └── main.jsx            # Punto de entrada de React
-│   ├── tailwind.config.js      # Configuración y tokens de color
+│   ├── tailwind.config.js      # Configuración de modo oscuro por clase
 │   └── package.json
-├── server/                     # Backend REST API (Node.js, Express, ES Modules)
+├── docs/                       # Centro de documentación y guías oficiales
+│   ├── README.md               # Índice general de documentación
+│   ├── GUIA_USUARIO.md         # Guía de uso rápido para usuarios finales
+│   ├── TASKS.md                # Backlog exhaustivo y roadmap de fases
+│   ├── Guia-Rapida-Jobflow.pdf # Guía visual en PDF vectorial
+│   ├── Manual-de-Usuario-Jobflow.pdf # Manual oficial de 4 páginas
+│   ├── Planificacion de jobflow.pdf  # Especificación de proyecto
+│   ├── modelo para jobflow.pdf # Wireframes y diseño de referencia
+│   └── jobflow-reporte-demo.pdf# Demo de reporte semanal exportado
+├── server/                     # Backend REST API (Node.js, Express 5, ES Modules)
+│   ├── scripts/                # Generadores de PDFs con PDFKit-Table
 │   ├── src/
-│   │   ├── config/             # Configuración de BD y variables
-│   │   ├── controllers/        # Controladores de negocio
-│   │   ├── models/             # Esquemas de persistencia
-│   │   ├── routes/             # Enrutadores Express
-│   │   ├── utils/              # Utilidades auxiliares (skillExtractor, etc.)
+│   │   ├── config/             # Conexión MongoDB y catálogo de skills
+│   │   ├── controllers/        # Controladores (applications, auth, ai, reports, etc.)
+│   │   ├── middlewares/        # authMiddleware (protección Bearer JWT)
+│   │   ├── models/             # Esquemas Mongoose (Application, User)
+│   │   ├── routes/             # Enrutadores Express (auth, apps, ai, reports, analytics)
+│   │   ├── services/           # Servicios (aiService Gemini, pdfService, matchService)
+│   │   ├── utils/              # Generador de tokens JWT
 │   │   └── server.js           # Servidor Express
 │   └── package.json
-├── README.md                   # Documentación principal
 ├── CHANGELOG.md                # Registro histórico de versiones
-└── TASKS.md                    # Backlog y seguimiento de tareas
+└── README.md                   # Documentación principal
 ```
 
 ### Stack Tecnológico
-* **Frontend:** React 19, Vite 8, Tailwind CSS v3, PostCSS, Autoprefixer, Heroicons.
+* **Frontend:** React 19, Vite 8, Tailwind CSS v3 (soporte Dual Dark/Light), PostCSS, Autoprefixer, Heroicons.
 * **Backend:** Node.js (>= v20), Express 5, ES Modules (`"type": "module"`).
-* **Testing:** Vitest 5, Supertest 7 (Pruebas unitarias y de integración de endpoints).
+* **Autenticación & Seguridad:** JWT (`jsonwebtoken`), cifrado `bcryptjs`, Google Identity Services (`google-auth-library`).
+* **Testing:** Vitest 5, Supertest 7 (75 pruebas unitarias y de integración de endpoints automatizadas).
 * **Inteligencia Artificial:** Google Gemini SDK (`@google/genai`), modelo `gemini-3.5-flash-lite`.
 * **Reportes:** PDFKit, PDFKit-Table (Generación vectorial en servidor).
 * **Gestor de paquetes:** `pnpm` (v11+).
-* **Base de datos:** MongoDB Atlas / Mongoose 9 (Esquema enriquecido `Application` con índices y agregaciones).
+* **Base de datos:** MongoDB Atlas / Mongoose 9 (Esquemas enriquecidos `User` y `Application` con índices y agregaciones).
 * **Utilidades:** `cors`, `dotenv`, `nodemon` (desarrollo backend).
 
 ---
@@ -156,7 +182,17 @@ Jobflow-app/
 ## 🗄️ Modelo de Datos
 
 ```text
+[ USER ]
+ ├── name (String, requerido)
+ ├── email (String, requerido, único, indexado)
+ ├── password (String, hasheado con bcryptjs)
+ ├── avatar (String)
+ ├── googleId (String, sparse index)
+ ├── theme ('dark' | 'light', default: 'dark')
+ └── timestamps: (createdAt, updatedAt)
+
 [ APPLICATION ]
+ ├── user: ObjectId (ref: 'User', requerido)
  ├── company:
  │    ├── name (String, requerido)
  │    ├── website (String)
@@ -171,6 +207,9 @@ Jobflow-app/
  ├── jobUrl (String)
  ├── requirementsRaw (String)
  ├── extractedSkills: [String]
+ ├── matchScore (Number, 0-100)
+ ├── suggestedPitch (String)
+ ├── companySummary (String)
  ├── appliedAt (Date, default: Date.now)
  ├── responseTimeDays (Number, default: null)
  ├── timestamps: (createdAt, updatedAt)
@@ -188,8 +227,13 @@ Jobflow-app/
 | Método | Ruta | Descripción | Estado |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | Chequeo de salud del servicio | ✅ Verificado (200 OK) |
-| `POST` | `/api/applications` | Registrar una nueva postulación con validaciones | ✅ Implementado y testeado |
-| `GET` | `/api/applications` | Listar postulaciones con paginación (`page`, `limit`), ordenamiento (`sortBy`, `order`) y filtros combinados (`status`, `priority`, `workMode`, `search`) | ✅ Implementado y testeado |
+| `POST` | `/api/auth/register` | Registro tradicional de usuario y emisión de JWT | ✅ Implementado y testeado |
+| `POST` | `/api/auth/login` | Inicio de sesión tradicional y emisión de JWT | ✅ Implementado y testeado |
+| `POST` | `/api/auth/google` | Autenticación 1-click con Google OAuth y emisión de JWT | ✅ Implementado y testeado |
+| `GET` | `/api/auth/me` | Obtener perfil del usuario autenticado (requiere JWT) | ✅ Implementado y testeado |
+| `PATCH` | `/api/auth/theme` | Sincronizar preferencia de tema ('dark' \| 'light') | ✅ Implementado y testeado |
+| `POST` | `/api/applications` | Registrar una nueva postulación asociada al usuario | ✅ Implementado y testeado |
+| `GET` | `/api/applications` | Listar postulaciones con paginación (`page`, `limit`), ordenamiento (`sortBy`, `order`) y filtros combinados | ✅ Implementado y testeado |
 | `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
 | `POST` | `/api/ai/analyze-job` | Extraer datos de vacantes con Google Gemini y generar pitch sugerido | ✅ Implementado y testeado |
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
@@ -243,7 +287,7 @@ pnpm run dev
 ### En `/server`:
 * `pnpm run dev`: Inicia el servidor backend con recarga automática (`nodemon`).
 * `pnpm start`: Inicia el servidor en modo producción con Node nativo.
-* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest.
+* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest (75 tests).
 * `pnpm run test:watch`: Ejecuta las pruebas en modo interactivo/watch.
 
 ### En `/client`:
@@ -255,4 +299,5 @@ pnpm run dev
 
 ## 🗺️ Roadmap de Tareas
 
-Para consultar el backlog detallado, criterios de aceptación y orden de ejecución paso a paso, consulta el archivo [TASKS.md](TASKS.md).
+Para consultar el backlog detallado, criterios de aceptación y orden de ejecución paso a paso, consulta el archivo [TASKS.md](docs/TASKS.md).
+
