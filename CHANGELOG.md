@@ -9,6 +9,17 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+### Added
+- **Centralización y Reestructuración de Documentación en Carpeta `/docs`:**
+  - Traslado de toda la documentación del proyecto (`GUIA_USUARIO.md`, `TASKS.md`, `Guia-Rapida-Jobflow.pdf`, `Manual-de-Usuario-Jobflow.pdf`, `Planificacion de jobflow.pdf`, `modelo para jobflow.pdf`, `jobflow-reporte-demo.pdf`) al nuevo directorio centralizado `docs/`, preservando exclusivamente `README.md` y `CHANGELOG.md` en la raíz.
+  - Creación del índice maestro `docs/README.md` con tabla descriptiva de manuales, especificaciones y comandos para generar documentos PDF.
+  - Actualización de los scripts de generación server-side `server/scripts/generateFriendlyGuidePdf.js` y `server/scripts/generateManualPdf.js` para compilar directamente sobre `docs/`.
+  - Ajuste de `.gitignore` para permitir el rastreo de PDFs en `!docs/*.pdf`.
+  - Actualización de la guía de usuario (`docs/GUIA_USUARIO.md`) con las nuevas secciones de autenticación multiusuario/Google OAuth y switch de tema dual armónico.
+- **Correcciones de Code Review e Integración Resiliente:**
+  - Intercepción y manejo reactivo de error HTTP 401 en descarga de reportes PDF (`downloadPdfReport` en `client/src/services/api.js`), eliminando el token expirado de `localStorage` y disparando el evento global `jobflow:unauthorized`.
+  - Sincronización inteligente de tema en `ThemeContext.jsx`: respeto prioritario de la preferencia activa local del usuario en `localStorage` ante un login/registro reciente, sincronizándola contra la base de datos (`PATCH /api/auth/theme`).
+
 ### Changed
 - **Renombrado integral del proyecto a Jobflow:**
   - Actualización de nombres de paquetes (`jobflow-server`, `jobflow-client`) y endpoint `/health` (`Jobflow API`).
