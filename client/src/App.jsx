@@ -336,17 +336,17 @@ export function App() {
   // Pantalla de carga mientras se valida la sesión persistida
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-navy-base flex flex-col items-center justify-center gap-4 text-slate-300">
-        <div className="w-12 h-12 rounded-2xl bg-navy-surface border border-gold-primary/40 flex items-center justify-center text-gold-primary shadow-xl shadow-gold-primary/10">
+      <div className="min-h-screen bg-light-base dark:bg-navy-base flex flex-col items-center justify-center gap-4 text-slate-700 dark:text-slate-300 transition-colors duration-200">
+        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-navy-surface border border-slate-200 dark:border-gold-primary/40 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-xl dark:shadow-gold-primary/10">
           <RadarIcon className="w-7 h-7 animate-pulse" />
         </div>
-        <p className="text-sm font-semibold tracking-wide text-slate-400">Verificando sesión en Jobflow...</p>
+        <p className="text-sm font-semibold tracking-wide text-slate-500 dark:text-slate-400">Verificando sesión en Jobflow...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-navy-base text-slate-100 flex flex-col selection:bg-gold-primary selection:text-navy-base">
+    <div className="min-h-screen bg-light-base text-slate-900 dark:bg-navy-base dark:text-slate-100 flex flex-col transition-colors duration-200 selection:bg-amber-500/30 selection:text-slate-900 dark:selection:bg-gold-primary dark:selection:text-navy-base">
       {/* Navbar Superior con Campana y Menú de Usuario */}
       <Navbar
         currentView={currentView}
@@ -380,33 +380,33 @@ export function App() {
         {!isAuthenticated ? (
           /* Estado Desconectado / Landing de Bienvenida y Seguridad */
           <div className="py-8 md:py-16 flex flex-col items-center text-center max-w-3xl mx-auto animate-fade-in">
-            <div className="w-16 h-16 rounded-2xl bg-navy-surface border border-gold-primary/40 flex items-center justify-center text-gold-primary shadow-2xl shadow-gold-primary/20 mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-navy-surface border border-slate-200 dark:border-gold-primary/40 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-xl dark:shadow-2xl shadow-slate-200/50 dark:shadow-gold-primary/20 mb-6">
               <RadarIcon className="w-9 h-9" />
             </div>
 
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gold-primary/10 border border-gold-primary/30 text-gold-primary text-xs font-bold uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 dark:bg-gold-primary/10 border border-amber-500/30 dark:border-gold-primary/30 text-amber-700 dark:text-gold-primary text-xs font-bold uppercase tracking-wider mb-4">
               <SparklesIcon className="w-3.5 h-3.5" />
               <span>Jobflow Radar PRO • Tu Espacio Privado</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
-              Gestiona tu búsqueda laboral con el poder de la <span className="text-gold-primary">Inteligencia Artificial</span>
+            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
+              Gestiona tu búsqueda laboral con el poder de la <span className="text-amber-600 dark:text-gold-primary">Inteligencia Artificial</span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 mb-8 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mb-8 max-w-2xl leading-relaxed">
               Registra y dale seguimiento a tus postulaciones, autocompleta vacantes con Gemini AI, calcula afinidad técnica en tiempo real y descarga reportes PDF ejecutivos en un espacio seguro y exclusivo para tu perfil.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => openAuthModal('register')}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl font-black text-sm bg-gold-primary hover:bg-gold-light text-navy-base shadow-lg shadow-gold-primary/20 hover:shadow-gold-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl font-black text-sm bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 shadow-lg shadow-amber-500/20 dark:shadow-gold-primary/20 hover:shadow-amber-500/30 dark:hover:shadow-gold-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 Crear Cuenta Gratis
               </button>
               <button
                 onClick={() => openAuthModal('login')}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm bg-navy-surface border border-slate-700 hover:border-gold-primary/60 text-slate-200 hover:text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 hover:border-amber-400 dark:hover:border-gold-primary/60 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
               >
                 Iniciar Sesión
               </button>
@@ -414,32 +414,32 @@ export function App() {
 
             {/* Tarjetas informativas de características */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 w-full text-left">
-              <div className="p-5 rounded-2xl bg-navy-surface/80 border border-slate-800 shadow-lg">
-                <div className="w-9 h-9 rounded-xl bg-navy-highlight border border-slate-700 flex items-center justify-center text-sky-tech mb-3">
+              <div className="p-5 rounded-2xl bg-white dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-navy-highlight border border-slate-200 dark:border-slate-700 flex items-center justify-center text-sky-600 dark:text-sky-tech mb-3">
                   <KanbanIcon className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1.5">Tablero Kanban & Alertas</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Tablero Kanban & Alertas</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Arrastra tus postulaciones por estado, registra eventos cronológicos y calcula tiempos de respuesta automáticamente.
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-navy-surface/80 border border-slate-800 shadow-lg">
-                <div className="w-9 h-9 rounded-xl bg-navy-highlight border border-slate-700 flex items-center justify-center text-gold-primary mb-3">
+              <div className="p-5 rounded-2xl bg-white dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-navy-highlight border border-slate-200 dark:border-slate-700 flex items-center justify-center text-amber-600 dark:text-gold-primary mb-3">
                   <SparklesIcon className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1.5">Copiloto IA con Gemini</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Copiloto IA con Gemini</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Pega cualquier oferta laboral y extrae instantáneamente las habilidades clave, resumen y pitch de presentación.
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-navy-surface/80 border border-slate-800 shadow-lg">
-                <div className="w-9 h-9 rounded-xl bg-navy-highlight border border-slate-700 flex items-center justify-center text-emerald-400 mb-3">
+              <div className="p-5 rounded-2xl bg-white dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg">
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-navy-highlight border border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3">
                   <FileTextIcon className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1.5">Reportes PDF & Métricas</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Reportes PDF & Métricas</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Analítica de conversión, empresas más ágiles y descarga de reportes ejecutivos en PDF para compartir con tu coach.
                 </p>
               </div>

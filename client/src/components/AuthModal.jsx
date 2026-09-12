@@ -203,34 +203,34 @@ export const AuthModal = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
       <div
-        className="relative w-full max-w-md bg-navy-base border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden animate-scale-up"
+        className="relative w-full max-w-md bg-white dark:bg-navy-base border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl shadow-slate-900/20 dark:shadow-black/60 overflow-hidden animate-scale-up transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra decorativa superior */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-tech via-gold-primary to-amber-500" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-sky-500 via-amber-500 to-amber-600 dark:from-sky-tech dark:via-gold-primary dark:to-amber-500" />
 
         {/* Header con botón cerrar */}
-        <div className="px-6 pt-5 pb-3 flex items-center justify-between border-b border-slate-800/80">
+        <div className="px-6 pt-5 pb-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-navy-surface border border-slate-700/80 flex items-center justify-center text-gold-primary">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-navy-surface border border-slate-200 dark:border-slate-700/80 flex items-center justify-center text-amber-600 dark:text-gold-primary">
               <RadarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h2 id="auth-modal-title" className="text-lg font-black text-white tracking-tight">
-                Job<span className="text-gold-primary">Flow</span>{' '}
-                <span className="text-xs font-normal text-slate-400">Auth</span>
+              <h2 id="auth-modal-title" className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                Job<span className="text-amber-600 dark:text-gold-primary">Flow</span>{' '}
+                <span className="text-xs font-normal text-slate-500 dark:text-slate-400">Auth</span>
               </h2>
             </div>
           </div>
           <button
             onClick={closeAuthModal}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
             aria-label="Cerrar modal"
           >
             <CloseIcon className="w-5 h-5" />
@@ -238,7 +238,7 @@ export const AuthModal = () => {
         </div>
 
         {/* Pestañas: Iniciar Sesión / Registrarse */}
-        <div className="flex border-b border-slate-800 bg-navy-surface/50 p-1.5 mx-6 mt-4 rounded-xl">
+        <div className="flex border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-navy-surface/50 p-1.5 mx-6 mt-4 rounded-xl">
           <button
             type="button"
             onClick={() => {
@@ -248,8 +248,8 @@ export const AuthModal = () => {
             }}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
               activeTab === 'login'
-                ? 'bg-navy-highlight text-gold-primary shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white dark:bg-navy-highlight text-amber-700 dark:text-gold-primary shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             Iniciar Sesión
@@ -263,8 +263,8 @@ export const AuthModal = () => {
             }}
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
               activeTab === 'register'
-                ? 'bg-navy-highlight text-gold-primary shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white dark:bg-navy-highlight text-amber-700 dark:text-gold-primary shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             Crear Cuenta
@@ -275,8 +275,8 @@ export const AuthModal = () => {
         <div className="p-6">
           {/* Mensaje de Error si ocurre */}
           {errorMessage && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-shake">
-              <AlertCircleIcon className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-shake">
+              <AlertCircleIcon className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
               <p className="flex-1">{errorMessage}</p>
             </div>
           )}
@@ -294,7 +294,7 @@ export const AuthModal = () => {
                 type="button"
                 onClick={handleManualGoogleClick}
                 disabled={submitting}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 hover:bg-slate-800 hover:border-slate-600 transition-all shadow-sm group"
+                className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-sm group"
               >
                 <GoogleIcon className="w-4 h-4" />
                 <span>Continuar con Google</span>
@@ -305,10 +305,10 @@ export const AuthModal = () => {
           {/* Separador Visual */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-800" />
+              <div className="w-full border-t border-slate-200 dark:border-slate-800" />
             </div>
             <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
-              <span className="bg-navy-base px-3 text-slate-500 font-medium">
+              <span className="bg-white dark:bg-navy-base px-3 text-slate-500 font-medium">
                 {activeTab === 'login' ? 'o ingresa con tu correo' : 'o regístrate con email'}
               </span>
             </div>
@@ -318,11 +318,11 @@ export const AuthModal = () => {
           {activeTab === 'login' ? (
             <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Correo Electrónico
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                     <MailIcon className="w-4 h-4" />
                   </span>
                   <input
@@ -332,17 +332,17 @@ export const AuthModal = () => {
                     onChange={(e) => setLoginEmail(e.target.value)}
                     placeholder="ejemplo@correo.com"
                     disabled={submitting}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-primary focus:ring-1 focus:ring-gold-primary transition-all disabled:opacity-50"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary focus:ring-1 focus:ring-amber-500 dark:focus:ring-gold-primary transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Contraseña
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                     <LockIcon className="w-4 h-4" />
                   </span>
                   <input
@@ -352,12 +352,12 @@ export const AuthModal = () => {
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={submitting}
-                    className="w-full pl-9 pr-10 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-primary focus:ring-1 focus:ring-gold-primary transition-all disabled:opacity-50"
+                    className="w-full pl-9 pr-10 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary focus:ring-1 focus:ring-amber-500 dark:focus:ring-gold-primary transition-all disabled:opacity-50"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
                     aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                   >
                     {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
@@ -368,11 +368,11 @@ export const AuthModal = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-gold-primary hover:bg-gold-light text-navy-base transition-all duration-200 shadow-md shadow-gold-primary/20 hover:shadow-gold-primary/30 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 dark:text-navy-base transition-all duration-200 shadow-md shadow-amber-500/20 dark:shadow-gold-primary/20 hover:shadow-amber-500/30 dark:hover:shadow-gold-primary/30 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-navy-base border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-slate-950 dark:border-navy-base border-t-transparent rounded-full animate-spin" />
                     <span>Iniciando Sesión...</span>
                   </>
                 ) : (
@@ -384,11 +384,11 @@ export const AuthModal = () => {
             /* Formulario 2: Crear Cuenta */
             <form onSubmit={handleRegisterSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Nombre Completo
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                     <UserIcon className="w-4 h-4" />
                   </span>
                   <input
@@ -398,17 +398,17 @@ export const AuthModal = () => {
                     onChange={(e) => setRegisterName(e.target.value)}
                     placeholder="Tu nombre y apellido"
                     disabled={submitting}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-primary focus:ring-1 focus:ring-gold-primary transition-all disabled:opacity-50"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary focus:ring-1 focus:ring-amber-500 dark:focus:ring-gold-primary transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Correo Electrónico
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                     <MailIcon className="w-4 h-4" />
                   </span>
                   <input
@@ -418,14 +418,14 @@ export const AuthModal = () => {
                     onChange={(e) => setRegisterEmail(e.target.value)}
                     placeholder="ejemplo@correo.com"
                     disabled={submitting}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-primary focus:ring-1 focus:ring-gold-primary transition-all disabled:opacity-50"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary focus:ring-1 focus:ring-amber-500 dark:focus:ring-gold-primary transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Contraseña
                   </label>
                   <div className="relative">
@@ -436,13 +436,13 @@ export const AuthModal = () => {
                       onChange={(e) => setRegisterPassword(e.target.value)}
                       placeholder="Mín. 6 caracteres"
                       disabled={submitting}
-                      className="w-full px-3 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-primary focus:ring-1 focus:ring-gold-primary transition-all disabled:opacity-50"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary focus:ring-1 focus:ring-amber-500 dark:focus:ring-gold-primary transition-all disabled:opacity-50"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Confirmar
                   </label>
                   <div className="relative">
@@ -453,7 +453,7 @@ export const AuthModal = () => {
                       onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                       placeholder="Repite la clave"
                       disabled={submitting}
-                      className="w-full px-3 py-2 bg-slate-900/90 border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-primary focus:ring-1 focus:ring-gold-primary transition-all disabled:opacity-50"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary focus:ring-1 focus:ring-amber-500 dark:focus:ring-gold-primary transition-all disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -463,7 +463,7 @@ export const AuthModal = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-[11px] text-sky-tech hover:text-sky-300 flex items-center gap-1.5 transition-colors"
+                  className="text-[11px] text-sky-600 dark:text-sky-tech hover:text-sky-700 dark:hover:text-sky-300 flex items-center gap-1.5 transition-colors"
                 >
                   {showPassword ? <EyeOffIcon className="w-3.5 h-3.5" /> : <EyeIcon className="w-3.5 h-3.5" />}
                   <span>{showPassword ? 'Ocultar contraseñas' : 'Ver contraseñas'}</span>
@@ -473,11 +473,11 @@ export const AuthModal = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-gold-primary hover:bg-gold-light text-navy-base transition-all duration-200 shadow-md shadow-gold-primary/20 hover:shadow-gold-primary/30 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 dark:text-navy-base transition-all duration-200 shadow-md shadow-amber-500/20 dark:shadow-gold-primary/20 hover:shadow-amber-500/30 dark:hover:shadow-gold-primary/30 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-navy-base border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-slate-950 dark:border-navy-base border-t-transparent rounded-full animate-spin" />
                     <span>Creando Cuenta...</span>
                   </>
                 ) : (
@@ -488,7 +488,7 @@ export const AuthModal = () => {
           )}
 
           {/* Footer del Modal */}
-          <div className="mt-4 pt-3 border-t border-slate-800/80 text-center text-xs text-slate-400">
+          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800/80 text-center text-xs text-slate-500 dark:text-slate-400">
             {activeTab === 'login' ? (
               <p>
                 ¿No tienes una cuenta?{' '}
@@ -499,7 +499,7 @@ export const AuthModal = () => {
                     setAuthModalTab('register');
                     setErrorMessage('');
                   }}
-                  className="text-gold-primary font-bold hover:underline"
+                  className="text-amber-700 dark:text-gold-primary font-bold hover:underline"
                 >
                   Regístrate gratis
                 </button>
@@ -514,7 +514,7 @@ export const AuthModal = () => {
                     setAuthModalTab('login');
                     setErrorMessage('');
                   }}
-                  className="text-gold-primary font-bold hover:underline"
+                  className="text-amber-700 dark:text-gold-primary font-bold hover:underline"
                 >
                   Inicia sesión aquí
                 </button>

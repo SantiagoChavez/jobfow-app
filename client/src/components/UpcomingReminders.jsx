@@ -49,22 +49,22 @@ export const UpcomingReminders = ({
   }
 
   return (
-    <div className="mb-6 p-4 rounded-2xl bg-navy-surface/60 border border-slate-800 backdrop-blur-sm">
+    <div className="mb-6 p-4 rounded-2xl bg-white/80 dark:bg-navy-surface/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none backdrop-blur-sm transition-colors">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <CalendarIcon className="w-4 h-4 text-sky-tech" />
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+          <CalendarIcon className="w-4 h-4 text-sky-600 dark:text-sky-tech" />
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
             Seguimientos y Alertas Clave
           </h4>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[11px] text-slate-400 font-medium">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
             {reminders.length} prioritarios
           </span>
           {onOpenReminders && (
             <button
               onClick={onOpenReminders}
-              className="text-xs font-bold text-sky-tech hover:text-gold-primary transition-colors flex items-center gap-0.5"
+              className="text-xs font-bold text-sky-600 dark:text-sky-tech hover:text-amber-600 dark:hover:text-gold-primary transition-colors flex items-center gap-0.5"
             >
               <span>Ver panel</span>
               <ChevronRightIcon className="w-3.5 h-3.5" />
@@ -78,27 +78,27 @@ export const UpcomingReminders = ({
           <div
             key={rem._id}
             onClick={() => onSelectApplication(rem)}
-            className="p-3 rounded-xl bg-navy-base/70 border border-slate-800 hover:border-slate-700 cursor-pointer transition-all flex flex-col justify-between group"
+            className="p-3 rounded-xl bg-slate-50/90 dark:bg-navy-base/70 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 cursor-pointer transition-all flex flex-col justify-between group shadow-sm dark:shadow-none"
           >
             <div>
               <div className="flex items-center justify-between gap-1 mb-1">
-                <span className="text-xs font-bold text-white group-hover:text-gold-primary transition-colors truncate">
+                <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-gold-primary transition-colors truncate">
                   {rem.company?.name}
                 </span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded font-semibold bg-slate-800 text-sky-tech border border-slate-700">
+                <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-slate-200/80 dark:bg-slate-800 text-sky-700 dark:text-sky-tech border border-slate-300 dark:border-slate-700">
                   {rem.status}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 font-medium mb-1 truncate">
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium mb-1 truncate">
                 {rem.role}
               </p>
-              <p className="text-[10px] text-gold-light/90 flex items-center gap-1 font-medium">
-                <ClockIcon className="w-3 h-3 text-gold-primary flex-shrink-0" />
+              <p className="text-[10px] text-amber-700 dark:text-gold-light/90 flex items-center gap-1 font-medium">
+                <ClockIcon className="w-3 h-3 text-amber-600 dark:text-gold-primary flex-shrink-0" />
                 <span>{rem.message}</span>
               </p>
             </div>
 
-            <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-end text-[10px] font-bold text-sky-tech group-hover:text-gold-primary">
+            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-end text-[10px] font-bold text-sky-600 dark:text-sky-tech group-hover:text-amber-600 dark:group-hover:text-gold-primary">
               <span>Gestionar</span>
               <ChevronRightIcon className="w-3 h-3" />
             </div>
