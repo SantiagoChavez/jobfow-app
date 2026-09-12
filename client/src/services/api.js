@@ -249,6 +249,18 @@ export async function getMe() {
   return await request('/auth/me');
 }
 
+/**
+ * Actualizar preferencia de tema del usuario ('dark' | 'light') en base de datos
+ * @param {'dark'|'light'} theme
+ * @returns {Promise<{ success: boolean, theme: string }>}
+ */
+export async function updateUserTheme(theme) {
+  return await request('/auth/theme', {
+    method: 'PATCH',
+    body: JSON.stringify({ theme }),
+  });
+}
+
 export default {
   getApplications,
   getApplicationById,
@@ -264,4 +276,5 @@ export default {
   registerUser,
   googleAuthUser,
   getMe,
+  updateUserTheme,
 };
