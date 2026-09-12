@@ -233,25 +233,25 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 
 ---
 
-## 🔐 Fase 11: Autenticación de Usuarios y Google OAuth (Tarjeta Trello 13 - Pendiente)
-- [ ] **11.1 Modelo de Datos y Seguridad en Servidor (`server/src/models/User.js`)**
-  - [ ] Crear esquema de usuario `User` con campos `name`, `email` (único e indexado), `password` (hasheado con bcryptjs para registro tradicional), `avatar`, `googleId` (índice sparse), `theme` ('dark' | 'light') y timestamps.
-  - [ ] Métodos de seguridad: comparación de contraseñas (`matchPassword`) y exclusión de hash en respuestas JSON.
-  - [ ] Actualizar modelo `Application` para asociar postulaciones a un usuario específico (`user: { type: ObjectId, ref: 'User' }`).
-- [ ] **11.2 Controladores y Rutas de Autenticación (`server/src/controllers/authController.js`)**
-  - [ ] Implementar `POST /api/auth/register`: validación de campos, hash de contraseña y emisión de token JWT.
-  - [ ] Implementar `POST /api/auth/login`: validación de credenciales y retorno de sesión JWT.
-  - [ ] Implementar `POST /api/auth/google`: verificación de token con Google Identity Services (`google-auth-library`), registro/inicio de sesión federado y emisión de JWT.
-  - [ ] Implementar `GET /api/auth/me`: obtención del perfil del usuario autenticado.
-  - [ ] Middleware `protect` (`server/src/middlewares/authMiddleware.js`): validación de token `Bearer` y protección de rutas privadas.
-- [ ] **11.3 Suite de Pruebas Automatizadas en Vitest (`server/src/tests/auth.test.js`)**
-  - [ ] Pruebas unitarias de registro tradicional, login con credenciales válidas/inválidas y verificación de Google OAuth.
-  - [ ] Pruebas de protección de rutas privadas (401 Unauthorized sin token).
-- [ ] **11.4 Contexto Global y Vistas de Autenticación en Frontend (`client/src/context/AuthContext.jsx`)**
-  - [ ] Proveedor `AuthContext` con persistencia de token en `localStorage`, manejo de estado `user`, `login`, `logout` y `loginWithGoogle`.
-  - [ ] Modal/Vista de Autenticación (`AuthModal.jsx`): pestañas de Iniciar Sesión y Registro con validaciones visuales en tiempo real.
-  - [ ] Botón de *"Continuar con Google"* integrado con la librería oficial `@react-oauth/google` o Google Identity Services.
-  - [ ] Menú de Perfil de Usuario en `Navbar.jsx`: visualización de avatar/nombre y botón de "Cerrar Sesión" (Logout) con confirmación toast.
+## 🔐 Fase 11: Autenticación de Usuarios y Google OAuth (Tarjeta Trello 13 - Completada)
+- [x] **11.1 Modelo de Datos y Seguridad en Servidor (`server/src/models/User.js`)**
+  - [x] Crear esquema de usuario `User` con campos `name`, `email` (único e indexado), `password` (hasheado con bcryptjs para registro tradicional), `avatar`, `googleId` (índice sparse), `theme` ('dark' | 'light') y timestamps.
+  - [x] Métodos de seguridad: comparación de contraseñas (`matchPassword`) y exclusión de hash en respuestas JSON.
+  - [x] Actualizar modelo `Application` para asociar postulaciones a un usuario específico (`user: { type: ObjectId, ref: 'User' }`).
+- [x] **11.2 Controladores y Rutas de Autenticación (`server/src/controllers/authController.js`)**
+  - [x] Implementar `POST /api/auth/register`: validación de campos, hash de contraseña y emisión de token JWT.
+  - [x] Implementar `POST /api/auth/login`: validación de credenciales y retorno de sesión JWT.
+  - [x] Implementar `POST /api/auth/google`: verificación de token con Google Identity Services (`google-auth-library`), registro/inicio de sesión federado y emisión de JWT.
+  - [x] Implementar `GET /api/auth/me`: obtención del perfil del usuario autenticado.
+  - [x] Middleware `protect` (`server/src/middlewares/authMiddleware.js`): validación de token `Bearer` y protección de rutas privadas.
+- [x] **11.3 Suite de Pruebas Automatizadas en Vitest (`server/src/tests/auth.test.js`)**
+  - [x] Pruebas unitarias de registro tradicional, login con credenciales válidas/inválidas y verificación de Google OAuth.
+  - [x] Pruebas de protección de rutas privadas (401 Unauthorized sin token).
+- [x] **11.4 Contexto Global y Vistas de Autenticación en Frontend (`client/src/context/AuthContext.jsx`)**
+  - [x] Proveedor `AuthContext` con persistencia de token en `localStorage`, manejo de estado `user`, `login`, `logout` y `loginWithGoogle`.
+  - [x] Modal/Vista de Autenticación (`AuthModal.jsx`): pestañas de Iniciar Sesión y Registro con validaciones visuales en tiempo real.
+  - [x] Botón de *"Continuar con Google"* integrado con la librería oficial `@react-oauth/google` o Google Identity Services.
+  - [x] Menú de Perfil de Usuario en `Navbar.jsx`: visualización de avatar/nombre y botón de "Cerrar Sesión" (Logout) con confirmación toast.
 
 ---
 

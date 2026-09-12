@@ -125,6 +125,20 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Badge reactivo y disparador de campana en `Navbar.jsx` con contador en vivo de alertas pendientes.
   - Stack counter en `useModalA11y.js` para mantener el bloqueo de scroll (`overflow: hidden`) al abrir modales anidados sobre el drawer.
 
+- **Sistema de Autenticación, Registro y Google OAuth (Tarjeta 13):**
+  - Modelo `User` en Mongoose (`server/src/models/User.js`) con campos `name`, `email` único, `password` hasheado con `bcryptjs`, `avatar`, `googleId` con índice sparse, `theme` y timestamps.
+  - Métodos criptográficos: `matchPassword` con `bcrypt.compare`, hook `pre('save')` para hasheo con salt de 10 rondas y transformación `toJSON` para excluir hash de contraseñas.
+  - Vinculación y aislamiento de datos: asociación de postulaciones en `Application.js` con `user: { type: ObjectId, ref: 'User' }`, índices compuestos `{ user: 1, appliedAt: -1 }` y `{ user: 1, status: 1 }`.
+  - Scoping de consultas por usuario en `applicationController.js`, pipeline de analíticas en `analyticsController.js` y reportes en `reportController.js`.
+  - Rutas y controladores de auth (`POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/google`, `GET /api/auth/me`).
+  - Middleware de protección Express `protect` (`server/src/middlewares/authMiddleware.js`) para validar tokens Bearer JWT y salvaguardar endpoints privados.
+  - Integración de Google OAuth con `google-auth-library` para verificar ID tokens federados.
+  - Suite automatizada en Vitest (`server/src/tests/auth.test.js`) con 17 pruebas unitarias y de integración (72 tests pasando al 100%).
+  - Frontend: `AuthContext.jsx` para gestión global de sesión, persistencia de token en `localStorage` e inyección automática en `client/src/services/api.js`.
+  - Componente modal `AuthModal.jsx`: accesible vía `useModalA11y`, con selector de pestañas (Iniciar Sesión / Registro), botón "Continuar con Google", validación en tiempo real y feedback visual de errores.
+  - Menú de perfil y logout en `Navbar.jsx`: avatar con foto/iniciales, menú desplegable con datos de cuenta, botón de cerrar sesión y notificación toast.
+  - Vista landing / bienvenida en `App.jsx` para usuarios no autenticados, protegiendo los datos privados del usuario.
+
 - **Despliegue Full-Stack en la Nube y DevOps:**
   - Configuración de SPA rewrites en Vercel (`client/vercel.json`) para prevenir errores 404 en recargas.
   - Creación del blueprint declarativo de Render (`render.yaml`) con comandos de build, start y health check.
