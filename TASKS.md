@@ -231,4 +231,52 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Botón de copiado con 1-click al portapapeles (`navigator.clipboard`) y notificación toast de éxito.
   - [x] Visualización de resumen de empresa (`companySummary`) y badge de afinidad técnica (`matchScore`).
 
+---
+
+## 🔐 Fase 11: Autenticación de Usuarios y Google OAuth (Tarjeta Trello 13 - Pendiente)
+- [ ] **11.1 Modelo de Datos y Seguridad en Servidor (`server/src/models/User.js`)**
+  - [ ] Crear esquema de usuario `User` con campos `name`, `email` (único e indexado), `password` (hasheado con bcryptjs para registro tradicional), `avatar`, `googleId` (índice sparse), `theme` ('dark' | 'light') y timestamps.
+  - [ ] Métodos de seguridad: comparación de contraseñas (`matchPassword`) y exclusión de hash en respuestas JSON.
+  - [ ] Actualizar modelo `Application` para asociar postulaciones a un usuario específico (`user: { type: ObjectId, ref: 'User' }`).
+- [ ] **11.2 Controladores y Rutas de Autenticación (`server/src/controllers/authController.js`)**
+  - [ ] Implementar `POST /api/auth/register`: validación de campos, hash de contraseña y emisión de token JWT.
+  - [ ] Implementar `POST /api/auth/login`: validación de credenciales y retorno de sesión JWT.
+  - [ ] Implementar `POST /api/auth/google`: verificación de token con Google Identity Services (`google-auth-library`), registro/inicio de sesión federado y emisión de JWT.
+  - [ ] Implementar `GET /api/auth/me`: obtención del perfil del usuario autenticado.
+  - [ ] Middleware `protect` (`server/src/middlewares/authMiddleware.js`): validación de token `Bearer` y protección de rutas privadas.
+- [ ] **11.3 Suite de Pruebas Automatizadas en Vitest (`server/src/tests/auth.test.js`)**
+  - [ ] Pruebas unitarias de registro tradicional, login con credenciales válidas/inválidas y verificación de Google OAuth.
+  - [ ] Pruebas de protección de rutas privadas (401 Unauthorized sin token).
+- [ ] **11.4 Contexto Global y Vistas de Autenticación en Frontend (`client/src/context/AuthContext.jsx`)**
+  - [ ] Proveedor `AuthContext` con persistencia de token en `localStorage`, manejo de estado `user`, `login`, `logout` y `loginWithGoogle`.
+  - [ ] Modal/Vista de Autenticación (`AuthModal.jsx`): pestañas de Iniciar Sesión y Registro con validaciones visuales en tiempo real.
+  - [ ] Botón de *"Continuar con Google"* integrado con la librería oficial `@react-oauth/google` o Google Identity Services.
+  - [ ] Menú de Perfil de Usuario en `Navbar.jsx`: visualización de avatar/nombre y botón de "Cerrar Sesión" (Logout) con confirmación toast.
+
+---
+
+## 🌓 Fase 12: Modo Claro Armónico y Switch de Tema Dual (Tarjeta Trello 14 - Pendiente)
+- [ ] **12.1 Definición de la Paleta Light Armónica (Tailwind & CSS Tokens)**
+  - [ ] Definir tokens de color para evitar el blanco puro estridente (`#ffffff`) y mantener la identidad Deep Cobalt & Gold:
+    - Fondo base suave: Tono hielo / slate refinado (`#f1f5f9` / `#e2e8f0` sutil).
+    - Superficies de tarjetas y modales: Blanco perlado cálido (`#ffffff` / `#f8fafc`) con sombras suaves y bordes cobalto tenues (`#cbd5e1`).
+    - Tipografía y títulos: Azul cobalto profundo y slate de alto contraste (`#0f172a`, `#1e293b`).
+    - Acentos de marca: Dorado ámbar de alto contraste sobre fondo claro (`#b45309` / `#d97706`) y azul técnico (`#0284c7`).
+  - [ ] Configurar estrategia `darkMode: 'class'` en `client/tailwind.config.js` y variables CSS semánticas en `client/src/index.css`.
+- [ ] **12.2 Componente Switch de Tema Interactivo (`ThemeToggle.jsx`)**
+  - [ ] Diseñar botón toggle fluido con iconos animados de Sol (modo claro) y Luna (modo oscuro).
+  - [ ] Ubicar el switch en `Navbar.jsx` accesible tanto en desktop como en dispositivos móviles.
+  - [ ] Transiciones CSS suaves entre paletas (`transition-colors duration-200`).
+- [ ] **12.3 Contexto de Tema y Persistencia (`ThemeContext.jsx`)**
+  - [ ] Hook `useTheme()` para conmutación de estado entre `'dark'` y `'light'`.
+  - [ ] Detección automática de preferencia del sistema operativo (`window.matchMedia('(prefers-color-scheme: dark)')`).
+  - [ ] Persistencia inmediata en `localStorage` (`jobflow_theme`).
+  - [ ] Sincronización automática con la preferencia guardada en el perfil del usuario autenticado (`User.theme`).
+- [ ] **12.4 Adaptación Visual Integral de Componentes**
+  - [ ] Tablero Kanban (`KanbanBoard.jsx`): columnas con fondos tintados suaves y tarjetas con contraste nítido.
+  - [ ] Tabla de Postulaciones (`ApplicationTable.jsx`): filas alternadas y encabezados contrastados.
+  - [ ] Métricas y KPIs (`MetricsSummary.jsx`): tarjetas estadísticas con bordes sutiles y textos oscuros legibles.
+  - [ ] Modales y Drawer (`QuickAddModal`, `ApplicationDetailModal`, `ReportModal`, `RemindersDrawer`): adaptación completa sin perder la jerarquía visual.
+
+
 
