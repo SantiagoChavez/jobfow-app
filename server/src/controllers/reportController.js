@@ -4,13 +4,18 @@ import { generateApplicationsPdfReport } from '../services/pdfService.js';
 /**
  * @desc    Generar y descargar reporte PDF estructurado de postulaciones
  * @route   GET /api/reports/pdf
- * @access  Public
+ * @access  Private (requiere protect)
  */
 export const downloadApplicationsPdf = async (req, res) => {
   try {
     const { from, to } = req.query;
     const filter = {};
     let dateRangeLabel = '';
+
+    // Filtrar por el usuario autenticado
+    if (req.user?._id) {
+      filter.user = req.user._id;
+    }
 
     if (from || to) {
       filter.appliedAt = {};

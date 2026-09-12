@@ -8,19 +8,21 @@ import {
   addInteraction,
 } from '../controllers/applicationController.js';
 import { previewMatch } from '../controllers/matchController.js';
+import { protect } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
+// Previsualización de afinidad de skills (algorítmica): /api/applications/match-preview
+router.route('/match-preview')
+  .post(previewMatch);
+
+// Proteger todas las operaciones privadas de postulaciones
+router.use(protect);
+
 // Rutas base: /api/applications
-// POST: Crear postulación
-// GET: Listar postulaciones con soporte de paginación (?page, ?limit), ordenamiento (?sortBy, ?order) y filtros (?status, ?priority, ?workMode, ?search)
 router.route('/')
   .post(createApplication)
   .get(getApplications);
-
-// Previsualización de afinidad de skills: /api/applications/match-preview
-router.route('/match-preview')
-  .post(previewMatch);
 
 // Rutas por ID: /api/applications/:id
 router.route('/:id')

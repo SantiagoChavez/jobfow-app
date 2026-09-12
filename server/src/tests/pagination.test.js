@@ -1,7 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
+import mongoose from 'mongoose';
 import app from '../app.js';
 import Application from '../models/Application.js';
+
+const mockUserId = new mongoose.Types.ObjectId('650000000000000000000001');
+
+vi.mock('../middlewares/authMiddleware.js', () => ({
+  protect: (req, _res, next) => {
+    req.user = {
+      _id: mockUserId,
+      name: 'Test User',
+      email: 'test@jobflow.dev',
+    };
+    next();
+  },
+}));
 
 describe('GET /api/applications - Paginación en Servidor, Ordenamiento y Filtros Combinados', () => {
   beforeEach(() => {
@@ -246,6 +260,7 @@ describe('GET /api/applications - Paginación en Servidor, Ordenamiento y Filtro
       expect(queryMock.limit).toHaveBeenCalledWith(5);
 
       const expectedFilter = {
+        user: mockUserId,
         status: { $in: ['ENVIADA', 'ENTREVISTA'] },
         priority: 'HIGH',
         workMode: 'REMOTE',
@@ -306,7 +321,7 @@ describe('GET /api/applications - Paginación en Servidor, Ordenamiento y Filtro
       const res = await request(app).get('/api/applications?search[$regex]=.*&status[$ne]=null');
 
       expect(res.status).toBe(200);
-      expect(countSpy).toHaveBeenCalledWith({});
+      expect(countSpy).toHaveBeenCalledWith({ user: mockUserId });
     });
   });
 
