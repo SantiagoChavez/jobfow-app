@@ -109,10 +109,19 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Creación del hook de accesibilidad `useModalA11y` en frontend con escucha de tecla `Escape` y bloqueo de scroll de fondo (`document.body.style.overflow = 'hidden'`), integrado en todos los modales de la aplicación.
   - Ampliación de la suite de pruebas en Vitest a 54 tests automatizados (100% pass).
 
-### Planned (Próximas Tareas)
-- **Tarjeta 12 - Drawer de Alertas y Notificaciones en Tiempo Real:** Panel lateral deslizable (slide-over) para gestión de recordatorios y seguimientos prioritarios.
-- **Frontend Paginado y Filtros Avanzados:** Conexión de controles de paginación numérica y selector de límite en `ApplicationTable.jsx`.
-- **Autenticación y Multi-Usuario:** Soporte para cuentas individuales de desarrolladores.
+- **Reminders Drawer, Toast Global y Paginación en Tabla (Tarjeta 12):**
+  - Creación de `RemindersDrawer.jsx`: panel lateral deslizable (slide-over) accesible con filtros de criticidad (`ALTA`, `MEDIA`), cálculo reactivo de días de inactividad y disparador seguro de contacto directo `mailto:` con asunto y cuerpo preformateados.
+  - Implementación de `ToastContext.jsx`: proveedor global de notificaciones con paleta Deep Cobalt, variantes semánticas (`success`, `error`, `info`), descarte manual interactivo y timer defensivo para prevenir fugas de memoria.
+  - Paginación interactiva en `ApplicationTable.jsx`: barra numérica al pie con navegación `< Anterior`, botones de página, elipsis (`...`) y `Siguiente >`, desacoplada del estado global de Kanban.
+  - Badge reactivo y disparador de campana en `Navbar.jsx` con contador en vivo de alertas pendientes.
+  - Stack counter en `useModalA11y.js` para mantener el bloqueo de scroll (`overflow: hidden`) al abrir modales anidados sobre el drawer.
+
+- **Despliegue Full-Stack en la Nube y DevOps:**
+  - Configuración de SPA rewrites en Vercel (`client/vercel.json`) para prevenir errores 404 en recargas.
+  - Creación del blueprint declarativo de Render (`render.yaml`) con comandos de build, start y health check.
+  - Normalización dinámica de `VITE_API_URL` en la capa de servicios (`client/src/services/api.js`).
+  - Base de datos en MongoDB Atlas M0 Free Tier (AWS) con IP whitelist global (`0.0.0.0/0`).
+  - Despliegue en producción operativo: Frontend en Vercel (`https://jobfow-app.vercel.app`) y Backend en Render (`https://jobfow-api.onrender.com`).
 
 ---
 

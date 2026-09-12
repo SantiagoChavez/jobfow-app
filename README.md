@@ -10,8 +10,21 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 
 ---
 
+## 🌐 Enlaces de Ejecución (Demo en Vivo)
+
+| Componente | Plataforma | URL de Acceso | Estado |
+| :--- | :--- | :--- | :--- |
+| **Frontend Web App** | Vercel | [https://jobfow-app.vercel.app](https://jobfow-app.vercel.app) | 🟢 Operativo (HTTPS) |
+| **Backend REST API** | Render | [https://jobfow-api.onrender.com](https://jobfow-api.onrender.com) | 🟢 Operativo (HTTPS) |
+| **Endpoint de Salud** | Render | [https://jobfow-api.onrender.com/health](https://jobfow-api.onrender.com/health) | 🟢 200 OK |
+| **Base de Datos** | MongoDB Atlas | Cluster M0 (AWS `sa-east-1` / `us-east-1`) | 🟢 Conectado |
+| **Copiloto IA** | Google Gemini | Modelo `gemini-3.5-flash-lite` | 🟢 Activo |
+
+---
+
 ## 📋 Tabla de Contenidos
 
+- [Enlaces de Ejecución (Demo en Vivo)](#-enlaces-de-ejecución-demo-en-vivo)
 - [Problema & Visión del Producto](#-problema--visión-del-producto)
 - [Características del MVP](#-características-del-mvp)
 - [Arquitectura del Proyecto](#-arquitectura-del-proyecto)
@@ -47,8 +60,12 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 - [x] **Lógica analítica de tiempos de respuesta:** Cálculo automático en días entre la postulación y la primera respuesta del reclutador (`responseTimeDays`).
 - [x] **Dashboard analítico y tablero Tracker:** Bloque de KPIs principales, alertas de seguimiento y tablero Kanban interactivo por columnas de estado.
 - [x] **Generación de Reporte PDF semanal:** Exportación vectorial descargable con métricas resumidas y listado tabular para presentar al coach.
-- [x] **Paginación en servidor y ordenamiento dinámico:** Endpoint `GET /api/applications` con `page`, `limit`, `sortBy`, `order` y DTO de metadatos de paginación para alto volumen.
-- [x] **Drag and Drop interactivo en Kanban:** Movimiento fluido de tarjetas entre columnas con persistencia en tiempo real, UI optimista y rollback ante errores.
+- [x] **Paginación en servidor y ordenamiento dinámico (Tarjeta 9):** Endpoint `GET /api/applications` con `page`, `limit`, `sortBy`, `order` y DTO de metadatos de paginación para alto volumen.
+- [x] **Drag and Drop interactivo en Kanban (Tarjeta 10):** Movimiento fluido de tarjetas entre columnas con persistencia en tiempo real, UI optimista y rollback ante errores.
+- [x] **Copiloto de IA con Google Gemini (Tarjeta 11):** Extracción estructurada de vacantes con `POST /api/ai/analyze-job`, sueldo estimado, cálculo de afinidad técnica (`matchScore`), skills faltantes y generación de pitch de contacto.
+- [x] **Drawer de Seguimientos y Alertas Clave (Tarjeta 12):** Slide-over accesible (`RemindersDrawer`) con filtro de criticidad, trigger seguro `mailto:` y badge reactivo en Navbar.
+- [x] **Toast Global y Paginación Interactiva en Tabla (Tarjeta 12):** Contexto global `ToastContext` reutilizable y botonera numérica interactiva en pie de tabla.
+- [x] **Despliegue Full-Stack en la Nube (DevOps):** Frontend en Vercel con SPA routing (`vercel.json`), Backend en Render (`render.yaml`) y Base de Datos en MongoDB Atlas M0.
 
 ---
 
