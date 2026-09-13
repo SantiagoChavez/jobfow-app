@@ -284,3 +284,10 @@ export const MoonIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+export const KeyIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m21 2-2 2m-1.5 1.5L14 9M3 21l9-9m0 0a5 5 0 1 0-7-7 5 5 0 0 0 7 7Z" />
+    <path d="m15 5 4 4" />
+  </svg>
+);
+

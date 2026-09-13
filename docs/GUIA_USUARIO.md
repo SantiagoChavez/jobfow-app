@@ -99,6 +99,20 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
 
 ---
 
+### Paso 8: Captura en 1 Clic con la Extensión de Chrome (LinkedIn & Indeed)
+¿Quieres guardar empleos mientras navegas por LinkedIn o Indeed sin tener que copiar y pegar manualmente? Utiliza la **Extensión de Chrome de Jobflow**:
+
+1. **Vincular tu cuenta en 3 segundos:**
+   - En la aplicación web de Jobflow, haz clic en tu avatar (arriba a la derecha) y selecciona **"🔑 Copiar Token Extensión"**. Verás una notificación verde confirmando que el token está copiado.
+   - Haz clic en el ícono de Jobflow en la barra de extensiones de tu navegador, pulsa en el engranaje de **Ajustes** (⚙️) y pega tu token en el campo correspondiente. Haz clic en **"Guardar Ajustes"**.
+2. **Capturar una vacante al instante:**
+   - Navega a cualquier empleo en LinkedIn, Indeed o cualquier portal laboral.
+   - Abre la extensión y haz clic en el botón dorado **"✨ Capturar y Analizar Vacante"**.
+   - El sistema extraerá automáticamente el contenido, la IA de Google Gemini analizará el perfil de la empresa y los requisitos, y creará la postulación directamente en tu tablero Kanban de Jobflow.
+   - Si estás en un portal no soportado, simplemente selecciona el texto de la vacante con el ratón y presiona el botón.
+
+---
+
 ## 💡 Consejos de Oro para tu Búsqueda de Empleo
 
 1. **Dedica 15 minutos diarios:** Revisa tu tablero por la mañana, mueve de columna las empresas que te hayan contactado y atiende las alertas de la campana.
