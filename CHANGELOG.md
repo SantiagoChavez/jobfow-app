@@ -9,6 +9,19 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-13
+
+### Added
+- **Módulo de Perfil de Usuario, Habilidades Dinámicas y Extracción Inteligente (Tarjeta 15):**
+  - Campos de perfil profesional en el modelo Mongoose `User`: `headline`, `bio`, `skills` (array de tecnologías) y `links: { github, linkedin, portfolio }`.
+  - Endpoint `PATCH /api/auth/profile`: Actualización de perfil del usuario autenticado con protección contra mass assignment y formateador seguro `formatUserDto`.
+  - Endpoint `POST /api/auth/profile/import-github`: Escaneo e importación de lenguajes y topics desde repositorios públicos de GitHub (`api.github.com`) con timeout defensivo (`AbortSignal.timeout(8000)`).
+  - Endpoint `POST /api/auth/profile/extract-ai`: Análisis cognitivo de fragmentos de CV o perfiles de LinkedIn con Google Gemini AI (`@google/genai`) para autocompletar titular, bio y skills.
+  - Normalización y canonicalización automática de tecnologías contra el diccionario del mercado (`skillsCatalog.js`).
+  - Personalización dinámica de afinidad técnica (Match %) y speech de presentación (Pitch) en base a las habilidades reales del usuario conectado.
+  - Componente modal interactivo `ProfileModal.jsx` con tabs, chip manager interactivo, soporte de teclado (`Enter`), deduplicación case-insensitive y accesibilidad WCAG.
+  - Suite de pruebas automatizadas `server/src/tests/profile.test.js` con mocks de APIs externas (82 tests pasando en 8 suites).
+
 ### Added
 - **Centralización y Reestructuración de Documentación en Carpeta `/docs`:**
   - Traslado de toda la documentación del proyecto (`GUIA_USUARIO.md`, `TASKS.md`, `Guia-Rapida-Jobflow.pdf`, `Manual-de-Usuario-Jobflow.pdf`, `Planificacion de jobflow.pdf`, `modelo para jobflow.pdf`, `jobflow-reporte-demo.pdf`) al nuevo directorio centralizado `docs/`, preservando exclusivamente `README.md` y `CHANGELOG.md` en la raíz.
