@@ -24,7 +24,7 @@ export const Navbar = ({
   onOpenReminders,
 }) => {
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
-  const { success } = useToast();
+  const { success, showToast } = useToast();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -195,7 +195,11 @@ export const Navbar = ({
                             const token = localStorage.getItem('jobflow_token');
                             if (token) {
                               navigator.clipboard.writeText(token);
-                              success('Token copiado al portapapeles para la extensión');
+                              if (typeof success === 'function') {
+                                success('Token copiado al portapapeles para la extensión');
+                              } else if (typeof showToast === 'function') {
+                                showToast('Token copiado al portapapeles para la extensión', 'success');
+                              }
                             }
                             setIsDropdownOpen(false);
                           }}
