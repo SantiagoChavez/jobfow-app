@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Jobflow — Capturador Rápido de Vacantes",
+  "version": "1.0.0",
+  "description": "Captura y analiza ofertas de empleo con IA (Google Gemini) desde LinkedIn, Indeed y cualquier portal con un solo clic hacia tu tablero Kanban en Jobflow.",
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Capturar Vacante para Jobflow",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "http://localhost:5173/*",
+    "https://*.onrender.com/*",
+    "https://jobfow-app.vercel.app/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["scripts/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

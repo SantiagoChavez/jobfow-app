@@ -129,21 +129,36 @@ export const AuthProvider = ({ children }) => {
     showToast('Sesión cerrada correctamente', 'info');
   }, [showToast]);
 
-  const value = {
-    user,
-    token,
-    loading,
-    isAuthenticated: Boolean(user && token),
-    isAuthModalOpen,
-    authModalTab,
-    openAuthModal,
-    closeAuthModal,
-    setAuthModalTab,
-    login,
-    register,
-    loginWithGoogle,
-    logout,
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      loading,
+      isAuthenticated: Boolean(user && token),
+      isAuthModalOpen,
+      authModalTab,
+      openAuthModal,
+      closeAuthModal,
+      setAuthModalTab,
+      login,
+      register,
+      loginWithGoogle,
+      logout,
+    }),
+    [
+      user,
+      token,
+      loading,
+      isAuthModalOpen,
+      authModalTab,
+      openAuthModal,
+      closeAuthModal,
+      login,
+      register,
+      loginWithGoogle,
+      logout,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

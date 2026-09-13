@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Navbar from './components/Navbar.jsx';
 import BottomNav from './components/BottomNav.jsx';
+import Footer from './components/Footer.jsx';
 import KPICards from './components/KPICards.jsx';
 import UpcomingReminders from './components/UpcomingReminders.jsx';
 import RemindersDrawer from './components/RemindersDrawer.jsx';
@@ -376,7 +377,7 @@ export function App() {
       />
 
       {/* Contenido Principal */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+      <main className={`flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 ${isAuthenticated ? 'pb-28 md:pb-16' : 'pb-16'}`}>
         {!isAuthenticated ? (
           /* Estado Desconectado / Landing de Bienvenida y Seguridad */
           <div className="py-8 md:py-16 flex flex-col items-center text-center max-w-3xl mx-auto animate-fade-in">
@@ -508,6 +509,9 @@ export function App() {
           </>
         )}
       </main>
+
+      {/* Footer Fijo Institucional */}
+      <Footer isAuthenticated={isAuthenticated} />
 
       {/* Navegación Móvil Fija */}
       {isAuthenticated && (

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobFlow — Capturador de Vacantes</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header Institucional -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-logo">
+          <span class="logo-text">Job<span class="gold-accent">Flow</span></span>
+        </div>
+        <span class="brand-tag">Extension</span>
+      </div>
+
+      <div class="header-actions">
+        <div id="connectionPill" class="connection-pill status-disconnected" title="Estado de autenticación">
+          <span class="status-dot"></span>
+          <span id="connectionText" class="status-label">Sin Token</span>
+        </div>
+        <button id="toggleSettingsBtn" class="icon-btn" title="Configurar API y Token" aria-label="Ajustes">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Panel de Configuración (Desplegable) -->
+    <section id="settingsSection" class="settings-card hidden">
+      <h3 class="section-title">Configuración de Conexión</h3>
+      
+      <div class="field-group">
+        <label for="environmentSelect" class="field-label">Entorno del Backend</label>
+        <select id="environmentSelect" class="form-select">
+          <option value="http://localhost:5000">Local (http://localhost:5000)</option>
+          <option value="https://jobflow-api.onrender.com">Producción (Render API)</option>
+          <option value="custom">URL Personalizada...</option>
+        </select>
+      </div>
+
+      <div id="customUrlGroup" class="field-group hidden">
+        <label for="customApiUrl" class="field-label">URL del Servidor</label>
+        <input type="text" id="customApiUrl" class="form-input" placeholder="https://mi-api.onrender.com">
+      </div>
+
+      <div class="field-group">
+        <div class="label-row">
+          <label for="jwtTokenInput" class="field-label">Token de Autenticación (JWT)</label>
+          <button id="syncFromTabBtn" type="button" class="link-btn" title="Detectar token si tienes Jobflow abierto">Detectar sesión</button>
+        </div>
+        <div class="input-with-action">
+          <input type="password" id="jwtTokenInput" class="form-input" placeholder="Pega tu token de Jobflow aquí...">
+          <button id="toggleTokenVisibilityBtn" type="button" class="btn-inside" title="Ver/Ocultar token">👁️</button>
+        </div>
+        <p class="field-hint">En JobFlow Web: Menú superior ➔ Perfil ➔ "Copiar Token para Extensión".</p>
+      </div>
+
+      <div class="settings-actions">
+        <button id="saveSettingsBtn" class="btn-secondary">Guardar Configuración</button>
+        <button id="closeSettingsBtn" class="btn-ghost">Cerrar</button>
+      </div>
+    </section>
+
+    <!-- Vista Principal: Información de la Pestaña -->
+    <main id="mainView" class="main-content">
+      <div class="tab-card">
+        <div class="tab-meta">
+          <span id="tabDomainBadge" class="domain-badge">Pestaña Activa</span>
+          <span id="sourceBadge" class="source-badge hidden">Detector Activo</span>
+        </div>
+        <h2 id="tabTitle" class="tab-title">Cargando pestaña activa...</h2>
+        <p id="tabUrl" class="tab-url">https://...</p>
+      </div>
+
+      <!-- Alerta informativa si no hay token -->
+      <div id="noTokenAlert" class="alert-box alert-warning hidden">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-content">
+          <strong>Autenticación requerida:</strong> Ingresa tu token JWT en los ajustes para guardar postulaciones a tu cuenta.
+          <button id="openSettingsLink" class="alert-link">Configurar ahora ➔</button>
+        </div>
+      </div>
+
+      <!-- Botón de Acción Principal -->
+      <div class="action-section">
+        <button id="captureBtn" class="btn-primary">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">Capturar y Procesar con IA</span>
+        </button>
+      </div>
+
+      <!-- Estado de Carga / Spinner con pasos -->
+      <div id="loadingState" class="loading-state hidden">
+        <div class="spinner"></div>
+        <p id="loadingStatusText" class="loading-text">Extrayendo texto de la oferta...</p>
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Estado de Éxito / Resultado -->
+      <div id="successState" class="success-card hidden">
+        <div class="success-header">
+          <div class="check-icon">✓</div>
+          <div class="success-title-box">
+            <h3 class="success-title">¡Guardada en JobFlow!</h3>
+            <span class="success-subtitle">Postulación añadida a tu Kanban</span>
+          </div>
+        </div>
+
+        <div class="result-body">
+          <div class="result-row">
+            <span class="result-label">Empresa:</span>
+            <strong id="resultCompany" class="result-value">-</strong>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Puesto:</span>
+            <strong id="resultRole" class="result-value">-</strong>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Modalidad:</span>
+            <span id="resultWorkMode" class="badge badge-neutral">-</span>
+            <span class="result-label ml-2">Prioridad:</span>
+            <span id="resultPriority" class="badge badge-neutral">-</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Afinidad IA:</span>
+            <span id="resultScore" class="badge badge-gold">0% Match</span>
+          </div>
+
+          <div id="skillsContainer" class="skills-wrap hidden">
+            <span class="skills-label">Skills detectadas:</span>
+            <div id="skillsTags" class="skills-tags"></div>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button id="openJobflowBtn" class="btn-secondary">
+            <span>Abrir en JobFlow Web</span> ↗
+          </button>
+          <button id="resetCaptureBtn" class="btn-ghost">Capturar otra</button>
+        </div>
+      </div>
+
+      <!-- Estado de Error -->
+      <div id="errorState" class="alert-box alert-error hidden">
+        <span class="alert-icon">✕</span>
+        <div class="alert-content">
+          <strong id="errorTitle">Ocurrió un error</strong>
+          <p id="errorMessage" class="error-desc">No se pudo procesar la vacante.</p>
+          <button id="retryBtn" class="btn-retry">Reintentar</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Discreto -->
+    <footer class="footer">
+      <span>JobFlow • Gemini 3.5 Flash Lite</span>
+      <span id="versionLabel">v1.0.0</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
