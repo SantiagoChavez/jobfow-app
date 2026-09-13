@@ -86,6 +86,7 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 - [x] **Toast Global y Paginación Interactiva en Tabla (Tarjeta 12):** Contexto global `ToastContext` reutilizable y botonera numérica interactiva en pie de tabla.
 - [x] **Autenticación Multiusuario y Google OAuth (Tarjeta 13):** Registro tradicional con bcrypt y JWT, inicio de sesión 1-click mediante Google Identity Services (`@google-auth-library`), persistencia de sesión segura y aislamiento de postulaciones por cuenta de usuario.
 - [x] **Modo Claro Armónico & Switch Dual (Tarjeta 14):** Selector de tema interactivo Sol/Luna en Navbar, paleta híbrida descansada (ice/slate con acentos dorados y cobalto), persistencia en `localStorage` y sincronización con perfil de usuario (`PATCH /api/auth/theme`).
+- [x] **Gestión de Perfil & Skills Dinámicas (Tarjeta 15):** Modal interactivo `ProfileModal` con gestor de chips, extracción automática de tecnologías desde repositorios de GitHub API, análisis inteligente de extracto de CV/LinkedIn con Gemini AI (`@google/genai`), cálculo personalizado de afinidad (Match %) y pitch de presentación IA adaptado al postulante.
 - [x] **Despliegue Full-Stack en la Nube (DevOps):** Frontend en Vercel con SPA routing (`vercel.json`), Backend en Render (`render.yaml`) y Base de Datos en MongoDB Atlas M0.
 
 ---
@@ -170,7 +171,7 @@ Jobflow-app/
 * **Frontend:** React 19, Vite 8, Tailwind CSS v3 (soporte Dual Dark/Light), PostCSS, Autoprefixer, Heroicons.
 * **Backend:** Node.js (>= v20), Express 5, ES Modules (`"type": "module"`).
 * **Autenticación & Seguridad:** JWT (`jsonwebtoken`), cifrado `bcryptjs`, Google Identity Services (`google-auth-library`).
-* **Testing:** Vitest 5, Supertest 7 (75 pruebas unitarias y de integración de endpoints automatizadas).
+* **Testing:** Vitest 5, Supertest 7 (82 pruebas unitarias y de integración de endpoints automatizadas en 8 suites).
 * **Inteligencia Artificial:** Google Gemini SDK (`@google/genai`), modelo `gemini-3.5-flash-lite`.
 * **Reportes:** PDFKit, PDFKit-Table (Generación vectorial en servidor).
 * **Gestor de paquetes:** `pnpm` (v11+).
@@ -189,6 +190,10 @@ Jobflow-app/
  ├── avatar (String)
  ├── googleId (String, sparse index)
  ├── theme ('dark' | 'light', default: 'dark')
+ ├── headline (String, default: 'Full Stack Developer')
+ ├── bio (String)
+ ├── skills: [String]
+ ├── links: { github, linkedin, portfolio }
  └── timestamps: (createdAt, updatedAt)
 
 [ APPLICATION ]
@@ -232,6 +237,9 @@ Jobflow-app/
 | `POST` | `/api/auth/google` | Autenticación 1-click con Google OAuth y emisión de JWT | ✅ Implementado y testeado |
 | `GET` | `/api/auth/me` | Obtener perfil del usuario autenticado (requiere JWT) | ✅ Implementado y testeado |
 | `PATCH` | `/api/auth/theme` | Sincronizar preferencia de tema ('dark' \| 'light') | ✅ Implementado y testeado |
+| `PATCH` | `/api/auth/profile` | Actualizar nombre, titular, bio, skills y enlaces del usuario | ✅ Implementado y testeado |
+| `POST` | `/api/auth/profile/import-github` | Extraer skills desde repositorios públicos de GitHub | ✅ Implementado y testeado |
+| `POST` | `/api/auth/profile/extract-ai` | Extraer titular, bio y skills con IA desde texto de CV o LinkedIn | ✅ Implementado y testeado |
 | `POST` | `/api/applications` | Registrar una nueva postulación asociada al usuario | ✅ Implementado y testeado |
 | `GET` | `/api/applications` | Listar postulaciones con paginación (`page`, `limit`), ordenamiento (`sortBy`, `order`) y filtros combinados | ✅ Implementado y testeado |
 | `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
@@ -287,7 +295,7 @@ pnpm run dev
 ### En `/server`:
 * `pnpm run dev`: Inicia el servidor backend con recarga automática (`nodemon`).
 * `pnpm start`: Inicia el servidor en modo producción con Node nativo.
-* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest (75 tests).
+* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest (82 tests en 8 suites).
 * `pnpm run test:watch`: Ejecuta las pruebas en modo interactivo/watch.
 
 ### En `/client`:

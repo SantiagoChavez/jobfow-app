@@ -30,7 +30,20 @@ Tus oportunidades de trabajo y métricas son confidenciales. Por eso, Jobflow cu
 
 ---
 
-### Paso 2: Conoce tu Tablero de Oportunidades
+### Paso 2: Configura tu Perfil Profesional y Habilidades Dinámicas (GitHub & IA)
+Para que el cálculo de afinidad técnica (**Match %**) y el **Pitch de Presentación del Copiloto IA** se adapten 100% a tu trayectoria real, configura tu perfil en segundos:
+
+1. Haz clic en tu avatar en la esquina superior derecha y selecciona **"👤 Mi Perfil & Skills"**.
+2. **Carga Mágica de Habilidades:**
+   - **🐙 Desde GitHub:** Ingresa tu usuario o enlace de perfil de GitHub y presiona **"⚡ Extraer Skills"**. Jobflow escaneará tus repositorios públicos y extraerá automáticamente los lenguajes y temas que dominas.
+   - **✨ Pegar CV / LinkedIn:** Pega un fragmento de tu currículum o tu sección *"Acerca de / Experiencia"* de LinkedIn y haz clic en **"✨ Extraer con IA"**. Gemini detectará tu titular profesional, redactará tu bio y extraerá todas tus tecnologías.
+3. **Gestor de Chips Interactivo:** Puedes añadir nuevas habilidades escribiendo su nombre y presionando `Enter`, hacer clic en las sugerencias rápidas recomendadas o eliminar las que no desees con la cruz `✕`.
+4. Completa o revisa tus enlaces profesionales (**LinkedIn**, **GitHub**, **Portafolio Web**) y haz clic en **"Guardar Cambios"**.
+5. **¡Listo!** A partir de este momento, cada vacante que analices contrastará sus requerimientos contra tus habilidades reales.
+
+---
+
+### Paso 3: Conoce tu Tablero de Oportunidades
 Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que representan el camino de tu postulación:
 
 1. 📤 **Postulado:** Empleos a los que ya enviaste tu CV y estás esperando contacto.
@@ -43,7 +56,7 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
 
 ---
 
-### Paso 3: Agregar una Postulación en Segundos con IA
+### Paso 4: Agregar una Postulación en Segundos con IA
 ¿Viste una oferta en LinkedIn, Zonajobs, Indeed o Computrabajo? No pierdas tiempo llenando formularios largos a mano.
 
 1. Haz clic en el botón dorado **"+ Nueva Postulación"** (arriba a la derecha).
@@ -59,7 +72,7 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
 
 ---
 
-### Paso 4: Consultar y Copiar tu Pitch Guardado en Cualquier Momento
+### Paso 5: Consultar y Copiar tu Pitch Guardado en Cualquier Momento
 A veces una empresa te contacta días o semanas después de que te postulaste y ya no recuerdas exactamente qué decía la vacante ni cómo presentarte.
 
 1. En el tablero o en la tabla, haz un clic sobre la tarjeta de la empresa.
@@ -70,7 +83,7 @@ A veces una empresa te contacta días o semanas después de que te postulaste y 
 
 ---
 
-### Paso 5: Campana de Alertas y Seguimiento sin Estrés
+### Paso 6: Campana de Alertas y Seguimiento sin Estrés
 Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las empresas donde te postulaste.
 
 - En la barra superior verás una **Campana con un número** que indica cuántas oportunidades necesitan tu atención.
@@ -80,7 +93,7 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 
 ---
 
-### Paso 6: Vista de Tabla y Descarga de Reportes
+### Paso 7: Vista de Tabla y Descarga de Reportes
 - Si prefieres ver tus postulaciones como una planilla ordenada, haz clic en la pestaña **"Lista"**.
   - Puedes filtrar por empresa, rol, estado o prioridad.
   - Al pie de la tabla cuentas con paginación para navegar de forma cómoda y rápida.
@@ -90,7 +103,7 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 
 ---
 
-### Paso 7: Personaliza tu Experiencia (Modo Claro & Oscuro)
+### Paso 8: Personaliza tu Experiencia (Modo Claro & Oscuro)
 Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trabajar de día o de noche sin fatiga visual:
 
 - En la barra superior, busca el **botón de Sol / Luna**.
@@ -99,7 +112,7 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
 
 ---
 
-### Paso 8: Captura en 1 Clic con la Extensión de Chrome (LinkedIn & Indeed)
+### Paso 9: Captura en 1 Clic con la Extensión de Chrome (LinkedIn & Indeed)
 ¿Quieres guardar empleos mientras navegas por LinkedIn o Indeed sin tener que copiar y pegar manualmente? Utiliza la **Extensión de Chrome de Jobflow**:
 
 1. **Vincular tu cuenta en 3 segundos:**
