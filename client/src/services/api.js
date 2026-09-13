@@ -268,6 +268,39 @@ export async function updateUserTheme(theme) {
   });
 }
 
+/**
+ * Actualizar datos del perfil profesional y habilidades técnicas
+ * @param {Object} profileData - { name, headline, bio, skills, links }
+ */
+export async function updateUserProfile(profileData) {
+  return await request('/auth/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(profileData),
+  });
+}
+
+/**
+ * Importar habilidades y repositorios desde la API pública de GitHub
+ * @param {string} githubUrlOrUsername
+ */
+export async function importGithubSkills(githubUrlOrUsername) {
+  return await request('/auth/profile/import-github', {
+    method: 'POST',
+    body: JSON.stringify({ githubUrl: githubUrlOrUsername }),
+  });
+}
+
+/**
+ * Extraer perfil estructurado y habilidades a partir de texto de CV o LinkedIn con Gemini
+ * @param {string} text
+ */
+export async function extractProfileFromText(text) {
+  return await request('/auth/profile/extract-ai', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+}
+
 export default {
   getApplications,
   getApplicationById,
@@ -284,4 +317,7 @@ export default {
   googleAuthUser,
   getMe,
   updateUserTheme,
+  updateUserProfile,
+  importGithubSkills,
+  extractProfileFromText,
 };
