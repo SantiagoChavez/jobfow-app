@@ -291,3 +291,27 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Ajustar excepciones en `.gitignore` para versionar PDFs de documentación en `docs/*.pdf`.
   - [x] Actualizar todos los enlaces relativos en `README.md`, `CHANGELOG.md` y `docs/GUIA_USUARIO.md`.
   - [x] Actualizar guía de usuario con flujos de autenticación / Google OAuth y conmutador de tema dual (Sol/Luna).
+
+---
+
+## 🧩 Fase 14: Extensión de Chrome (Manifest V3) — Capturador Rápido con IA (Completada)
+- [x] **14.1 Configuración de la Extensión (`extension/manifest.json`)**
+  - [x] Manifiesto V3 estricto con permisos mínimos (`activeTab`, `scripting`, `storage`).
+  - [x] Permisos de host configurados para `localhost:5000`, `localhost:5173`, Render y Vercel.
+  - [x] Iconos institucionales generados en `assets/` (16x16, 48x48, 128x128).
+- [x] **14.2 Extracción en Capas de Portales Laborales (`extension/scripts/content.js`)**
+  - [x] Capa de selección manual con prioridad de control (`window.getSelection()`).
+  - [x] Selectores específicos adaptados para LinkedIn Jobs, Indeed y Glassdoor.
+  - [x] Selector semántico general con sanitización de DOM (eliminación de scripts, nav, footer, styles).
+  - [x] Detección y sincronización automática de sesión web con JobFlow.
+- [x] **14.3 Interfaz y Lógica del Popup (`extension/popup/`)**
+  - [x] Diseño temático Deep Cobalt & Crisp Gold (`popup.html` y `popup.css`).
+  - [x] Panel de configuración desplegable con selector de entorno (Local vs Producción) y almacenamiento seguro de JWT en `chrome.storage.local`.
+  - [x] Coordinador `popup.js`: extracción activa, análisis inteligente con `POST /api/ai/analyze-job` (Gemini) y persistencia en `POST /api/applications`.
+  - [x] Máquina de estados visuales: Reposo ➔ Progreso animado con spinner y barra ➔ Tarjeta de éxito con afinidad y tags ➔ Alertas de error con reintento.
+- [x] **14.4 Integración y UX en Frontend Web (`client/src/components/Navbar.jsx`)**
+  - [x] Botón "Copiar Token Extensión" en el menú de perfil de usuario con notificación Toast.
+  - [x] Icono vectorial `KeyIcon` añadido en `Icons.jsx`.
+- [x] **14.5 Documentación de Instalación y Uso (`extension/README.md`)**
+  - [x] Guía paso a paso para carga descomprimida en `chrome://extensions/`.
+  - [x] Matriz de resolución de problemas y configuración de credenciales.

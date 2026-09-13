@@ -9,8 +9,10 @@ import {
   UserIcon,
   LogOutIcon,
   ChevronDownIcon,
+  KeyIcon,
 } from './Icons.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 import { ThemeToggle } from './ThemeToggle.jsx';
 
 export const Navbar = ({
@@ -22,6 +24,7 @@ export const Navbar = ({
   onOpenReminders,
 }) => {
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
+  const { success } = useToast();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -180,7 +183,23 @@ export const Navbar = ({
                   </div>
 
                   {/* Acciones */}
-                  <div className="p-1">
+                  <div className="p-1 space-y-0.5">
+                    <button
+                      onClick={() => {
+                        const token = localStorage.getItem('jobflow_token');
+                        if (token) {
+                          navigator.clipboard.writeText(token);
+                          success('Token copiado al portapapeles para la extensión');
+                        }
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-700 dark:hover:text-gold-primary hover:bg-slate-50 dark:hover:bg-navy-highlight rounded-xl transition-colors text-left"
+                      title="Copiar token para usar en la extensión de Chrome"
+                    >
+                      <KeyIcon className="w-4 h-4 text-amber-500 dark:text-gold-primary" />
+                      <span>Copiar Token Extensión</span>
+                    </button>
+
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
