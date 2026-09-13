@@ -1,8 +1,28 @@
 import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import { extractSkillsFromGithub, extractProfileFromCvText } from '../services/profileService.js';
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+/**
+ * Normaliza y formatea el DTO de usuario respetando compatibilidad hacia atrás
+ */
+export const formatUserDto = (user) => {
+  if (!user) return null;
+  const dto = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar || '',
+    theme: user.theme || 'dark',
+  };
+  if (user.headline !== undefined) dto.headline = user.headline;
+  if (user.bio !== undefined) dto.bio = user.bio;
+  if (user.skills !== undefined) dto.skills = user.skills;
+  if (user.links !== undefined) dto.links = user.links;
+  return dto;
+};
 
 /**
  * @desc    Registrar nuevo usuario tradicional (email y contraseña)
@@ -297,4 +317,135 @@ export const updateTheme = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc    Actualizar datos del perfil profesional y habilidades técnicas
+ * @route   PATCH /api/auth/profile
+ * @access  Private (requiere protect)
+ */
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, headline, bio, skills, links } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado',
+      });
+    }
+
+    if (name && typeof name === 'string' && name.trim()) {
+      user.name = name.trim();
+    }
+
+    if (headline !== undefined && typeof headline === 'string') {
+      user.headline = headline.trim();
+    }
+
+    if (bio !== undefined && typeof bio === 'string') {
+      user.bio = bio.trim();
+    }
+
+    if (Array.isArray(skills)) {
+      const cleanSkills = Array.from(
+        new Set(
+          skills
+            .map((s) => (typeof s === 'string' ? s.trim() : ''))
+            .filter(Boolean)
+        )
+      );
+      user.skills = cleanSkills;
+    }
+
+    if (links && typeof links === 'object') {
+      user.links = {
+        github: typeof links.github === 'string' ? links.github.trim() : user.links?.github || '',
+        linkedin: typeof links.linkedin === 'string' ? links.linkedin.trim() : user.links?.linkedin || '',
+        portfolio: typeof links.portfolio === 'string' ? links.portfolio.trim() : user.links?.portfolio || '',
+      };
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Perfil profesional actualizado exitosamente',
+      user: formatUserDto(user),
+    });
+  } catch (error) {
+    console.error('Error al actualizar perfil del usuario:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al actualizar el perfil profesional',
+    });
+  }
+};
+
+/**
+ * @desc    Extraer automáticamente habilidades técnicas y repositorios desde la API pública de GitHub
+ * @route   POST /api/auth/profile/import-github
+ * @access  Private (requiere protect)
+ */
+export const importGithubProfile = async (req, res) => {
+  try {
+    const { githubUrl, username } = req.body;
+    const target = githubUrl || username;
+
+    if (!target || typeof target !== 'string' || !target.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Debes proporcionar una URL o nombre de usuario de GitHub válido.',
+      });
+    }
+
+    const result = await extractSkillsFromGithub(target.trim());
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result,
+    });
+  } catch (error) {
+    console.error('Error al importar skills desde GitHub:', error.message);
+    return res.status(400).json({
+      success: false,
+      message: error.message || 'Error al importar datos desde GitHub.',
+    });
+  }
+};
+
+/**
+ * @desc    Extraer perfil y habilidades desde texto libre de CV o LinkedIn con Gemini AI
+ * @route   POST /api/auth/profile/extract-ai
+ * @access  Private (requiere protect)
+ */
+export const extractProfileFromCv = async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (!text || typeof text !== 'string' || text.trim().length < 20) {
+      return res.status(400).json({
+        success: false,
+        message: 'El texto del CV o LinkedIn es obligatorio y debe tener al menos 20 caracteres.',
+      });
+    }
+
+    const result = await extractProfileFromCvText(text.trim());
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result,
+    });
+  } catch (error) {
+    console.error('Error al extraer perfil con IA:', error.message);
+    const statusCode = error.message?.includes('Timeout') ? 504 : 500;
+    return res.status(statusCode).json({
+      success: false,
+      message: error.message || 'Error al procesar el análisis de perfil con IA.',
+    });
+  }
+};
+
 
