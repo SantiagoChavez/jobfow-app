@@ -9,7 +9,7 @@ export const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET;
   if (!secret || !secret.trim()) {
     if (process.env.NODE_ENV === 'production') {
-      console.warn('⚠️ ADVERTENCIA: JWT_SECRET no configurado en entorno de producción. Usando clave secreta por defecto.');
+      throw new Error('FATAL: JWT_SECRET es obligatorio en entorno de producción para prevenir vulnerabilidades de firma.');
     }
     return 'jobflow_secret_key_2026_production_grade';
   }
