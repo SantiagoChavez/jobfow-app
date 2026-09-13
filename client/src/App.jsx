@@ -12,6 +12,7 @@ import QuickAddModal from './components/QuickAddModal.jsx';
 import ApplicationDetailModal from './components/ApplicationDetailModal.jsx';
 import ReportModal from './components/ReportModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
+import ProfileModal from './components/ProfileModal.jsx';
 import { useToast } from './context/ToastContext.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import {
@@ -55,6 +56,7 @@ export function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isRemindersDrawerOpen, setIsRemindersDrawerOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
 
   // Carga de la colección completa desde la API (con all=true)
@@ -374,6 +376,13 @@ export function App() {
             setIsRemindersDrawerOpen(true);
           }
         }}
+        onOpenProfileModal={() => {
+          if (!isAuthenticated) {
+            openAuthModal('login');
+          } else {
+            setIsProfileModalOpen(true);
+          }
+        }}
       />
 
       {/* Contenido Principal */}
@@ -561,6 +570,12 @@ export function App() {
           setIsRemindersDrawerOpen(false);
           setSelectedApp(app);
         }}
+      />
+
+      {/* Modal: Mi Perfil & Habilidades */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
       />
 
       {/* Modal Global de Autenticación */}

@@ -129,6 +129,10 @@ export const AuthProvider = ({ children }) => {
     showToast('Sesión cerrada correctamente', 'info');
   }, [showToast]);
 
+  const updateUser = useCallback((updatedData) => {
+    setUser((prev) => (prev ? { ...prev, ...updatedData } : updatedData));
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -144,6 +148,7 @@ export const AuthProvider = ({ children }) => {
       register,
       loginWithGoogle,
       logout,
+      updateUser,
     }),
     [
       user,
@@ -157,6 +162,7 @@ export const AuthProvider = ({ children }) => {
       register,
       loginWithGoogle,
       logout,
+      updateUser,
     ]
   );
 
