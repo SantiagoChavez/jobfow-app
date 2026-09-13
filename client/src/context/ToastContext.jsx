@@ -36,12 +36,19 @@ export const ToastProvider = ({ children }) => {
     };
   }, []);
 
+  const success = useCallback((message, duration) => showToast(message, 'success', duration), [showToast]);
+  const error = useCallback((message, duration) => showToast(message, 'error', duration), [showToast]);
+  const info = useCallback((message, duration) => showToast(message, 'info', duration), [showToast]);
+
   const contextValue = useMemo(
     () => ({
       showToast,
       hideToast,
+      success,
+      error,
+      info,
     }),
-    [showToast, hideToast]
+    [showToast, hideToast, success, error, info]
   );
 
   return (

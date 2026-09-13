@@ -33,22 +33,15 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setThemeState] = useState(getInitialTheme);
   const { user, isAuthenticated } = useAuth();
 
-  // Sincronizar con el perfil del usuario autenticado respetando preferencia local activa
+  // Sincronizar con el perfil del usuario autenticado (perfil > localStorage > prefers-color-scheme > fallback)
   useEffect(() => {
     if (user?.theme && (user.theme === 'dark' || user.theme === 'light')) {
-      try {
-        const localTheme = localStorage.getItem('jobflow_theme');
-        if (localTheme && (localTheme === 'dark' || localTheme === 'light') && localTheme !== user.theme) {
-          updateUserTheme(localTheme).catch((err) => {
-            console.warn('Error al sincronizar tema local con perfil:', err.message);
-          });
-          setThemeState(localTheme);
-          return;
-        }
-      } catch (err) {
-        console.warn('Error al leer tema local para sincronización:', err);
-      }
       setThemeState(user.theme);
+      try {
+        localStorage.setItem('jobflow_theme', user.theme);
+      } catch (err) {
+        console.warn('Error al sincronizar tema de perfil en localStorage:', err);
+      }
     }
   }, [user?.theme]);
 
