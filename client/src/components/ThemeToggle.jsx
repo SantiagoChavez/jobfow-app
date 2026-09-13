@@ -7,7 +7,7 @@ import { SunIcon, MoonIcon } from './Icons.jsx';
  * Presenta micro-animaciones en los iconos de Sol y Luna con diseño responsivo y accesible.
  */
 export const ThemeToggle = ({ className = '' }) => {
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <button
