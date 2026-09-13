@@ -63,11 +63,16 @@ export const downloadApplicationsPdf = async (req, res) => {
     };
 
     // Generar buffer binario del PDF
-    const pdfBuffer = await generateApplicationsPdfReport(applications, metrics, {
-      from,
-      to,
-      label: dateRangeLabel,
-    });
+    const pdfBuffer = await generateApplicationsPdfReport(
+      applications,
+      metrics,
+      {
+        from,
+        to,
+        label: dateRangeLabel,
+      },
+      req.user
+    );
 
     // Configurar encabezados HTTP para descarga
     res.setHeader('Content-Type', 'application/pdf');
