@@ -22,6 +22,7 @@ export const Navbar = ({
   onOpenReportModal,
   remindersCount = 0,
   onOpenReminders,
+  onOpenProfileModal,
 }) => {
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
   const { success, showToast } = useToast();
@@ -190,6 +191,19 @@ export const Navbar = ({
 
                       {/* Acciones */}
                       <div className="p-1 space-y-0.5">
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            if (typeof onOpenProfileModal === 'function') {
+                              onOpenProfileModal();
+                            }
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-700 dark:hover:text-gold-primary hover:bg-slate-50 dark:hover:bg-navy-highlight rounded-xl transition-colors text-left"
+                        >
+                          <UserIcon className="w-4 h-4 text-amber-500 dark:text-gold-primary" />
+                          <span>Mi Perfil & Skills</span>
+                        </button>
+
                         <button
                           onClick={() => {
                             const token = localStorage.getItem('jobflow_token');

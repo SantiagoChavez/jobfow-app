@@ -42,6 +42,36 @@ const userSchema = new Schema(
       enum: ['dark', 'light'],
       default: 'dark',
     },
+    headline: {
+      type: String,
+      trim: true,
+      default: 'Full Stack Developer',
+    },
+    bio: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    skills: {
+      type: [String],
+      default: () => [
+        'JavaScript',
+        'TypeScript',
+        'Node.js',
+        'Express',
+        'React',
+        'MongoDB',
+        'PostgreSQL',
+        'Git',
+        'REST API',
+        'Tailwind CSS',
+      ],
+    },
+    links: {
+      github: { type: String, trim: true, default: '' },
+      linkedin: { type: String, trim: true, default: '' },
+      portfolio: { type: String, trim: true, default: '' },
+    },
   },
   {
     timestamps: true,
