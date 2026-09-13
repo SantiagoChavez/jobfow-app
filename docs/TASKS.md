@@ -315,3 +315,30 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 - [x] **14.5 Documentación de Instalación y Uso (`extension/README.md`)**
   - [x] Guía paso a paso para carga descomprimida en `chrome://extensions/`.
   - [x] Matriz de resolución de problemas y configuración de credenciales.
+
+---
+
+## 👤 Fase 15: Perfil de Usuario, Habilidades Dinámicas y Extracción Inteligente (Tarjeta Trello 15 - Completada)
+- [x] **15.1 Extensión de Esquema Mongoose (`server/src/models/User.js`)**
+  - [x] Incorporar campos `headline` (String, default: 'Full Stack Developer'), `bio` (String), `skills` (Array de strings con lista base de tecnologías) y `links` (`github`, `linkedin`, `portfolio`).
+  - [x] Formateador y DTO defensivo `formatUserDto` para preservar retrocompatibilidad con tests de autenticación existentes.
+- [x] **15.2 Servicio de Extracción de Habilidades (`server/src/services/profileService.js`)**
+  - [x] Parser defensivo de URLs y usernames de GitHub (`parseGithubUsername`).
+  - [x] Canonicalizador y normalizador de tecnologías contra el diccionario maestro `skillsCatalog.js` (`canonicalizeSkill`).
+  - [x] Integración con la API REST pública de GitHub (`api.github.com/users/:username` y `/repos`) con control de timeout (`AbortSignal.timeout(8000)`).
+  - [x] Extracción cognitiva de titular, bio y skills desde texto libre de CV o LinkedIn con Google Gemini AI (`@google/genai`).
+- [x] **15.3 Controladores y Rutas de Perfil en Backend (`server/src/controllers/authController.js` y `authRoutes.js`)**
+  - [x] Endpoint `PATCH /api/auth/profile`: actualización atómica y sanitizada de datos profesionales sin riesgo de mass assignment.
+  - [x] Endpoint `POST /api/auth/profile/import-github`: escaneo de repositorios de GitHub con validación de inputs.
+  - [x] Endpoint `POST /api/auth/profile/extract-ai`: análisis de CV con control de timeout defensivo.
+  - [x] Resolución dinámica de skills en `POST /api/applications/match-preview` y `POST /api/match/calculate` para usuarios autenticados.
+  - [x] Inyección dinámica de perfil y skills en `POST /api/ai/analyze-job` para personalizar el Pitch de contacto generado por Gemini.
+- [x] **15.4 Interfaz y Gestión de Perfil en Frontend (`client/src/components/ProfileModal.jsx`)**
+  - [x] Modal interactivo con navegación por pestañas (`🐙 Desde GitHub` vs `✨ Pegar CV / LinkedIn`).
+  - [x] Chip manager interactivo con soporte de agregado manual, eliminación inmediata (`✕`) y sugerencias clicables populares.
+  - [x] Deduplicación case-insensitive de skills al importar desde GitHub o IA.
+  - [x] Campos para titular profesional, resumen/bio y enlaces (LinkedIn, GitHub, Portfolio).
+  - [x] Integración con `AuthContext.jsx` mediante `updateUser()` para reactividad global instantánea.
+  - [x] Acceso directo desde el menú desplegable de usuario en `Navbar.jsx` ("👤 Mi Perfil & Skills").
+- [x] **15.5 Suite de Pruebas Automatizadas (`server/src/tests/profile.test.js`)**
+  - [x] 7 pruebas unitarias y de integración cubriendo actualización de perfil, extracción mockeada de GitHub, extracción con Gemini y matching dinámico (82 tests totales en verde).
