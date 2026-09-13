@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         status: 'ENVIADA',
         priority,
         workMode,
-        salary: aiResult.salary || undefined,
+        salary: aiResult.salary ? String(aiResult.salary) : undefined,
         companySummary: aiResult.companySummary || '',
         matchScore: typeof aiResult.matchScore === 'number' ? aiResult.matchScore : null,
         extractedSkills: Array.isArray(aiResult.extractedSkills) ? aiResult.extractedSkills : [],
