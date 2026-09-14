@@ -113,16 +113,29 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
 ---
 
 ### Paso 9: Captura en 1 Clic con la Extensión de Chrome (LinkedIn & Indeed)
-¿Quieres guardar empleos mientras navegas por LinkedIn o Indeed sin tener que copiar y pegar manualmente? Utiliza la **Extensión de Chrome de Jobflow**:
+¿Quieres guardar empleos mientras navegas por LinkedIn, Indeed o Glassdoor sin tener que copiar y pegar manualmente? Utiliza la **Extensión oficial de Chrome de Jobflow**:
 
-1. **Vincular tu cuenta en 3 segundos:**
-   - En la aplicación web de Jobflow, haz clic en tu avatar (arriba a la derecha) y selecciona **"🔑 Copiar Token Extensión"**. Verás una notificación verde confirmando que el token está copiado.
-   - Haz clic en el ícono de Jobflow en la barra de extensiones de tu navegador, pulsa en el engranaje de **Ajustes** (⚙️) y pega tu token en el campo correspondiente. Haz clic en **"Guardar Ajustes"**.
-2. **Capturar una vacante al instante:**
+1. **Instalar la extensión en el navegador (solo la primera vez):**
+   - Abre Google Chrome (o un navegador basado en Chromium como Brave o Edge).
+   - Escribe en la barra de direcciones: `chrome://extensions/` y presiona Enter.
+   - En la esquina superior derecha, activa el interruptor **"Modo de desarrollador"** (*Developer mode*).
+   - Haz clic en el botón **"Cargar descomprimida"** (*Load unpacked*) en la esquina superior izquierda.
+   - Selecciona la carpeta `extension` ubicada en la raíz de este proyecto (`Jobfow-app/extension`).
+   - *(Recomendado)*: Haz clic en el ícono de rompecabezas en la barra de Chrome y **fija** (*Pin*) la extensión de Jobflow para tenerla siempre visible.
+
+2. **Vincular tu cuenta con el Token JWT en 3 segundos:**
+   - En la aplicación web de Jobflow (con tu sesión iniciada), haz clic en tu avatar en la esquina superior derecha del Navbar.
+   - Selecciona la opción **"🔑 Copiar Token Extensión"**. Aparecerá una notificación verde confirmando que tu token de sesión seguro fue copiado al portapapeles.
+   - Haz clic en el ícono de Jobflow en la barra de extensiones del navegador.
+   - Pulsa en el ícono de **Ajustes (⚙️)** en la esquina superior derecha del popup.
+   - Pega tu token en el campo **Token de Autenticación (JWT)** y haz clic en **"Guardar Ajustes"**.
+   - El indicador superior cambiará inmediatamente a **"Conectado"** (verde). *(Tip: si estás en desarrollo local, selecciona el entorno `Local (http://localhost:5000)`, o `Producción` si usas la versión desplegada en Render).*
+
+3. **Capturar una vacante al instante:**
    - Navega a cualquier empleo en LinkedIn, Indeed o cualquier portal laboral.
-   - Abre la extensión y haz clic en el botón dorado **"✨ Capturar y Analizar Vacante"**.
-   - El sistema extraerá automáticamente el contenido, la IA de Google Gemini analizará el perfil de la empresa y los requisitos, y creará la postulación directamente en tu tablero Kanban de Jobflow.
-   - Si estás en un portal no soportado, simplemente selecciona el texto de la vacante con el ratón y presiona el botón.
+   - Abre la extensión y haz clic en el botón dorado **"⚡ Capturar y Procesar con IA"**.
+   - El sistema extraerá automáticamente el contenido de la vacante, la IA de Google Gemini analizará el perfil de la empresa y los requisitos requeridos, calculará tu afinidad y registrará la postulación directamente en tu **Tablero Kanban**.
+   - Si estás en un portal con diseño atípico o iframes, simplemente selecciona el texto de la vacante con el ratón antes de presionar el botón y se procesará la selección.
 
 ---
 
