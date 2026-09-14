@@ -9,6 +9,16 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-09-14
+
+### Fixed
+- **Sincronización en Tiempo Real entre la Extensión de Chrome y la Aplicación Web (Tablero Tracker y KPIs):**
+  - Corrección de la discrepancia de datos donde las postulaciones capturadas desde la extensión de Chrome se guardaban en la base de datos pero no se reflejaban de inmediato en el Tablero Tracker (Kanban) ni en el contador de KPIs sin recargar la página completa.
+  - Implementación de mecanismo reactivo en la aplicación web (`client/src/App.jsx`) que escucha eventos `window.focus`, `document.visibilitychange` y el evento personalizado `jobflow:sync` para refrescar de forma silenciosa y en segundo plano (`fetchAllData(true)`) la colección completa de postulaciones y las métricas analíticas.
+  - Actualización de los cambios de vista (`handleViewChange`) para que la transición a cualquier vista refresque automáticamente el estado en segundo plano sin bloqueos visuales.
+  - Actualización del content script (`extension/scripts/content.js`) y del popup (`extension/popup/popup.js`) para emitir una notificación `jobflow:sync` a todas las pestañas de JobFlow abiertas tan pronto como se guarda con éxito una postulación.
+  - Actualización de permisos en `manifest.json` incorporando `"tabs"` y actualización de la extensión a la versión `v1.0.3`.
+
 ## [1.3.2] - 2026-09-14
 
 ### Changed
