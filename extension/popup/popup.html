@@ -38,8 +38,8 @@
       <div class="field-group">
         <label for="environmentSelect" class="field-label">Entorno del Backend</label>
         <select id="environmentSelect" class="form-select">
-          <option value="http://localhost:5000">Local (http://localhost:5000)</option>
-          <option value="https://jobflow-api.onrender.com">Producción (Render API)</option>
+          <option value="https://jobfow-api.onrender.com">Producción (Render API)</option>
+          <option value="http://localhost:5000">Desarrollo Local (localhost:5000)</option>
           <option value="custom">URL Personalizada...</option>
         </select>
       </div>
@@ -154,7 +154,11 @@
         <div class="alert-content">
           <strong id="errorTitle">Ocurrió un error</strong>
           <p id="errorMessage" class="error-desc">No se pudo procesar la vacante.</p>
-          <button id="retryBtn" class="btn-retry">Reintentar</button>
+          <div class="error-actions">
+            <button id="retryBtn" class="btn-retry">Reintentar</button>
+            <button id="quickFixEnvBtn" class="btn-quick-fix hidden">Cambiar a Producción (Render)</button>
+            <button id="errorSettingsBtn" class="btn-settings-fix">⚙️ Ajustes</button>
+          </div>
         </div>
       </div>
     </main>
@@ -162,7 +166,7 @@
     <!-- Footer Discreto -->
     <footer class="footer">
       <span>JobFlow • Gemini 3.5 Flash Lite</span>
-      <span id="versionLabel">v1.0.0</span>
+      <span id="versionLabel">v1.0.1</span>
     </footer>
   </div>
 

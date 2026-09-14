@@ -52,21 +52,33 @@ Para instalar y probar la extensión localmente en tu navegador:
 ## ⚙️ Configuración Inicial (Token JWT y Entorno)
 
 1. **Abre el Popup de la Extensión** haciendo clic en su icono en la barra superior del navegador.
-2. Haz clic en el icono de **Engranaje (⚙️)** en la esquina superior derecha del popup para abrir los ajustes:
+2. Por defecto, la extensión viene configurada para conectarse a **Producción (Render API: `https://jobfow-api.onrender.com`)**.
+3. Haz clic en el icono de **Engranaje (⚙️)** en la esquina superior derecha del popup si deseas revisar o cambiar los ajustes:
    * **Entorno del Backend:**
-     * `Local (http://localhost:5000)` para desarrollo en tu máquina.
-     * `Producción (Render API)` para utilizar el backend desplegado en la nube.
+     * `Producción (Render API)`: Conexión con la API en la nube (`https://jobfow-api.onrender.com`). *(Recomendado para uso diario)*.
+     * `Desarrollo Local (localhost:5000)`: Para desarrolladores con el servidor backend corriendo en su máquina.
+     * `URL Personalizada...`: Para instancias privadas o túneles de desarrollo.
    * **Token de Autenticación (JWT):**
-     * En la web de JobFlow, haz clic en tu avatar en el menú superior y pulsa **"Copiar Token para Extensión"**.
+     * En la web de JobFlow, haz clic en tu avatar en el menú superior y pulsa **"Copiar Token Extensión"**.
      * Pega el token en el campo correspondiente del popup.
      * *(Tip: Si tienes abierta la pestaña de JobFlow Web, puedes pulsar "Detectar sesión" para que lo autocomplete automáticamente).*
-3. Haz clic en **"Guardar Configuración"**. El indicador superior cambiará a **"Conectado"** en color verde.
+4. Haz clic en **"Guardar Configuración"**. El indicador superior cambiará a **"Conectado"** en color verde.
+
+---
+
+## 🔄 Actualizar la Extensión (Si ya la tenías instalada)
+
+Si has actualizado el código del proyecto o recibido una nueva versión:
+1. Ve a `chrome://extensions/` en tu navegador.
+2. Localiza la tarjeta de **Jobflow — Capturador Rápido de Vacantes**.
+3. Haz clic en el icono circular de **Recargar (🔄)** en la esquina inferior derecha de la tarjeta.
+4. La extensión se actualizará inmediatamente a la versión más reciente (`v1.0.1`).
 
 ---
 
 ## 🎯 Cómo Usar la Extensión
 
-1. Navega a una oferta de trabajo (por ejemplo, en LinkedIn Jobs o Indeed).
+1. Navega a una oferta de trabajo (por ejemplo, en LinkedIn Jobs, Indeed, BambooHR o Glassdoor).
 2. Haz clic en el icono de **JobFlow** en tu barra de extensiones.
 3. Verifica que detecte la pestaña activa y haz clic en el botón dorado:
    ```text
@@ -84,4 +96,5 @@ Para instalar y probar la extensión localmente en tu navegador:
 | :--- | :--- | :--- |
 | **"Sin Token" o Error 401** | No se configuró el JWT o expiró la sesión | Abre la web de Jobflow, copia tu token desde el perfil y pégalo en los ajustes del popup. |
 | **"No se detectó el texto"** | El portal usa iframes o clases CSS desconocidas | Selecciona con el mouse el texto de la vacante en la página y vuelve a pulsar el botón en el popup. |
-| **Error de conexión con el backend** | El servidor local no está corriendo | Asegúrate de tener el backend iniciado con `pnpm dev` en la carpeta `/server` (puerto 5000). |
+| **"Failed to fetch" (Error en Análisis de IA)** | El backend seleccionado está inactivo o apuntando a localhost:5000 | Si estás en el navegador diario sin el backend local corriendo, haz clic en **"Cambiar a Producción"** en el mensaje de error o en Ajustes (⚙️) selecciona `Producción (Render API)`. Si el backend de Render estaba suspendido (plan gratuito), espera 20-30 segundos a que despierte y pulsa **Reintentar**. |
+| **Cambios no se reflejan tras actualizar código** | Chrome mantiene en caché la versión previa de la extensión | Abre `chrome://extensions/` y haz clic en el botón de recarga (🔄) de la extensión JobFlow. |
