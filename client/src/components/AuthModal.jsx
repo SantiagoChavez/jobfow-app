@@ -259,7 +259,23 @@ export const AuthModalDialog = () => {
         </div>
 
         {/* Contenido del Modal */}
-        <div className="p-6">
+        <div className="relative p-6">
+          {/* Overlay de Carga durante Autenticación */}
+          {submitting && (
+            <div className="absolute inset-0 z-20 bg-white/90 dark:bg-navy-base/90 backdrop-blur-xs flex flex-col items-center justify-center gap-3 animate-fade-in p-6 text-center select-none">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-navy-surface border border-slate-200 dark:border-slate-700/80 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-lg">
+                <RadarIcon className="w-6 h-6 animate-pulse" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                  Autenticando en JobFlow...
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-xs">
+                  Validando credenciales seguras y preparando tu tablero
+                </p>
+              </div>
+            </div>
+          )}
           {/* Mensaje de Error si ocurre */}
           {errorMessage && (
             <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-shake">

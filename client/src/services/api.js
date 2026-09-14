@@ -301,6 +301,21 @@ export async function extractProfileFromText(text) {
   });
 }
 
+/**
+ * Chequeo silencioso de salud para precalentar el backend en plataformas gratuitas (ej. Render spin-down)
+ */
+export async function pingBackend() {
+  try {
+    const rawApiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.trim() : '';
+    const healthUrl = rawApiUrl
+      ? `${rawApiUrl.replace(/\/+$/, '')}/health`
+      : '/health';
+    await fetch(healthUrl, { method: 'GET', cache: 'no-store' }).catch(() => null);
+  } catch {
+    // Silencioso por diseño
+  }
+}
+
 export default {
   getApplications,
   getApplicationById,
@@ -320,4 +335,5 @@ export default {
   updateUserProfile,
   importGithubSkills,
   extractProfileFromText,
+  pingBackend,
 };
