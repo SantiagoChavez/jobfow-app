@@ -39,6 +39,7 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 - [Requisitos Previos](#-requisitos-previos)
 - [Instalación y Puesta en Marcha](#-instalación-y-puesta-en-marcha)
 - [Scripts Disponibles](#-scripts-disponibles)
+- [Historial de Bugs, Advertencias y Soluciones](#-historial-de-bugs-advertencias-y-soluciones-técnicas)
 - [Roadmap de Tareas](#-roadmap-de-tareas)
 
 ---
@@ -302,6 +303,40 @@ pnpm run dev
 * `pnpm run dev`: Inicia el servidor de desarrollo de Vite con HMR.
 * `pnpm run build`: Compila la aplicación frontend optimizada para producción.
 * `pnpm run preview`: Previsualiza la compilación de producción localmente.
+
+---
+
+## 🐛 Historial de Bugs, Advertencias y Soluciones Técnicas
+
+Esta sección documenta los bugs, advertencias de compilador/linter y problemas arquitectónicos resueltos a lo largo del ciclo de desarrollo, sirviendo como base de conocimiento para el equipo y asegurando estabilidad técnica continua.
+
+### 📋 Matriz de Problemas Resueltos
+
+| ID | Componente / Archivo | Tipo de Problema | Descripción y Causa Raíz | Solución Técnica Aplicada | Estado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **BUG-01** | `client/src/components/ProfileModal.jsx` | `react(set-state-in-effect)` | Llamada a múltiples `setState` sincrónicos dentro de un `useEffect` al abrir el modal para cargar datos de usuario, provocando renders en cascada innecesarios en React 19. | Se desacopló la lógica en `ProfileModalDialog` montado de forma condicional (`if (!isOpen) return null`). El estado del formulario se inicializa de forma pura desde las props/contexto en el renderizado inicial sin requerir efectos sincrónicos. | 🟢 Resuelto |
+| **BUG-02** | `client/src/components/ProfileModal.jsx` | `eslint(no-unused-vars)` | El identificador `AlertCircleIcon` se importaba desde `./Icons.jsx` pero no se utilizaba en el marcado del modal tras un ajuste previo de interfaz. | Remoción del import no utilizado, limpiando el bundle y el árbol de dependencias del componente. | 🟢 Resuelto |
+| **BUG-03** | `client/src/components/AuthModal.jsx` | `react(set-state-in-effect)` & Estado duplicado | Existencia de un estado local redundante `activeTab` que se sincronizaba forzosamente con `authModalTab` de `AuthContext` mediante `useEffect`, disparando renderizados extra. | Eliminación del estado duplicado, derivando directamente `const activeTab = authModalTab \|\| 'login'`. La conmutación de pestañas y reseteo de errores se gestiona atómicamente en el manejador de eventos sin hooks de efecto. | 🟢 Resuelto |
+| **BUG-04** | `client/src/components/AuthModal.jsx` | `react(set-state-in-effect)` | Reseteo sincrónico de `errorMessage` y `showPassword` en `useEffect` al abrir/cerrar el modal. | Se extrajo `AuthModalDialog` para montarse únicamente cuando `isAuthModalOpen === true`, garantizando estados limpios por ciclo de vida natural del componente. | 🟢 Resuelto |
+| **BUG-05** | `client/src/components/QuickAddModal.jsx` | `react(set-state-in-effect)` | Invocación sincrónica inmediata de `setMatchData(null)` dentro del cuerpo de `useEffect` cuando el texto de requerimientos tenía menos de 5 caracteres, previo al temporizador de debounce. | Se trasladó la limpieza de afinidad dentro del temporizador de debounce asíncrono, eliminando llamadas a `setState` en la fase síncrona del efecto. | 🟢 Resuelto |
+| **BUG-06** | `client/src/context/ThemeContext.jsx` | `react(set-state-in-effect)` | Sincronización sincrónica del tema del usuario autenticado (`user.theme`) llamando a `setThemeState` en el cuerpo del efecto. | Diferimiento controlado de la sincronización mediante `setTimeout` asíncrono, condicionado estrictamente a si `user.theme !== theme`. | 🟢 Resuelto |
+| **BUG-07** | `client/src/App.jsx` | `react(set-state-in-effect)` | `fetchAllData()` ejecutaba sincrónicamente `setLoading(true)` al montarse el efecto dependiente de `[isAuthenticated]`. | Ejecución asíncrona desacoplada (`loadAsyncData()`) con bandera de suscripción activa (`isSubscribed`) para evitar estados fuera de orden y renderizados en cascada. | 🟢 Resuelto |
+| **BUG-08** | `client/src/components/Navbar.jsx` | Compatibilidad & Defensiva | Posible excepción en tiempo de ejecución al invocar `success()` de toast si la función no estaba definida en el contexto del árbol inmediato. | Validación defensiva estricta de tipo (`typeof success === 'function'`) con fallback transparente hacia `showToast(msg, 'success')`. | 🟢 Resuelto |
+| **BUG-09** | `client/src/context/AuthContext.jsx` | Error de importación | Omisión de la importación de `useMemo` requerida para la memorización del valor expuesto por el Provider de autenticación. | Incorporación explícita de `useMemo` desde `'react'`, previniendo renders innecesarios en consumidores del contexto. | 🟢 Resuelto |
+| **BUG-10** | `client/.oxlintrc.json` | `react(only-export-components)` | Falsos positivos del plugin de Fast Refresh sobre módulos de Contexto (`ThemeContext`, `ToastContext`, `AuthContext`) que exportan tanto el `Provider` como su custom hook de consumo (`useAuth`, `useTheme`, `useToast`). | Configuración normalizada de `"react/only-export-components": "off"`, preservando el patrón idiomático oficial de React Context sin fragmentar archivos innecesariamente. | 🟢 Resuelto |
+| **BUG-11** | `client/src/components/AuthModal.jsx` | Autocompletado invasivo de credenciales en navegador | Los navegadores basados en Chromium rellenaban automáticamente las credenciales guardadas (usuario y contraseña) al abrir el modal, generando riesgo de seguridad en equipos compartidos. | Se configuraron atributos `autoComplete="off"`, `autoComplete="new-password"` y se inicializaron los inputs con `readOnly={true}` que se desactiva fluidamente al recibir foco (`onFocus`), bloqueando el autollenado automático del navegador sin afectar la escritura. | 🟢 Resuelto |
+| **BUG-12** | `client/src/components/AuthModal.jsx` | Exposición de perfil personal en botón Google Sign-In | El botón de Google Identity Services generaba un iframe personalizado con avatar, nombre completo y correo de la cuenta de Google activa ("Continuar como..."), exponiendo datos personales sin acción del usuario. | Reconfiguración de `google.accounts.id.renderButton` con `size: 'medium'` y `text: 'signin_with'`, junto con limpieza previa del contenedor. Esto inhabilita contractualmente la personalización de perfil de GIS, renderizando un botón genérico y profesional "Iniciar sesión con Google". | 🟢 Resuelto |
+| **BUG-13** | `client/src/App.jsx` & `client/src/components/AuthModal.jsx` | Fricción UX y omisión de opción Google en Landing y Registro | En la Landing Page no había visibilidad de registro con Google (solo botones de correo). Además, al abrir "Crear Cuenta" el botón de Google mostraba "Iniciar sesión con Google", confundiendo a nuevos usuarios sobre si podían registrarse con Google. | 1) Se añadió el botón oficial "Continuar con Google" directamente en el Hero de la Landing junto a una leyenda informativa de registro instantáneo. 2) Se dinamizó `renderButton` en `AuthModal.jsx` para renderizar `text: 'signup_with'` ("Registrarse con Google") en la pestaña de registro y `text: 'signin_with'` en la de login, acompañado de un subtítulo explicativo de 1 clic. | 🟢 Resuelto |
+| **BUG-14** | `client/src/components/Footer.jsx`, `Navbar.jsx`, `AboutModal.jsx` | Ausencia de transparencia institucional y firma sobrecargada | El footer contenía "Creado por SoftwareChavez Dev" con redacción redundante y no existía un canal institucional para que visitantes o evaluadores conozcan el stack tecnológico oficial del proyecto. | 1) Se simplificó la firma del footer a un minimalista `by SoftwareChavez ↗` con enlace a GitHub. 2) Se creó `AboutModal.jsx` con el propósito del proyecto, tarjeta del autor y los logotipos vectoriales oficiales de las 8 tecnologías del stack (React 19, Tailwind, Vite, Node, Express 5, MongoDB Atlas, Gemini AI y Google OAuth), accesible desde el Header y el menú de usuario. | 🟢 Resuelto |
+| **BUG-15** | `client/src/App.jsx` | Jerarquía visual desbalanceada en Landing Hero | El titular H1 "Gestiona tu búsqueda laboral..." opacaba la identidad de marca, mientras que el logo del radar carecía de escala y el nombre de la plataforma no encabezaba la sección. | 1) Se unificó el emblema central con el logo del radar y el nombre `JobFlow` (sin PRO) alineados horizontalmente en el centro con tipografía `text-5xl font-black`. 2) Se aplicó un aura/resplandor dorado difuminado (`glow` suave con gradiente ámbar) que aporta relieve y profundidad. 3) Se equilibró la escala del titular H1 para una armonía visual de nivel SaaS internacional. | 🟢 Resuelto |
+
+### 🛠️ Protocolo para Registro de Nuevas Incidencias
+Para documentar futuros bugs o comportamientos inesperados, utilizar la siguiente estructura:
+1. **ID**: Identificador incremental (`BUG-XX`).
+2. **Componente / Módulo**: Archivo(s) exacto(s) involucrado(s).
+3. **Síntoma / Error**: Mensaje exacto de la terminal, logs o excepción visible.
+4. **Causa Raíz**: Diagnóstico técnico del motivo del fallo o incompatibilidad.
+5. **Solución Implementada**: Explicación concisa de la corrección defensiva aplicada y verificación con tests.
 
 ---
 
