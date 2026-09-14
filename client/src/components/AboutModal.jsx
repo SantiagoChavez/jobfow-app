@@ -12,6 +12,7 @@ import {
   MongoIcon,
   GeminiIcon,
   GoogleIcon,
+  SoftwareChavezIcon,
 } from './Icons.jsx';
 
 /**
@@ -177,12 +178,17 @@ export const AboutModal = ({ isOpen, onClose }) => {
           {/* Tarjeta del Autor / Creador */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 dark:from-gold-primary dark:to-amber-200 text-slate-950 font-black text-sm flex items-center justify-center shadow-md shadow-amber-500/20">
-                SC
+              <div
+                translate="no"
+                className="notranslate w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 dark:from-gold-primary dark:to-amber-200 text-slate-950 flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0 select-none overflow-hidden"
+                title="SoftwareChavez"
+                aria-label="SoftwareChavez"
+              >
+                <SoftwareChavezIcon className="w-6 h-6 text-slate-950 notranslate pointer-events-none" />
               </div>
-              <div>
+              <div translate="no" className="notranslate">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white notranslate" translate="no">
                     SoftwareChavez
                   </h4>
                   <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
