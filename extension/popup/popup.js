@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const syncFromTabBtn = document.getElementById('syncFromTabBtn');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const quickFixEnvBtn = document.getElementById('quickFixEnvBtn');
+  const errorSettingsBtn = document.getElementById('errorSettingsBtn');
 
   const tabTitle = document.getElementById('tabTitle');
   const tabUrl = document.getElementById('tabUrl');
@@ -46,24 +48,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errorMessage = document.getElementById('errorMessage');
   const retryBtn = document.getElementById('retryBtn');
 
+  const PRODUCTION_API_URL = 'https://jobfow-api.onrender.com';
+  const LOCAL_API_URL = 'http://localhost:5000';
+
   let currentTab = null;
-  let activeApiUrl = 'http://localhost:5000';
+  let activeApiUrl = PRODUCTION_API_URL;
   let activeToken = '';
 
   // 1. Cargar configuración persistente
   const loadConfig = async () => {
     return new Promise((resolve) => {
       chrome.storage.local.get(['jobflow_api_url', 'jobflow_token', 'jobflow_env'], (items) => {
-        activeApiUrl = items.jobflow_api_url || 'http://localhost:5000';
+        let storedUrl = items.jobflow_api_url;
+        let storedEnv = items.jobflow_env;
+
+        // Migración proactiva: corregir URL histórica con typo si estaba guardada
+        if (storedUrl && storedUrl.includes('jobflow-api.onrender.com')) {
+          storedUrl = PRODUCTION_API_URL;
+          chrome.storage.local.set({ jobflow_api_url: PRODUCTION_API_URL });
+        }
+        if (storedEnv && storedEnv.includes('jobflow-api.onrender.com')) {
+          storedEnv = PRODUCTION_API_URL;
+          chrome.storage.local.set({ jobflow_env: PRODUCTION_API_URL });
+        }
+
+        // Por defecto conectar a la API en la nube (Render)
+        activeApiUrl = storedUrl || PRODUCTION_API_URL;
         activeToken = items.jobflow_token || '';
 
-        // Actualizar formulario de configuración
-        if (items.jobflow_env) {
-          environmentSelect.value = items.jobflow_env;
+        // Sincronizar selector de entorno en UI
+        if (storedEnv) {
+          environmentSelect.value = (storedEnv === 'https://jobflow-api.onrender.com' || storedEnv === PRODUCTION_API_URL)
+            ? PRODUCTION_API_URL
+            : storedEnv;
+        } else if (activeApiUrl === PRODUCTION_API_URL || activeApiUrl.includes('onrender.com')) {
+          environmentSelect.value = PRODUCTION_API_URL;
         } else if (activeApiUrl.includes('localhost')) {
-          environmentSelect.value = 'http://localhost:5000';
-        } else if (activeApiUrl.includes('onrender.com')) {
-          environmentSelect.value = 'https://jobflow-api.onrender.com';
+          environmentSelect.value = LOCAL_API_URL;
         } else {
           environmentSelect.value = 'custom';
         }
@@ -71,6 +92,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (environmentSelect.value === 'custom') {
           customUrlGroup.classList.remove('hidden');
           customApiUrl.value = activeApiUrl;
+        } else {
+          customUrlGroup.classList.add('hidden');
         }
 
         jwtTokenInput.value = activeToken;
@@ -106,17 +129,30 @@ document.addEventListener('DOMContentLoaded', async () => {
           const urlObj = new URL(currentTab.url);
           tabDomainBadge.textContent = urlObj.hostname.replace('www.', '');
 
-          // Si es LinkedIn / Indeed, destacar badge
+          // Si es LinkedIn / Indeed / BambooHR / Glassdoor, destacar badge
           if (urlObj.hostname.includes('linkedin')) {
             sourceBadge.textContent = 'LinkedIn Jobs';
             sourceBadge.classList.remove('hidden');
           } else if (urlObj.hostname.includes('indeed')) {
             sourceBadge.textContent = 'Indeed';
             sourceBadge.classList.remove('hidden');
+          } else if (urlObj.hostname.includes('bamboohr')) {
+            sourceBadge.textContent = 'BambooHR';
+            sourceBadge.classList.remove('hidden');
+          } else if (urlObj.hostname.includes('glassdoor')) {
+            sourceBadge.textContent = 'Glassdoor';
+            sourceBadge.classList.remove('hidden');
           }
 
-          // Si estamos en Jobflow Web, intentar autocompletar sesión
-          if (urlObj.hostname.includes('localhost') || urlObj.hostname.includes('vercel.app')) {
+          // Si estamos en Jobflow Web en producción (Vercel), asegurar entorno producción
+          if (urlObj.hostname.includes('vercel.app')) {
+            if (activeApiUrl === LOCAL_API_URL) {
+              activeApiUrl = PRODUCTION_API_URL;
+              environmentSelect.value = PRODUCTION_API_URL;
+              chrome.storage.local.set({ jobflow_api_url: PRODUCTION_API_URL, jobflow_env: PRODUCTION_API_URL });
+            }
+            checkJobflowWebSession(currentTab.id);
+          } else if (urlObj.hostname.includes('localhost')) {
             checkJobflowWebSession(currentTab.id);
           }
         } catch {
@@ -137,6 +173,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           syncFromTabBtn.textContent = 'Sesión detectada (Aplicar)';
           syncFromTabBtn.onclick = () => {
             jwtTokenInput.value = response.token;
+            if (currentTab?.url?.includes('vercel.app')) {
+              environmentSelect.value = PRODUCTION_API_URL;
+            }
             saveSettings();
           };
         }
@@ -152,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const envVal = selectedUrl;
 
     if (selectedUrl === 'custom') {
-      selectedUrl = customApiUrl.value.trim() || 'http://localhost:5000';
+      selectedUrl = customApiUrl.value.trim() || PRODUCTION_API_URL;
     }
 
     const tokenVal = jwtTokenInput.value.trim();
@@ -168,6 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         activeToken = tokenVal;
         updateConnectionUI();
         settingsSection.classList.add('hidden');
+        errorState.classList.add('hidden');
       }
     );
   };
@@ -247,10 +287,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Paso 2: Análisis con Gemini 3.5 Flash Lite
-    updateLoadingStep('Analizando con IA (Gemini 3.5 Flash Lite)...', '65%');
+    updateLoadingStep('Analizando con IA (conectando con servidor)...', '60%');
 
     let aiResult = null;
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
       const aiResponse = await fetch(`${activeApiUrl}/api/ai/analyze-job`, {
         method: 'POST',
         headers: {
@@ -260,19 +303,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         body: JSON.stringify({
           text: extractedData.text,
         }),
+        signal: controller.signal,
       });
 
-      const aiJson = await aiResponse.json();
+      clearTimeout(timeoutId);
+
+      const aiJson = await aiResponse.json().catch(() => ({}));
 
       if (!aiResponse.ok || !aiJson.success) {
-        throw new Error(aiJson.message || aiJson.error || 'Error al analizar la oferta con IA.');
+        if (aiResponse.status === 401) {
+          throw new Error('Tu token JWT ha expirado o no es válido. Actualízalo en Ajustes (⚙️).');
+        }
+        throw new Error(aiJson.message || aiJson.error || `Error ${aiResponse.status} al procesar la oferta con IA.`);
       }
 
       aiResult = aiJson.data || aiJson;
     } catch (err) {
       loadingState.classList.add('hidden');
       captureBtn.disabled = false;
-      showError('Error en Análisis de IA', err.message || 'No se pudo comunicar con el servicio de IA de Jobflow.');
+      handleFetchError('Error en Análisis de IA', err);
       return;
     }
 
@@ -307,6 +356,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         suggestedPitch: aiResult.suggestedPitch || '',
       };
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       const saveResponse = await fetch(`${activeApiUrl}/api/applications`, {
         method: 'POST',
         headers: {
@@ -314,15 +366,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           Authorization: `Bearer ${activeToken}`,
         },
         body: JSON.stringify(applicationPayload),
+        signal: controller.signal,
       });
 
-      const saveJson = await saveResponse.json();
+      clearTimeout(timeoutId);
+
+      const saveJson = await saveResponse.json().catch(() => ({}));
 
       if (!saveResponse.ok) {
         if (saveResponse.status === 401) {
           throw new Error('Tu token JWT ha expirado o no es válido. Actualízalo en ajustes.');
         }
-        throw new Error(saveJson.message || 'Error al crear la postulación en la base de datos.');
+        throw new Error(saveJson.message || saveJson.error || `Error ${saveResponse.status} al crear la postulación.`);
       }
 
       // Éxito total
@@ -335,7 +390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       loadingState.classList.add('hidden');
       captureBtn.disabled = false;
-      showError('Error al Guardar', err.message);
+      handleFetchError('Error al Guardar', err);
     }
   };
 
@@ -375,9 +430,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     successState.classList.remove('hidden');
   };
 
-  const showError = (title, message) => {
+  const handleFetchError = (title, err) => {
+    let message = err.message || 'No se pudo comunicar con el servicio de Jobflow.';
+    let isNetworkError = false;
+
+    if (err.name === 'AbortError') {
+      message = `Tiempo de espera agotado al contactar el servidor (${activeApiUrl}). Si el servicio en Render estaba inactivo (arranque en frío), puede tardar hasta 40 segundos en activarse. Por favor reintenta en instantes.`;
+      isNetworkError = true;
+    } else if (err.message === 'Failed to fetch' || err instanceof TypeError) {
+      isNetworkError = true;
+      if (activeApiUrl.includes('localhost')) {
+        message = `No se pudo conectar a ${activeApiUrl}. Tu servidor local no parece estar iniciado en el puerto 5000. Si utilizas JobFlow en la nube, pulsa "Cambiar a Producción".`;
+      } else {
+        message = `No se pudo establecer conexión con el backend en ${activeApiUrl}. Si el servidor gratuito de Render estaba suspendido, puede requerir unos segundos para despertar. Vuelve a pulsar Reintentar.`;
+      }
+    }
+
+    showError(title, message, isNetworkError);
+  };
+
+  const showError = (title, message, showQuickFix = false) => {
     errorTitle.textContent = title;
     errorMessage.textContent = message;
+
+    if (quickFixEnvBtn) {
+      if (showQuickFix && activeApiUrl !== PRODUCTION_API_URL) {
+        quickFixEnvBtn.classList.remove('hidden');
+        quickFixEnvBtn.onclick = () => {
+          activeApiUrl = PRODUCTION_API_URL;
+          environmentSelect.value = PRODUCTION_API_URL;
+          chrome.storage.local.set(
+            {
+              jobflow_api_url: PRODUCTION_API_URL,
+              jobflow_env: PRODUCTION_API_URL,
+            },
+            () => {
+              errorState.classList.add('hidden');
+              handleCapture(); // Reintentar de inmediato con la URL correcta
+            }
+          );
+        };
+      } else {
+        quickFixEnvBtn.classList.add('hidden');
+      }
+    }
+
     errorState.classList.remove('hidden');
   };
 
@@ -389,6 +486,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   closeSettingsBtn.addEventListener('click', () => {
     settingsSection.classList.add('hidden');
   });
+
+  if (errorSettingsBtn) {
+    errorSettingsBtn.addEventListener('click', () => {
+      settingsSection.classList.remove('hidden');
+      errorState.classList.add('hidden');
+    });
+  }
 
   environmentSelect.addEventListener('change', () => {
     if (environmentSelect.value === 'custom') {

@@ -321,15 +321,59 @@ body {
   display: block;
 }
 
+.error-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
 .btn-retry {
   background-color: rgba(239, 68, 68, 0.25);
   border: 1px solid rgba(239, 68, 68, 0.5);
   color: #FEE2E2;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-retry:hover {
+  background-color: rgba(239, 68, 68, 0.4);
+}
+
+.btn-quick-fix {
+  background-color: rgba(250, 204, 21, 0.2);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  color: #FEF08A;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-quick-fix:hover {
+  background-color: rgba(250, 204, 21, 0.35);
+}
+
+.btn-settings-fix {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #E2E8F0;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 11px;
   cursor: pointer;
-  margin-top: 6px;
+  transition: background-color 0.2s;
+}
+
+.btn-settings-fix:hover {
+  background-color: rgba(255, 255, 255, 0.16);
 }
 
 /* Buttons */
