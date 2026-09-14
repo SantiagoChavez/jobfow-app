@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   CloseIcon,
   UserIcon,
   SparklesIcon,
   CheckCircleIcon,
-  AlertCircleIcon,
 } from './Icons.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -22,54 +21,36 @@ const POPULAR_SKILLS_SUGGESTIONS = [
   'Redux', 'Vue', 'Angular', 'Java', 'Spring Boot', 'C#', 'SQL',
 ];
 
-export const ProfileModal = ({ isOpen, onClose }) => {
+const ProfileModalDialog = ({ isOpen, onClose }) => {
   const { user, updateUser } = useAuth();
   const { showToast, success, error: showError } = useToast();
 
   const [activeImportTab, setActiveImportTab] = useState('github'); // 'github' | 'ai'
-  const [githubInput, setGithubInput] = useState('');
+  const [githubInput, setGithubInput] = useState(user?.links?.github || '');
   const [cvText, setCvText] = useState('');
   const [isImportingGithub, setIsImportingGithub] = useState(false);
   const [isExtractingAi, setIsExtractingAi] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Campos de formulario
-  const [name, setName] = useState('');
-  const [headline, setHeadline] = useState('');
-  const [bio, setBio] = useState('');
-  const [skills, setSkills] = useState([]);
+  // Campos de formulario inicializados reactivamente desde el perfil actual
+  const [name, setName] = useState(user?.name || '');
+  const [headline, setHeadline] = useState(user?.headline || 'Full Stack Developer');
+  const [bio, setBio] = useState(user?.bio || '');
+  const [skills, setSkills] = useState(
+    Array.isArray(user?.skills) && user.skills.length > 0
+      ? user.skills
+      : ['JavaScript', 'TypeScript', 'Node.js', 'Express', 'React', 'MongoDB', 'Git', 'REST API']
+  );
   const [newSkillInput, setNewSkillInput] = useState('');
   const [links, setLinks] = useState({
-    linkedin: '',
-    github: '',
-    portfolio: '',
+    linkedin: user?.links?.linkedin || '',
+    github: user?.links?.github || '',
+    portfolio: user?.links?.portfolio || '',
   });
 
   const skillInputRef = useRef(null);
 
   useModalA11y(isOpen, onClose);
-
-  // Cargar datos actuales del usuario al abrir
-  useEffect(() => {
-    if (user && isOpen) {
-      setName(user.name || '');
-      setHeadline(user.headline || 'Full Stack Developer');
-      setBio(user.bio || '');
-      setSkills(Array.isArray(user.skills) && user.skills.length > 0 ? user.skills : [
-        'JavaScript', 'TypeScript', 'Node.js', 'Express', 'React', 'MongoDB', 'Git', 'REST API'
-      ]);
-      setLinks({
-        linkedin: user.links?.linkedin || '',
-        github: user.links?.github || '',
-        portfolio: user.links?.portfolio || '',
-      });
-      if (user.links?.github) {
-        setGithubInput(user.links.github);
-      }
-    }
-  }, [user, isOpen]);
-
-  if (!isOpen) return null;
 
   // Agregar habilidad (desde input o sugerencia)
   const handleAddSkill = (skillToAdd) => {
@@ -570,4 +551,10 @@ export const ProfileModal = ({ isOpen, onClose }) => {
   );
 };
 
+export const ProfileModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+  return <ProfileModalDialog isOpen={isOpen} onClose={onClose} />;
+};
+
 export default ProfileModal;
+

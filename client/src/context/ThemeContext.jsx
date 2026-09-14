@@ -35,15 +35,18 @@ export const ThemeProvider = ({ children }) => {
 
   // Sincronizar con el perfil del usuario autenticado (perfil > localStorage > prefers-color-scheme > fallback)
   useEffect(() => {
-    if (user?.theme && (user.theme === 'dark' || user.theme === 'light')) {
-      setThemeState(user.theme);
-      try {
-        localStorage.setItem('jobflow_theme', user.theme);
-      } catch (err) {
-        console.warn('Error al sincronizar tema de perfil en localStorage:', err);
-      }
+    if (user?.theme && (user.theme === 'dark' || user.theme === 'light') && user.theme !== theme) {
+      const timer = setTimeout(() => {
+        setThemeState(user.theme);
+        try {
+          localStorage.setItem('jobflow_theme', user.theme);
+        } catch (err) {
+          console.warn('Error al sincronizar tema de perfil en localStorage:', err);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [user?.theme]);
+  }, [user?.theme, theme]);
 
   // Aplicar o remover clase 'dark' en el elemento <html> y persistir en localStorage
   useEffect(() => {

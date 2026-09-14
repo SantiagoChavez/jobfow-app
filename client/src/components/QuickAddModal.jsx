@@ -100,15 +100,17 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
 
   // Debounced análisis de afinidad de skills
   useEffect(() => {
-    if (!formData.requirementsRaw || formData.requirementsRaw.trim().length < 5) {
-      setMatchData((prev) => (prev !== null ? null : prev));
-      return;
-    }
+    const rawText = formData.requirementsRaw?.trim() || '';
 
     const timer = setTimeout(async () => {
+      if (rawText.length < 5) {
+        setMatchData((prev) => (prev !== null ? null : prev));
+        return;
+      }
+
       try {
         setAnalyzingMatch(true);
-        const result = await previewMatch(formData.requirementsRaw);
+        const result = await previewMatch(rawText);
         setMatchData(result);
       } catch (err) {
         console.error('Error al analizar afinidad:', err);

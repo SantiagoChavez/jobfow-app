@@ -13,6 +13,7 @@ import ApplicationDetailModal from './components/ApplicationDetailModal.jsx';
 import ReportModal from './components/ReportModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
+import AboutModal from './components/AboutModal.jsx';
 import { useToast } from './context/ToastContext.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import {
@@ -20,6 +21,7 @@ import {
   SparklesIcon,
   KanbanIcon,
   FileTextIcon,
+  GoogleIcon,
 } from './components/Icons.jsx';
 import {
   getApplications,
@@ -57,6 +59,7 @@ export function App() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isRemindersDrawerOpen, setIsRemindersDrawerOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
 
   // Carga de la colección completa desde la API (con all=true)
@@ -101,15 +104,50 @@ export function App() {
 
   // Sincronización inicial y reactiva con el estado de autenticación
   useEffect(() => {
+    let isSubscribed = true;
+
     if (isAuthenticated) {
-      fetchAllData();
+      const loadAsyncData = async () => {
+        if (!localStorage.getItem('jobflow_token')) return;
+        try {
+          const [appsRes, analyticsData] = await Promise.all([
+            getApplications({ all: true }),
+            getAnalyticsSummary().catch(() => null),
+          ]);
+          if (!isSubscribed) return;
+          setAllApplications(appsRes.data || []);
+          setAnalytics(analyticsData);
+          setError(null);
+        } catch (err) {
+          if (!isSubscribed) return;
+          console.error('Error al cargar datos generales:', err);
+          setError('No se pudo conectar con el servidor backend. Verifica que esté en ejecución en el puerto 5000.');
+        } finally {
+          if (isSubscribed) {
+            setLoading(false);
+          }
+        }
+      };
+
+      loadAsyncData();
     } else {
-      setAllApplications([]);
-      setTableApplications([]);
-      setAnalytics(null);
-      setLoading(false);
+      const timer = setTimeout(() => {
+        if (!isSubscribed) return;
+        setAllApplications([]);
+        setTableApplications([]);
+        setAnalytics(null);
+        setLoading(false);
+      }, 0);
+      return () => {
+        isSubscribed = false;
+        clearTimeout(timer);
+      };
     }
-  }, [isAuthenticated, fetchAllData]);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [isAuthenticated]);
 
   // Manejadores sincronizados de vista y filtros para evitar renders en cascada
   const handleViewChange = (view) => {
@@ -383,6 +421,7 @@ export function App() {
             setIsProfileModalOpen(true);
           }
         }}
+        onOpenAboutModal={() => setIsAboutModalOpen(true)}
       />
 
       {/* Contenido Principal */}
@@ -390,16 +429,30 @@ export function App() {
         {!isAuthenticated ? (
           /* Estado Desconectado / Landing de Bienvenida y Seguridad */
           <div className="py-8 md:py-16 flex flex-col items-center text-center max-w-3xl mx-auto animate-fade-in">
-            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-navy-surface border border-slate-200 dark:border-gold-primary/40 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-xl dark:shadow-2xl shadow-slate-200/50 dark:shadow-gold-primary/20 mb-6">
-              <RadarIcon className="w-9 h-9" />
+            {/* Emblema Central: Logo Radar con Glow Dorado + JobFlow */}
+            <div className="relative flex items-center justify-center gap-3.5 sm:gap-4 mb-5 select-none group">
+              {/* Resplandor / Aura Dorada Suave */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/25 via-yellow-400/35 to-amber-500/25 dark:from-gold-primary/25 dark:via-yellow-300/30 dark:to-gold-primary/25 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+              {/* Contenedor del Radar Agrandado con relieve */}
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white dark:bg-navy-surface border border-amber-300/60 dark:border-gold-primary/50 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-xl shadow-amber-500/15 dark:shadow-gold-primary/20 transition-transform duration-300 group-hover:scale-105">
+                <RadarIcon className="w-10 h-10 sm:w-12 sm:h-12" />
+              </div>
+
+              {/* Nombre JobFlow centrado */}
+              <span className="relative text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                Job<span className="text-amber-600 dark:text-gold-primary">Flow</span>
+              </span>
             </div>
 
+            {/* Badge de espacio privado */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 dark:bg-gold-primary/10 border border-amber-500/30 dark:border-gold-primary/30 text-amber-700 dark:text-gold-primary text-xs font-bold uppercase tracking-wider mb-4">
               <SparklesIcon className="w-3.5 h-3.5" />
-              <span>Jobflow Radar PRO • Tu Espacio Privado</span>
+              <span>Radar Inteligente • Tu Espacio Privado</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
+            {/* Titular principal con tamaño equilibrado */}
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mb-4 max-w-2xl">
               Gestiona tu búsqueda laboral con el poder de la <span className="text-amber-600 dark:text-gold-primary">Inteligencia Artificial</span>
             </h1>
 
@@ -407,19 +460,39 @@ export function App() {
               Registra y dale seguimiento a tus postulaciones, autocompleta vacantes con Gemini AI, calcula afinidad técnica en tiempo real y descarga reportes PDF ejecutivos en un espacio seguro y exclusivo para tu perfil.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-              <button
-                onClick={() => openAuthModal('register')}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl font-black text-sm bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 shadow-lg shadow-amber-500/20 dark:shadow-gold-primary/20 hover:shadow-amber-500/30 dark:hover:shadow-gold-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Crear Cuenta Gratis
-              </button>
-              <button
-                onClick={() => openAuthModal('login')}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 hover:border-amber-400 dark:hover:border-gold-primary/60 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
-              >
-                Iniciar Sesión
-              </button>
+            <div className="flex flex-col items-center gap-3.5 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+                {/* Botón rápido con Google */}
+                <button
+                  onClick={() => openAuthModal('register')}
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-sm bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 text-slate-800 dark:text-white shadow-sm hover:shadow transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 group"
+                >
+                  <GoogleIcon className="w-4 h-4" />
+                  <span>Continuar con Google</span>
+                </button>
+
+                {/* Botón Crear Cuenta con Correo */}
+                <button
+                  onClick={() => openAuthModal('register')}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl font-black text-sm bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 shadow-lg shadow-amber-500/20 dark:shadow-gold-primary/20 hover:shadow-amber-500/30 dark:hover:shadow-gold-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Crear Cuenta Gratis
+                </button>
+
+                {/* Botón Iniciar Sesión */}
+                <button
+                  onClick={() => openAuthModal('login')}
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-sm bg-slate-100 dark:bg-navy-surface/60 border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-gold-primary/60 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Iniciar Sesión
+                </button>
+              </div>
+
+              {/* Mensaje de apoyo para nuevos usuarios */}
+              <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 text-center">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Registro instantáneo en 1 clic disponible con Google o con tu correo</span>
+              </p>
             </div>
 
             {/* Tarjetas informativas de características */}
@@ -576,6 +649,12 @@ export function App() {
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
+      />
+
+      {/* Modal: Acerca de JobFlow */}
+      <AboutModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
       />
 
       {/* Modal Global de Autenticación */}

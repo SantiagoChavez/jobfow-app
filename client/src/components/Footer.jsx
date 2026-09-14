@@ -14,20 +14,20 @@ export const Footer = ({ isAuthenticated = false }) => {
         isAuthenticated ? 'bottom-[52px] md:bottom-0' : 'bottom-0'
       }`}
     >
-      {/* Izquierda: Firma de Creador Freelance */}
+      {/* Izquierda: Firma SoftwareChavez */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px] sm:text-xs">
-          Creado por
-        </span>
         <a
           href="https://github.com/SantiagoChavez"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-bold text-slate-800 dark:text-slate-100 hover:text-amber-600 dark:hover:text-gold-primary transition-colors flex items-center gap-1 group text-[11px] sm:text-xs"
-          title="Ver perfil de SoftwareChavez Dev"
+          className="font-medium text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-gold-primary transition-colors flex items-center gap-1.5 group text-[11px] sm:text-xs"
+          title="Ver perfil de SoftwareChavez en GitHub"
         >
-          <span>SoftwareChavez Dev</span>
-          <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
+          <span className="text-slate-400 dark:text-slate-500 font-normal">by</span>
+          <span className="font-bold text-slate-800 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-gold-primary transition-colors">
+            SoftwareChavez
+          </span>
+          <span className="text-[10px] text-slate-400 group-hover:text-amber-500 transition-colors opacity-70 group-hover:opacity-100">↗</span>
         </a>
       </div>
 

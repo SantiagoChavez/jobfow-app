@@ -14,7 +14,7 @@ import {
   AlertCircleIcon,
 } from './Icons.jsx';
 
-export const AuthModal = () => {
+export const AuthModalDialog = () => {
   const {
     isAuthModalOpen,
     closeAuthModal,
@@ -31,7 +31,7 @@ export const AuthModal = () => {
   useModalA11y(isAuthModalOpen, closeAuthModal);
 
   // Estados locales de los formularios
-  const [activeTab, setActiveTab] = useState(authModalTab || 'login');
+  const activeTab = authModalTab || 'login';
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,24 +49,8 @@ export const AuthModal = () => {
   // Contenedor para el botón nativo de Google Identity Services
   const googleBtnContainerRef = useRef(null);
 
-  // Sincronizar pestaña si cambia desde el contexto
-  useEffect(() => {
-    setActiveTab(authModalTab);
-    setErrorMessage('');
-  }, [authModalTab]);
-
-  // Limpiar campos y errores al abrir/cerrar modal
-  useEffect(() => {
-    if (isAuthModalOpen) {
-      setErrorMessage('');
-      setShowPassword(false);
-    }
-  }, [isAuthModalOpen]);
-
   // Carga e inicialización de Google Identity Services (GIS)
   useEffect(() => {
-    if (!isAuthModalOpen) return;
-
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     if (!clientId || !clientId.trim()) return;
 
@@ -92,13 +76,20 @@ export const AuthModal = () => {
             auto_select: false,
           });
 
-          // Renderizar botón oficial de Google estilizado
+          // Limpiar contenedor previo para evitar duplicaciones
+          googleBtnContainerRef.current.innerHTML = '';
+
+          // Renderizar botón oficial en modo neutral/genérico:
+          // Según la especificación oficial de Google Identity Services, 'size: medium'
+          // y 'text: signin_with' desactivan la personalización automática que expone
+          // el avatar, nombre y correo del usuario activo en el navegador.
+          const isDark = document.documentElement.classList.contains('dark');
           window.google.accounts.id.renderButton(googleBtnContainerRef.current, {
-            theme: 'filled_black',
-            size: 'large',
-            text: 'continue_with',
+            theme: isDark ? 'filled_black' : 'outline',
+            size: 'medium',
+            text: activeTab === 'register' ? 'signup_with' : 'signin_with',
             shape: 'rectangular',
-            width: googleBtnContainerRef.current.offsetWidth || 340,
+            width: 280,
             logo_alignment: 'left',
           });
         } catch (err) {
@@ -126,9 +117,7 @@ export const AuthModal = () => {
         script.addEventListener('load', initializeGoogleSignIn);
       }
     }
-  }, [isAuthModalOpen, loginWithGoogle]);
-
-  if (!isAuthModalOpen) return null;
+  }, [loginWithGoogle, activeTab]);
 
   // Manejador de Login tradicional
   const handleLoginSubmit = async (e) => {
@@ -242,7 +231,6 @@ export const AuthModal = () => {
           <button
             type="button"
             onClick={() => {
-              setActiveTab('login');
               setAuthModalTab('login');
               setErrorMessage('');
             }}
@@ -257,7 +245,6 @@ export const AuthModal = () => {
           <button
             type="button"
             onClick={() => {
-              setActiveTab('register');
               setAuthModalTab('register');
               setErrorMessage('');
             }}
@@ -283,6 +270,11 @@ export const AuthModal = () => {
 
           {/* Botón oficial de Google OAuth */}
           <div className="mb-4">
+            <p className="text-[11px] text-center text-slate-500 dark:text-slate-400 mb-2 font-medium">
+              {activeTab === 'register'
+                ? '⚡ Regístrate en 1 clic sin contraseñas con tu cuenta'
+                : '⚡ Acceso rápido y seguro en 1 clic'}
+            </p>
             <div
               ref={googleBtnContainerRef}
               className="w-full flex justify-center overflow-hidden rounded-xl"
@@ -297,7 +289,7 @@ export const AuthModal = () => {
                 className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-sm group"
               >
                 <GoogleIcon className="w-4 h-4" />
-                <span>Continuar con Google</span>
+                <span>{activeTab === 'register' ? 'Registrarse con Google' : 'Continuar con Google'}</span>
               </button>
             )}
           </div>
@@ -309,14 +301,14 @@ export const AuthModal = () => {
             </div>
             <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
               <span className="bg-white dark:bg-navy-base px-3 text-slate-500 font-medium">
-                {activeTab === 'login' ? 'o ingresa con tu correo' : 'o regístrate con email'}
+                {activeTab === 'login' ? 'o ingresa con tu correo' : 'o regístrate llenando tus datos'}
               </span>
             </div>
           </div>
 
           {/* Formulario 1: Iniciar Sesión */}
           {activeTab === 'login' ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-3.5">
+            <form onSubmit={handleLoginSubmit} autoComplete="off" className="space-y-3.5">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                   Correo Electrónico
@@ -327,6 +319,10 @@ export const AuthModal = () => {
                   </span>
                   <input
                     type="email"
+                    name="login_email_no_autofill"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => { e.target.readOnly = false; }}
                     required
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
@@ -347,6 +343,10 @@ export const AuthModal = () => {
                   </span>
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    name="login_password_no_autofill"
+                    autoComplete="new-password"
+                    readOnly
+                    onFocus={(e) => { e.target.readOnly = false; }}
                     required
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
@@ -372,8 +372,8 @@ export const AuthModal = () => {
               >
                 {submitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-slate-950 dark:border-navy-base border-t-transparent rounded-full animate-spin" />
-                    <span>Iniciando Sesión...</span>
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span>Iniciando sesión...</span>
                   </>
                 ) : (
                   <span>Iniciar Sesión</span>
@@ -382,7 +382,7 @@ export const AuthModal = () => {
             </form>
           ) : (
             /* Formulario 2: Crear Cuenta */
-            <form onSubmit={handleRegisterSubmit} className="space-y-3">
+            <form onSubmit={handleRegisterSubmit} autoComplete="off" className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Nombre Completo
@@ -393,6 +393,8 @@ export const AuthModal = () => {
                   </span>
                   <input
                     type="text"
+                    name="register_name"
+                    autoComplete="off"
                     required
                     value={registerName}
                     onChange={(e) => setRegisterName(e.target.value)}
@@ -413,6 +415,8 @@ export const AuthModal = () => {
                   </span>
                   <input
                     type="email"
+                    name="register_email"
+                    autoComplete="off"
                     required
                     value={registerEmail}
                     onChange={(e) => setRegisterEmail(e.target.value)}
@@ -431,6 +435,8 @@ export const AuthModal = () => {
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
+                      name="register_password"
+                      autoComplete="new-password"
                       required
                       value={registerPassword}
                       onChange={(e) => setRegisterPassword(e.target.value)}
@@ -448,6 +454,8 @@ export const AuthModal = () => {
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
+                      name="register_confirm_password"
+                      autoComplete="new-password"
                       required
                       value={registerConfirmPassword}
                       onChange={(e) => setRegisterConfirmPassword(e.target.value)}
@@ -495,7 +503,6 @@ export const AuthModal = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab('register');
                     setAuthModalTab('register');
                     setErrorMessage('');
                   }}
@@ -510,7 +517,6 @@ export const AuthModal = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab('login');
                     setAuthModalTab('login');
                     setErrorMessage('');
                   }}
@@ -525,6 +531,12 @@ export const AuthModal = () => {
       </div>
     </div>
   );
+};
+
+export const AuthModal = () => {
+  const { isAuthModalOpen } = useAuth();
+  if (!isAuthModalOpen) return null;
+  return <AuthModalDialog />;
 };
 
 export default AuthModal;
