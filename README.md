@@ -152,6 +152,12 @@ Jobflow-app/
 │   ├── Planificacion de jobflow.pdf  # Especificación de proyecto
 │   ├── modelo para jobflow.pdf # Wireframes y diseño de referencia
 │   └── jobflow-reporte-demo.pdf# Demo de reporte semanal exportado
+├── extension/                  # Extensión oficial de Chrome (Manifest V3)
+│   ├── manifest.json           # Manifiesto V3 estricto con permisos mínimos
+│   ├── popup/                  # Interfaz compacta Deep Cobalt & Crisp Gold
+│   ├── scripts/                # content.js (extractor contextual y de selección)
+│   ├── assets/                 # Iconos oficiales (16x16, 48x48, 128x128)
+│   └── README.md               # Guía técnica de la extensión
 ├── server/                     # Backend REST API (Node.js, Express 5, ES Modules)
 │   ├── scripts/                # Generadores de PDFs con PDFKit-Table
 │   ├── src/
@@ -288,6 +294,25 @@ pnpm install
 pnpm run dev
 ```
 * Cliente activo en: `http://localhost:5173`
+
+### 4. Instalar y Vincular la Extensión de Chrome (`/extension`)
+Jobflow incluye una extensión oficial de navegador (Manifest V3) para capturar ofertas laborales desde LinkedIn, Indeed o cualquier portal web con 1 clic y procesarlas con Gemini AI:
+
+1. **Cargar la extensión en el navegador:**
+   - Abre Google Chrome (o un navegador basado en Chromium como Brave o Edge) y entra a: `chrome://extensions/`.
+   - Activa el interruptor **"Modo de desarrollador"** (esquina superior derecha).
+   - Haz clic en **"Cargar descomprimida"** (esquina superior izquierda).
+   - Selecciona la carpeta `extension` ubicada en la raíz de este repositorio (`c:\Users\Santiago\Proyectos integradores\Jobfow-app\extension`).
+   - *(Recomendado)*: Fija (*Pin*) la extensión desde el ícono de rompecabezas para tenerla siempre visible en la barra superior.
+2. **Vincular tu cuenta con el Token JWT:**
+   - En la aplicación web (`http://localhost:5173`), inicia sesión con tu usuario.
+   - Haz clic en tu avatar (esquina superior derecha del Navbar) para abrir el menú de usuario.
+   - Selecciona **"🔑 Copiar Token Extensión"**. Tu token de sesión seguro se copiará al portapapeles.
+   - Haz clic en el ícono de la extensión en tu navegador y presiona el ícono de **Engranaje (⚙️ Ajustes)** en la esquina superior derecha del popup.
+   - Selecciona el entorno (`Local` para desarrollo local en puerto 5000 o `Producción` para Render) y pega tu token en el campo **Token de Autenticación (JWT)**.
+   - Presiona **"Guardar Ajustes"**. El indicador cambiará a **"Conectado"** (verde).
+3. **Captura con IA en 1 clic:**
+   - Navega a cualquier empleo en LinkedIn, Indeed o portales similares, abre la extensión y pulsa **"⚡ Capturar y Procesar con IA"** para registrar la vacante directamente en tu Kanban.
 
 ---
 
