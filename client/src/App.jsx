@@ -69,11 +69,11 @@ export function App() {
   }, []);
 
   // Carga de la colección completa desde la API (con all=true)
-  const fetchAllData = useCallback(async () => {
+  const fetchAllData = useCallback(async (isSilent = false) => {
     if (!localStorage.getItem('jobflow_token')) return;
 
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       setError(null);
       const [appsRes, analyticsData] = await Promise.all([
         getApplications({ all: true }),
@@ -83,9 +83,13 @@ export function App() {
       setAnalytics(analyticsData);
     } catch (err) {
       console.error('Error al cargar datos generales:', err);
-      setError('No se pudo conectar con el servidor backend. Verifica que esté en ejecución en el puerto 5000.');
+      if (!isSilent) {
+        setError('No se pudo conectar con el servidor de Jobflow. Verifica tu conexión a internet.');
+      }
     } finally {
-      setLoading(false);
+      if (!isSilent) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -108,6 +112,43 @@ export function App() {
     }
   }, [searchQuery, statusFilter, showToast]);
 
+  // Sincronización en tiempo real: volver a enfocar ventana, visibilidad y eventos de extensión
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const handleAutoSync = () => {
+      if (localStorage.getItem('jobflow_token')) {
+        fetchAllData(true);
+        if (currentView === 'table') {
+          fetchTableData(currentPage, searchQuery, statusFilter);
+        }
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        handleAutoSync();
+      }
+    };
+
+    const handleExtensionSync = (e) => {
+      handleAutoSync();
+      if (e?.detail?.company) {
+        showToast(`Postulación en "${e.detail.company}" sincronizada.`);
+      }
+    };
+
+    window.addEventListener('focus', handleAutoSync);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('jobflow:sync', handleExtensionSync);
+
+    return () => {
+      window.removeEventListener('focus', handleAutoSync);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('jobflow:sync', handleExtensionSync);
+    };
+  }, [isAuthenticated, fetchAllData, fetchTableData, currentView, currentPage, searchQuery, statusFilter, showToast]);
+
   // Sincronización inicial y reactiva con el estado de autenticación
   useEffect(() => {
     let isSubscribed = true;
@@ -127,7 +168,7 @@ export function App() {
         } catch (err) {
           if (!isSubscribed) return;
           console.error('Error al cargar datos generales:', err);
-          setError('No se pudo conectar con el servidor backend. Verifica que esté en ejecución en el puerto 5000.');
+          setError('No se pudo conectar con el servidor de Jobflow. Verifica tu conexión a internet.');
         } finally {
           if (isSubscribed) {
             setLoading(false);
@@ -158,6 +199,7 @@ export function App() {
   // Manejadores sincronizados de vista y filtros para evitar renders en cascada
   const handleViewChange = (view) => {
     setCurrentView(view);
+    fetchAllData(true);
     if (view === 'table') {
       setCurrentPage(1);
       fetchTableData(1, searchQuery, statusFilter);
