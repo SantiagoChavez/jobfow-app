@@ -33,21 +33,7 @@
 
     <!-- Panel de Configuración (Desplegable) -->
     <section id="settingsSection" class="settings-card hidden">
-      <h3 class="section-title">Configuración de Conexión</h3>
-      
-      <div class="field-group">
-        <label for="environmentSelect" class="field-label">Entorno del Backend</label>
-        <select id="environmentSelect" class="form-select">
-          <option value="https://jobfow-api.onrender.com">Producción (Render API)</option>
-          <option value="http://localhost:5000">Desarrollo Local (localhost:5000)</option>
-          <option value="custom">URL Personalizada...</option>
-        </select>
-      </div>
-
-      <div id="customUrlGroup" class="field-group hidden">
-        <label for="customApiUrl" class="field-label">URL del Servidor</label>
-        <input type="text" id="customApiUrl" class="form-input" placeholder="https://mi-api.onrender.com">
-      </div>
+      <h3 class="section-title">Vinculación de Cuenta</h3>
 
       <div class="field-group">
         <div class="label-row">
@@ -58,11 +44,11 @@
           <input type="password" id="jwtTokenInput" class="form-input" placeholder="Pega tu token de Jobflow aquí...">
           <button id="toggleTokenVisibilityBtn" type="button" class="btn-inside" title="Ver/Ocultar token">👁️</button>
         </div>
-        <p class="field-hint">En JobFlow Web: Menú superior ➔ Perfil ➔ "Copiar Token para Extensión".</p>
+        <p class="field-hint">En JobFlow Web: Menú superior ➔ Perfil ➔ "Copiar Token Extensión".</p>
       </div>
 
       <div class="settings-actions">
-        <button id="saveSettingsBtn" class="btn-secondary">Guardar Configuración</button>
+        <button id="saveSettingsBtn" class="btn-secondary">Guardar Token</button>
         <button id="closeSettingsBtn" class="btn-ghost">Cerrar</button>
       </div>
     </section>
@@ -156,7 +142,6 @@
           <p id="errorMessage" class="error-desc">No se pudo procesar la vacante.</p>
           <div class="error-actions">
             <button id="retryBtn" class="btn-retry">Reintentar</button>
-            <button id="quickFixEnvBtn" class="btn-quick-fix hidden">Cambiar a Producción (Render)</button>
             <button id="errorSettingsBtn" class="btn-settings-fix">⚙️ Ajustes</button>
           </div>
         </div>
@@ -166,7 +151,7 @@
     <!-- Footer Discreto -->
     <footer class="footer">
       <span>JobFlow • Gemini 3.5 Flash Lite</span>
-      <span id="versionLabel">v1.0.1</span>
+      <span id="versionLabel">v1.0.2</span>
     </footer>
   </div>
 
