@@ -11,6 +11,7 @@ Bienvenido a la carpeta de documentación centralizada de **Jobflow**. En este d
 | **Guía de Usuario Rápida** | Markdown (`.md`) | Postulantes, evaluadores y usuarios no técnicos que buscan una guía paso a paso intuitiva. | [GUIA_USUARIO.md](./GUIA_USUARIO.md) |
 | **Guía Rápida Vectorial** | PDF Vectorial | Versión impresa o descargable de la guía de usuario con paleta Deep Cobalt & Gold. | [Guia-Rapida-Jobflow.pdf](./Guia-Rapida-Jobflow.pdf) |
 | **Manual de Usuario Oficial** | PDF Vectorial (4 págs) | Manual integral con especificaciones de arquitectura, flujos de datos y contratos. | [Manual-de-Usuario-Jobflow.pdf](./Manual-de-Usuario-Jobflow.pdf) |
+| **Extensión de Navegador (Chrome V3)** | Markdown (`.md`) | Guía técnica y paso a paso para instalar la extensión y capturar vacantes con IA. | [extension/README.md](../extension/README.md) |
 | **Backlog & Roadmap de Tareas** | Markdown (`.md`) | Desglose exhaustivo de fases técnicas, tarjetas de Trello (1 a 14) y criterios de aceptación. | [TASKS.md](./TASKS.md) |
 | **Planificación del Proyecto** | PDF Documento | Análisis de requerimientos, alcance y planificación original del proyecto integrador. | [Planificacion de jobflow.pdf](./Planificacion%20de%20jobflow.pdf) |
 | **Modelo de Referencia Visual** | PDF Diseño | Wireframes, flujos de pantallas y diseño de referencia visual de la aplicación. | [modelo para jobflow.pdf](./modelo%20para%20jobflow.pdf) |
