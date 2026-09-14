@@ -9,7 +9,17 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
-## [1.3.0] - 2026-09-13
+## [1.3.1] - 2026-09-14
+
+### Fixed
+- **Extensión de Chrome — Corrección de "Failed to fetch" y Soporte de BambooHR (`BUG-20`):**
+  - Corrección de la URL del backend en producción: reemplazo de `https://jobflow-api.onrender.com` (con 'l') por la dirección real desplegada `https://jobfow-api.onrender.com`.
+  - Configuración del entorno de **Producción (Render API)** como destino predeterminado de la extensión al instalar o iniciar, evitando fallos de conexión por intentar alcanzar `http://localhost:5000` cuando no hay un servidor local activo.
+  - Migración proactiva de almacenamiento local (`chrome.storage.local`): detección y actualización automática de URLs legadas con typo hacia la URL operativa en Render.
+  - Diagnóstico granular de red y UX de recuperación: manejo controlado de errores de red (`TypeError: Failed to fetch`) y timeouts (`AbortController` de 60s para arranque en frío de Render), incorporando un botón de 1 clic **"Cambiar a Producción (Render)"** y acceso directo a **Ajustes (⚙️)**.
+  - Extracción nativa para portales de **BambooHR** (`bamboohr.com`) en `content.js` con selectores dedicados y reconocimiento de badge en el popup.
+  - Actualización de versión de la extensión a `v1.0.1` en `manifest.json` y `popup.html`.
+  - Actualización de `extension/README.md` y `docs/GUIA_USUARIO.md` con instrucciones para recargar la extensión desde `chrome://extensions/`.
 
 ### Added
 - **Módulo de Perfil de Usuario, Habilidades Dinámicas y Extracción Inteligente (Tarjeta 15):**
