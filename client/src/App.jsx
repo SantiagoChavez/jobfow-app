@@ -30,6 +30,7 @@ import {
   addInteraction,
   deleteApplication,
   getAnalyticsSummary,
+  pingBackend,
 } from './services/api.js';
 
 export function App() {
@@ -61,6 +62,11 @@ export function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
+
+  // Precalentamiento temprano y silencioso del backend (mitigación de spin-down en Render)
+  useEffect(() => {
+    pingBackend();
+  }, []);
 
   // Carga de la colección completa desde la API (con all=true)
   const fetchAllData = useCallback(async () => {
