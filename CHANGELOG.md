@@ -9,6 +9,16 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-09-14
+
+### Changed
+- **Extensión de Chrome — Conexión Directa a JobFlow Cloud y Mensajes de Diagnóstico Claros:**
+  - Supresión completa de configuraciones y selectores de entorno local (`localhost:5000`), vinculando la extensión de manera directa, transparente e incondicional a la API de JobFlow Cloud (`https://jobfow-api.onrender.com`).
+  - Eliminación de menciones a proveedores de infraestructura (Render) en la interfaz de usuario para una experiencia limpia y centrada en el producto.
+  - Simplificación del panel de Ajustes (⚙️) focalizado exclusivamente en la vinculación del token de autenticación (JWT) con detección de sesión en un clic.
+  - Diagnóstico de errores enriquecido: mensajes detallados y específicos ante tokens expirados, texto insuficiente en la página, desconexión de red o respuestas no exitosas del backend, sin jerga técnica.
+  - Actualización de permisos de manifiesto (eliminación de permisos locales innecesarios) y actualización de versión a `v1.0.2`.
+
 ## [1.3.1] - 2026-09-14
 
 ### Fixed
