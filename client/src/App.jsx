@@ -425,7 +425,7 @@ export function App() {
       />
 
       {/* Contenido Principal */}
-      <main className={`flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 ${isAuthenticated ? 'pb-28 md:pb-16' : 'pb-16'}`}>
+      <main className={`flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 ${isAuthenticated ? 'pb-24 md:pb-16' : 'pb-16'}`}>
         {!isAuthenticated ? (
           /* Estado Desconectado / Landing de Bienvenida y Seguridad */
           <div className="py-8 md:py-16 flex flex-col items-center text-center max-w-3xl mx-auto animate-fade-in">

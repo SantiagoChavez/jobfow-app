@@ -365,4 +365,24 @@ export const GeminiIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+export const SoftwareChavezIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 32 32"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    translate="no"
+    aria-hidden="true"
+  >
+    {/* S */}
+    <path d="M13.5 11.5 C13.5 9.5 12 8.5 10 8.5 C7.8 8.5 6.5 10 6.5 12 C6.5 15.2 13.5 15 13.5 19 C13.5 21.5 12 23.5 9.5 23.5 C7.2 23.5 6.5 21.8 6.5 20.2" />
+    {/* C */}
+    <path d="M25.5 12 C24.5 9.5 22.5 8.5 20 8.5 C16.5 8.5 14.5 11.5 14.5 16 C14.5 20.5 16.5 23.5 20 23.5 C22.5 23.5 24.5 22.5 25.5 20" />
+  </svg>
+);
+
+
 

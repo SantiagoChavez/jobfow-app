@@ -10,8 +10,8 @@ import { RadarIcon } from './Icons.jsx';
 export const Footer = ({ isAuthenticated = false }) => {
   return (
     <footer
-      className={`fixed left-0 right-0 z-30 bg-white/95 dark:bg-navy-base/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 px-4 lg:px-8 py-2 transition-all duration-200 text-xs select-none shadow-sm dark:shadow-none ${
-        isAuthenticated ? 'bottom-[52px] md:bottom-0' : 'bottom-0'
+      className={`fixed left-0 right-0 bottom-0 z-30 bg-white/95 dark:bg-navy-base/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 px-4 lg:px-8 py-2 transition-all duration-200 text-xs select-none shadow-sm dark:shadow-none ${
+        isAuthenticated ? 'hidden md:flex' : 'flex'
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between w-full">
