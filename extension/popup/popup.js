@@ -325,6 +325,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Éxito total
       updateLoadingStep('¡Completado!', '100%');
+
+      // Notificar en tiempo real a todas las pestañas abiertas de JobFlow
+      try {
+        chrome.tabs.query({}, (tabs) => {
+          if (chrome.runtime.lastError || !tabs) return;
+          tabs.forEach((t) => {
+            if (t.url && (t.url.includes('localhost') || t.url.includes('vercel.app') || t.url.includes('jobflow') || t.url.includes('jobfow'))) {
+              chrome.tabs.sendMessage(t.id, {
+                action: 'NOTIFY_APPLICATION_SAVED',
+                company: companyName,
+                role: roleName,
+              }, () => {
+                // Silenciar error si la pestaña no tiene el content script activo
+                if (chrome.runtime.lastError) { /* noop */ }
+              });
+            }
+          });
+        });
+      } catch (notifyErr) {
+        console.warn('Error al notificar pestañas activas de Jobflow:', notifyErr);
+      }
+
       setTimeout(() => {
         loadingState.classList.add('hidden');
         captureBtn.disabled = false;

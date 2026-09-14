@@ -239,5 +239,22 @@
       sendResponse(session);
       return true;
     }
+
+    if (request.action === 'NOTIFY_APPLICATION_SAVED') {
+      try {
+        window.dispatchEvent(
+          new CustomEvent('jobflow:sync', {
+            detail: {
+              company: request.company,
+              role: request.role,
+            },
+          })
+        );
+      } catch (err) {
+        console.warn('Error al despachar evento de sincronización:', err);
+      }
+      sendResponse({ received: true });
+      return true;
+    }
   });
 })();
