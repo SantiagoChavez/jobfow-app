@@ -5,6 +5,11 @@ import { extractSkillsFromGithub, extractProfileFromCvText } from '../services/p
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Precalentamiento en memoria de certificados públicos de Google para acelerar login inicial
+if (typeof googleClient.getFederatedSignonCertsAsync === 'function') {
+  googleClient.getFederatedSignonCertsAsync().catch(() => null);
+}
+
 /**
  * Normaliza y formatea el DTO de usuario respetando compatibilidad hacia atrás
  */
@@ -219,28 +224,32 @@ export const googleAuthUser = async (req, res) => {
     const { sub: googleId, email, name, picture } = payload;
     const normalizedEmail = email.toLowerCase().trim();
 
-    // 1. Buscar si ya existe usuario con este googleId
-    let user = await User.findOne({ googleId });
+    // 1. Buscar usuario de forma atómica indexada (por googleId o por correo normalizado)
+    let user = await User.findOne({
+      $or: [{ googleId }, { email: normalizedEmail }],
+    });
 
-    // 2. Si no, buscar por email para vincular cuenta
-    if (!user) {
-      user = await User.findOne({ email: normalizedEmail });
-
-      if (user) {
+    if (user) {
+      let needsSave = false;
+      if (!user.googleId) {
         user.googleId = googleId;
-        if (!user.avatar && picture) {
-          user.avatar = picture;
-        }
-        await user.save();
-      } else {
-        // 3. Crear nuevo usuario federado
-        user = await User.create({
-          name: name || 'Usuario Google',
-          email: normalizedEmail,
-          googleId,
-          avatar: picture || '',
-        });
+        needsSave = true;
       }
+      if (!user.avatar && picture) {
+        user.avatar = picture;
+        needsSave = true;
+      }
+      if (needsSave) {
+        await user.save();
+      }
+    } else {
+      // 2. Crear nuevo usuario federado si es su primer acceso
+      user = await User.create({
+        name: name || 'Usuario Google',
+        email: normalizedEmail,
+        googleId,
+        avatar: picture || '',
+      });
     }
 
     const token = generateToken(user._id);
