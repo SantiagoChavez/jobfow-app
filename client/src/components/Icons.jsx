@@ -291,3 +291,78 @@ export const KeyIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+export const InfoIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="16" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </svg>
+);
+
+export const GithubIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+  </svg>
+);
+
+export const ReactIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="-11.5 -10.23174 23 20.46348">
+    <circle cx="0" cy="0" r="2.05" fill="#61DAFB"/>
+    <g stroke="#61DAFB" strokeWidth="1" fill="none">
+      <ellipse rx="11" ry="4.2"/>
+      <ellipse rx="11" ry="4.2" transform="rotate(60)"/>
+      <ellipse rx="11" ry="4.2" transform="rotate(120)"/>
+    </g>
+  </svg>
+);
+
+export const TailwindIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="#38BDF8">
+    <path d="M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 C13.666,10.618,15.027,12,18.001,12c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C16.337,6.182,14.976,4.8,12.001,4.8z M6.001,12c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 c1.177,1.194,2.538,2.576,5.512,2.576c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C10.337,13.382,8.976,12,6.001,12z"/>
+  </svg>
+);
+
+export const ViteIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24">
+    <path d="M23.15 2.587L12.55.21a.83.83 0 00-.36 0L1.59 2.587a.835.835 0 00-.638.64L.014 9.873c-.027.24.037.48.18.67l11.455 13.11a.833.833 0 001.252 0L24.356 10.54a.838.838 0 00.18-.67l-.938-6.645a.835.835 0 00-.448-.643z" fill="#BD34FE"/>
+    <path d="M19.78 3.328l-8.5 17.51-1.05-7.14a.833.833 0 00-.776-.713l-4.72-.34 8.78-8.23 6.26-1.087z" fill="#FFD62E"/>
+  </svg>
+);
+
+export const NodeIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="#5FA04E">
+    <path d="M12 2l10 5.8v11.6L12 25.2 2 19.4V7.8L12 2zm-1.5 13.5v-3c0-.8-.7-1.5-1.5-1.5s-1.5.7-1.5 1.5v3h-2v-3c0-1.9 1.6-3.5 3.5-3.5s3.5 1.6 3.5 3.5v3h-2zm5 0c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" />
+  </svg>
+);
+
+export const ExpressIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-8h2v8zm5-4.5c0 .83-.67 1.5-1.5 1.5h-1.5v3h-2v-8h3.5c.83 0 1.5.67 1.5 1.5v2z" />
+  </svg>
+);
+
+export const MongoIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24">
+    <path d="M12 1.5C12 1.5 5.5 8.5 5.5 14.5C5.5 18.5 8.5 22.5 12 22.5C15.5 22.5 18.5 18.5 18.5 14.5C18.5 8.5 12 1.5 12 1.5Z" fill="#13AA52"/>
+    <path d="M12 1.5V22.5C11.5 22.5 5.5 18.5 5.5 14.5C5.5 8.5 12 1.5 12 1.5Z" fill="#116149"/>
+    <path d="M12 22.5V1.5C12.2 1.7 12.8 2.5 13.5 4C14.5 6 15 9.5 14.5 13C14 16.5 12.5 21.5 12 22.5Z" fill="#FFEAA5" opacity="0.3"/>
+  </svg>
+);
+
+export const GeminiIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none">
+    <defs>
+      <linearGradient id="gemini-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#1BA1E3" />
+        <stop offset="50%" stopColor="#5B68DF" />
+        <stop offset="100%" stopColor="#C462D4" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M12 2C12 7.52 7.52 12 2 12C7.52 12 12 16.48 12 22C12 16.48 16.48 12 22 12C16.48 12 12 7.52 12 2Z"
+      fill="url(#gemini-grad)"
+    />
+  </svg>
+);
+
+

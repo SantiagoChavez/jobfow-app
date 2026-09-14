@@ -10,6 +10,7 @@ import {
   LogOutIcon,
   ChevronDownIcon,
   KeyIcon,
+  InfoIcon,
 } from './Icons.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -23,6 +24,7 @@ export const Navbar = ({
   remindersCount = 0,
   onOpenReminders,
   onOpenProfileModal,
+  onOpenAboutModal,
 }) => {
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
   const { success, showToast } = useToast();
@@ -112,16 +114,38 @@ export const Navbar = ({
           <ThemeToggle />
 
           {!isAuthenticated ? (
-            /* Botón de Ingreso cuando no está autenticado */
-            <button
-              onClick={() => openAuthModal('login')}
-              className="flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 transition-all duration-200 shadow-md shadow-amber-500/20 dark:shadow-gold-primary/20 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <UserIcon className="w-4 h-4" />
-              <span>Ingresar</span>
-            </button>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Botón Acerca de */}
+              <button
+                onClick={onOpenAboutModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-gold-primary hover:bg-slate-100 dark:hover:bg-navy-surface border border-slate-200/80 dark:border-slate-800 transition-all shadow-xs"
+                title="Conoce más sobre JobFlow y su stack tecnológico"
+              >
+                <InfoIcon className="w-4 h-4 text-amber-500 dark:text-gold-primary" />
+                <span>Acerca de</span>
+              </button>
+
+              {/* Botón de Ingreso cuando no está autenticado */}
+              <button
+                onClick={() => openAuthModal('login')}
+                className="flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 transition-all duration-200 shadow-md shadow-amber-500/20 dark:shadow-gold-primary/20 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <UserIcon className="w-4 h-4" />
+                <span>Ingresar</span>
+              </button>
+            </div>
           ) : (
             <>
+              {/* Botón Acerca de (siempre accesible) */}
+              <button
+                onClick={onOpenAboutModal}
+                className="p-2 rounded-xl bg-white dark:bg-navy-surface border border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-gold-primary hover:border-amber-300 dark:hover:border-gold-primary/50 hover:bg-slate-50 dark:hover:bg-navy-highlight transition-all shadow-sm"
+                title="Acerca de JobFlow y Stack Tecnológico"
+                aria-label="Acerca de JobFlow"
+              >
+                <InfoIcon className="w-5 h-5 text-amber-500 dark:text-gold-primary" />
+              </button>
+
               {/* Botón de Campana / Alertas y Seguimientos */}
               <button
                 onClick={onOpenReminders}
@@ -222,6 +246,19 @@ export const Navbar = ({
                         >
                           <KeyIcon className="w-4 h-4 text-amber-500 dark:text-gold-primary" />
                           <span>Copiar Token Extensión</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            if (typeof onOpenAboutModal === 'function') {
+                              onOpenAboutModal();
+                            }
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-amber-700 dark:hover:text-gold-primary hover:bg-slate-50 dark:hover:bg-navy-highlight rounded-xl transition-colors text-left"
+                        >
+                          <InfoIcon className="w-4 h-4 text-amber-500 dark:text-gold-primary" />
+                          <span>Acerca de JobFlow</span>
                         </button>
 
                         <button
