@@ -59,6 +59,36 @@
     const isLinkedIn = currentUrl.includes('linkedin.com');
     const isIndeed = currentUrl.includes('indeed.com');
     const isGlassdoor = currentUrl.includes('glassdoor.com');
+    const isBambooHR = currentUrl.includes('bamboohr.com');
+
+    if (isBambooHR) {
+      const bambooSelectors = [
+        '[data-qa="job-description"]',
+        '[data-qa="job-details"]',
+        '.BambooHR-ATS-Jobs-Item',
+        '.BambooHR-ATS-board',
+        'div.pos-job-description',
+        'section[class*="description"]',
+        'div[class*="description"]',
+        'main article',
+        'main',
+      ];
+      for (const sel of bambooSelectors) {
+        const el = document.querySelector(sel);
+        if (el) {
+          const text = cleanNodeText(el);
+          if (text.length >= 50) {
+            return {
+              success: true,
+              url: currentUrl,
+              title: pageTitle,
+              text: text.slice(0, 8000),
+              source: 'BAMBOOHR_SPECIFIC',
+            };
+          }
+        }
+      }
+    }
 
     if (isLinkedIn) {
       const linkedInSelectors = [
