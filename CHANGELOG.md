@@ -9,6 +9,15 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.4] - 2026-09-16
+
+### Fixed
+- **Conmutación Instantánea y Reactiva de Modo Claro / Modo Oscuro (`ThemeContext`):**
+  - Corrección del bug de parpadeo y reversión inmediata al hacer clic en el botón de alternancia de tema Sol / Luna.
+  - Desacoplamiento de la dependencia circular en el `useEffect` de sincronización de usuario en `ThemeContext.jsx`, impidiendo que el tema en estado de `AuthContext` sobreescribiera la acción manual del usuario antes de guardarse en el backend.
+  - Sincronización atómica inmediata entre el estado local `theme`, el almacenamiento `localStorage`, el estado de usuario `AuthContext` y la API remota (`PATCH /api/auth/theme`).
+  - Incorporación de script síncrono ultra-rápido en el `<head>` de `index.html` para erradicar el parpadeo de tema desalineado (FOUC) durante recargas de página.
+
 ## [1.3.3] - 2026-09-14
 
 ### Fixed
