@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jobflow — Radar & Career Tracker</title>
+    <!-- Inicialización síncrona de tema (Deep Cobalt / Modo Claro) para evitar parpadeos visuales (FOUC) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('jobflow_theme');
+          var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+          var theme = (saved === 'dark' || saved === 'light') ? saved : (prefersLight ? 'light' : 'dark');
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <!-- Preconexión y descarga anticipada de Google Identity Services (GIS) para login instantáneo -->
     <link rel="preconnect" href="https://accounts.google.com" />
     <link rel="dns-prefetch" href="https://accounts.google.com" />
