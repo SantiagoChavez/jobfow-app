@@ -1,8 +1,24 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { updateUserTheme } from '../services/api.js';
 
 const ThemeContext = createContext(null);
+
+/**
+ * Aplica de forma directa e inmediata las clases CSS correspondientes al elemento <html>
+ * @param {'dark'|'light'} targetTheme
+ */
+const applyThemeToDom = (targetTheme) => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  if (targetTheme === 'dark') {
+    root.classList.add('dark');
+    root.classList.remove('light');
+  } else {
+    root.classList.remove('dark');
+    root.classList.add('light');
+  }
+};
 
 /**
  * Obtiene el tema inicial según orden de prioridad:
@@ -31,34 +47,15 @@ const getInitialTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setThemeState] = useState(getInitialTheme);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
 
-  // Sincronizar con el perfil del usuario autenticado (perfil > localStorage > prefers-color-scheme > fallback)
+  // Referencias para rastrear el último usuario y tema sincronizados desde el backend
+  const prevUserIdRef = useRef(user?._id);
+  const prevUserThemeRef = useRef(user?.theme);
+
+  // Aplicar clase en el DOM y persistir en localStorage cuando theme cambia
   useEffect(() => {
-    if (user?.theme && (user.theme === 'dark' || user.theme === 'light') && user.theme !== theme) {
-      const timer = setTimeout(() => {
-        setThemeState(user.theme);
-        try {
-          localStorage.setItem('jobflow_theme', user.theme);
-        } catch (err) {
-          console.warn('Error al sincronizar tema de perfil en localStorage:', err);
-        }
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [user?.theme, theme]);
-
-  // Aplicar o remover clase 'dark' en el elemento <html> y persistir en localStorage
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.remove('dark');
-      root.classList.add('light');
-    }
-
+    applyThemeToDom(theme);
     try {
       localStorage.setItem('jobflow_theme', theme);
     } catch (err) {
@@ -66,25 +63,68 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [theme]);
 
-  // Cambiar tema explícitamente y sincronizar con backend si está autenticado
+  // Sincronizar con el perfil del usuario autenticado SOLO ante nuevo login o cambio remoto de usuario
+  useEffect(() => {
+    if (!user) {
+      prevUserIdRef.current = null;
+      prevUserThemeRef.current = null;
+      return;
+    }
+
+    const isNewUserSession = user._id !== prevUserIdRef.current;
+    const isThemeUpdatedFromBackend = user.theme && user.theme !== prevUserThemeRef.current;
+
+    if (isNewUserSession || isThemeUpdatedFromBackend) {
+      prevUserIdRef.current = user._id;
+      prevUserThemeRef.current = user.theme;
+
+      if (user.theme === 'dark' || user.theme === 'light') {
+        setThemeState(user.theme);
+        applyThemeToDom(user.theme);
+        try {
+          localStorage.setItem('jobflow_theme', user.theme);
+        } catch (err) {
+          console.warn('Error al sincronizar tema de perfil en localStorage:', err);
+        }
+      }
+    }
+  }, [user]);
+
+  // Cambiar tema explícitamente y sincronizar con backend y AuthContext
   const setTheme = useCallback(
     (newTheme) => {
       if (newTheme !== 'dark' && newTheme !== 'light') return;
-      setThemeState(newTheme);
 
+      // Mantener ref sincronizado para que el effect de sesión no lo confunda con un cambio externo
+      prevUserThemeRef.current = newTheme;
+
+      // Actualizar estado local y DOM de forma inmediata
+      setThemeState(newTheme);
+      applyThemeToDom(newTheme);
+
+      try {
+        localStorage.setItem('jobflow_theme', newTheme);
+      } catch (err) {
+        console.warn('Error al persistir tema en localStorage:', err);
+      }
+
+      // Sincronizar AuthContext y backend si el usuario está conectado
       if (isAuthenticated) {
+        if (updateUser) {
+          updateUser({ theme: newTheme });
+        }
         updateUserTheme(newTheme).catch((err) => {
           console.warn('No se pudo sincronizar el tema con el servidor:', err.message);
         });
       }
     },
-    [isAuthenticated]
+    [isAuthenticated, updateUser]
   );
 
   // Conmutador toggle rápido Sol / Luna
   const toggleTheme = useCallback(() => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  }, [theme, setTheme]);
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  }, [setTheme]);
 
   const value = useMemo(
     () => ({
