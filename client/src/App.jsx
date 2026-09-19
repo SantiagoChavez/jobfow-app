@@ -29,6 +29,8 @@ import {
   createApplication,
   updateApplicationStatus,
   addInteraction,
+  updateInteraction,
+  deleteInteraction,
   deleteApplication,
   getAnalyticsSummary,
   pingBackend,
@@ -373,6 +375,46 @@ export function App() {
     getAnalyticsSummary().then((res) => setAnalytics(res)).catch(() => {});
   };
 
+  // Manejador: Actualizar Interacción
+  const handleUpdateInteraction = async (appId, interactionId, interactionData) => {
+    try {
+      const updated = await updateInteraction(appId, interactionId, interactionData);
+      setAllApplications((prev) =>
+        prev.map((app) => (app._id === appId ? { ...app, ...updated } : app))
+      );
+      setTableApplications((prev) =>
+        prev.map((app) => (app._id === appId ? { ...app, ...updated } : app))
+      );
+      if (selectedApp && selectedApp._id === appId) {
+        setSelectedApp((prev) => ({ ...prev, ...updated }));
+      }
+      showToast('Evento actualizado en el historial');
+    } catch (err) {
+      console.error('Error al actualizar interacción:', err);
+      showToast(err.message || 'Error al actualizar interacción', 'error');
+    }
+  };
+
+  // Manejador: Eliminar Interacción
+  const handleDeleteInteraction = async (appId, interactionId) => {
+    try {
+      const updated = await deleteInteraction(appId, interactionId);
+      setAllApplications((prev) =>
+        prev.map((app) => (app._id === appId ? { ...app, ...updated } : app))
+      );
+      setTableApplications((prev) =>
+        prev.map((app) => (app._id === appId ? { ...app, ...updated } : app))
+      );
+      if (selectedApp && selectedApp._id === appId) {
+        setSelectedApp((prev) => ({ ...prev, ...updated }));
+      }
+      showToast('Evento eliminado del historial');
+    } catch (err) {
+      console.error('Error al eliminar interacción:', err);
+      showToast(err.message || 'Error al eliminar interacción', 'error');
+    }
+  };
+
   // Manejador: Eliminar Postulación
   const handleDeleteApplication = async (id) => {
     try {
@@ -672,6 +714,8 @@ export function App() {
         onClose={() => setSelectedApp(null)}
         onStatusChange={handleStatusChange}
         onAddInteraction={handleAddInteraction}
+        onUpdateInteraction={handleUpdateInteraction}
+        onDeleteInteraction={handleDeleteInteraction}
         onDelete={handleDeleteApplication}
       />
 

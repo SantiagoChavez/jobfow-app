@@ -117,12 +117,33 @@ export async function updateApplicationStatus(id, status, options = {}) {
 }
 
 /**
- * Registrar una interacción manual (entrevista, mensaje, respuesta, etc.)
+ * Registrar una interacción manual (entrevista, mensaje, respuesta, challenge, etc.)
  */
 export async function addInteraction(id, interactionData) {
   const res = await request(`/applications/${id}/interactions`, {
     method: 'POST',
     body: JSON.stringify(interactionData),
+  });
+  return res.data || res;
+}
+
+/**
+ * Actualizar una interacción existente en una postulación
+ */
+export async function updateInteraction(id, interactionId, interactionData) {
+  const res = await request(`/applications/${id}/interactions/${interactionId}`, {
+    method: 'PUT',
+    body: JSON.stringify(interactionData),
+  });
+  return res.data || res;
+}
+
+/**
+ * Eliminar una interacción individual de una postulación
+ */
+export async function deleteInteraction(id, interactionId) {
+  const res = await request(`/applications/${id}/interactions/${interactionId}`, {
+    method: 'DELETE',
   });
   return res.data || res;
 }

@@ -13,6 +13,8 @@ const interactionSchema = new Schema(
         'POSTULACION_ENVIADA',
         'MENSAJE_ENVIADO',
         'RESPUESTA_RECIBIDA',
+        'CHALLENGE_TECNICO',
+        'PRUEBA_TECNICA',
         'ENTREVISTA',
         'RECHAZO',
         'OFERTA',

@@ -9,6 +9,21 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.6] - 2026-09-19
+
+### Added
+- **Soporte para Challenges y Pruebas Técnicas en el Timeline (`CHALLENGE_TECNICO`):**
+  - Incorporación del tipo de evento `CHALLENGE_TECNICO` / `PRUEBA_TECNICA` en el modelo y controlador backend (`Application.js`, `applicationController.js`).
+  - Al registrar un challenge técnico, la postulación actualiza inteligentemente su estado hacia `ENTREVISTA` si no se encontraba en `OFERTA`.
+  - Inclusión de la opción `💻 Challenge / Prueba Técnica` en el selector del modal de detalle con soporte para guardar enlaces a repositorios de GitHub, consignas y feedback técnico.
+
+### Added & Enhanced
+- **Edición y Eliminación de Eventos en el Historial del Timeline:**
+  - Implementación de edición en línea (✏️) para notas, tipo de interacción y fecha en el modal de detalle (`ApplicationDetailModal.jsx`), respaldada por la nueva ruta `PUT /api/applications/:id/interactions/:interactionId`.
+  - Implementación de eliminación individual de eventos (🗑️) mediante la nueva ruta `DELETE /api/applications/:id/interactions/:interactionId`.
+  - Detección visual de eventos vacíos (sin notas): visualización directa del botón de eliminación en 1 clic para depurar eventos residuales o agregados por error, y opción de "+ Agregar nota" rápida.
+  - Alertas de confirmación seguras previas a eliminar eventos con contenido importante.
+
 ## [1.3.5] - 2026-09-19
 
 ### Fixed
