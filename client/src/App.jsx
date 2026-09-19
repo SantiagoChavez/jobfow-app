@@ -16,6 +16,7 @@ import ProfileModal from './components/ProfileModal.jsx';
 import AboutModal from './components/AboutModal.jsx';
 import { useToast } from './context/ToastContext.jsx';
 import { useAuth } from './context/AuthContext.jsx';
+import GoogleSignInButton from './components/GoogleSignInButton.jsx';
 import {
   RadarIcon,
   SparklesIcon,
@@ -510,14 +511,12 @@ export function App() {
 
             <div className="flex flex-col items-center gap-3.5 w-full sm:w-auto">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-                {/* Botón rápido con Google */}
-                <button
-                  onClick={() => openAuthModal('register')}
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-sm bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 text-slate-800 dark:text-white shadow-sm hover:shadow transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 group"
-                >
-                  <GoogleIcon className="w-4 h-4" />
-                  <span>Continuar con Google</span>
-                </button>
+                {/* Botón rápido y directo con Google (1 solo clic) */}
+                <GoogleSignInButton
+                  text="continue_with"
+                  buttonWidth={220}
+                  onFallbackClick={() => openAuthModal('login')}
+                />
 
                 {/* Botón Crear Cuenta con Correo */}
                 <button

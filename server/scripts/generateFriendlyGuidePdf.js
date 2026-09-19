@@ -55,29 +55,50 @@ async function generateFriendlyGuide() {
       .stroke();
   };
 
-  const drawStepBox = (y, height, stepNum, title, text, tip = null) => {
-    doc.roundedRect(40, y, contentWidth, height, 8)
+  const drawStepBox = (y, stepNum, title, text, tip = null) => {
+    // Medir altura precisa de los textos
+    doc.font('Helvetica-Bold').fontSize(10.5);
+    const titleH = doc.heightOfString(title, { width: contentWidth - 95 });
+
+    doc.font('Helvetica').fontSize(8.5);
+    const textH = doc.heightOfString(text, { width: contentWidth - 95, lineGap: 2.5 });
+
+    let tipH = 0;
+    if (tip) {
+      doc.font('Helvetica-Bold').fontSize(7.8);
+      tipH = doc.heightOfString(`TIP: ${tip}`, { width: contentWidth - 95, lineGap: 2 }) + 6;
+    }
+
+    const boxHeight = Math.max(65, 20 + titleH + 6 + textH + (tip ? tipH + 6 : 0) + 10);
+
+    // Fondo y borde de la tarjeta
+    doc.roundedRect(40, y, contentWidth, boxHeight, 8)
       .fillAndStroke(colors.bgCard, colors.borderLight);
 
-    // Badge numérico circular
-    doc.circle(62, y + 20, 12).fill(colors.navyHighlight);
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#FFFFFF')
-      .text(String(stepNum), 56, y + 14, { width: 12, align: 'center' });
+    // Badge numérico circular centrado
+    const badgeCenterY = y + 22;
+    doc.circle(62, badgeCenterY, 11).fill(colors.navyHighlight);
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#FFFFFF')
+      .text(String(stepNum), 56, badgeCenterY - 5, { width: 12, align: 'center' });
 
     // Título del paso
-    doc.font('Helvetica-Bold').fontSize(11).fillColor(colors.navySurface)
-      .text(title, 82, y + 14, { width: contentWidth - 95 });
+    const titleY = y + 12;
+    doc.font('Helvetica-Bold').fontSize(10.5).fillColor(colors.navySurface)
+      .text(title, 82, titleY, { width: contentWidth - 95 });
 
-    // Texto descriptivo
-    doc.font('Helvetica').fontSize(9).fillColor(colors.slateBody)
-      .text(text, 82, y + 32, { width: contentWidth - 95, lineGap: 3 });
+    // Texto descriptivo inmediatamente después del título
+    const textY = titleY + titleH + 4;
+    doc.font('Helvetica').fontSize(8.5).fillColor(colors.slateBody)
+      .text(text, 82, textY, { width: contentWidth - 95, lineGap: 2.5 });
 
-    // Tip opcional
+    // Tip opcional claramente separado debajo del texto descriptivo
     if (tip) {
-      const tipY = y + height - 24;
-      doc.font('Helvetica-Bold').fontSize(8).fillColor(colors.goldDark)
-        .text(`TIP: ${tip}`, 82, tipY, { width: contentWidth - 95 });
+      const tipY = textY + textH + 5;
+      doc.font('Helvetica-Bold').fontSize(7.8).fillColor(colors.goldDark)
+        .text(`TIP: ${tip}`, 82, tipY, { width: contentWidth - 95, lineGap: 2 });
     }
+
+    return y + boxHeight + 10;
   };
 
   // ==========================================
@@ -168,16 +189,17 @@ async function generateFriendlyGuide() {
   doc.addPage();
   drawPageHeader('Paso a Paso: Tablero y Copiloto de Inteligencia Artificial');
 
-  doc.font('Helvetica-Bold').fontSize(15).fillColor(colors.navyBase)
-    .text('Como utilizar Jobflow en tu dia a dia', 40, 38);
+  doc.font('Helvetica-Bold').fontSize(14).fillColor(colors.navyBase)
+    .text('Como utilizar Jobflow en tu dia a dia', 40, 36);
 
-  doc.font('Helvetica').fontSize(9).fillColor(colors.slateBody)
-    .text('Sigue estos pasos sencillos para llevar el registro de tus postulaciones y destacar ante los reclutadores.', 40, 56);
+  doc.font('Helvetica').fontSize(8.5).fillColor(colors.slateBody)
+    .text('Sigue estos pasos sencillos para llevar el registro de tus postulaciones y destacar ante los reclutadores.', 40, 52);
+
+  let currentY = 70;
 
   // Paso 1: El Tablero
-  drawStepBox(
-    76,
-    88,
+  currentY = drawStepBox(
+    currentY,
     1,
     'Tu Tablero de Oportunidades (Kanban)',
     'En la pantalla principal veras 5 columnas: Postulado, Contacto Inicial, Entrevistas, Oferta y Descartado. ' +
@@ -187,9 +209,8 @@ async function generateFriendlyGuide() {
   );
 
   // Paso 2: Autocompletar con IA
-  drawStepBox(
-    174,
-    108,
+  currentY = drawStepBox(
+    currentY,
     2,
     'Registrar una Postulacion con Inteligencia Artificial (1 Clic)',
     'Cuando veas una oferta interesante en LinkedIn, Computrabajo o cualquier sitio web:\n' +
@@ -202,9 +223,8 @@ async function generateFriendlyGuide() {
   );
 
   // Paso 3: Consultar y Copiar el Pitch
-  drawStepBox(
-    292,
-    95,
+  currentY = drawStepBox(
+    currentY,
     3,
     'Consultar y Copiar tu Pitch en Cualquier Momento',
     'Si una empresa te escribe semanas despues de postularte, no te preocupes por recordar que decia el aviso:\n' +
@@ -215,12 +235,12 @@ async function generateFriendlyGuide() {
   );
 
   // Cuadro informativo: Que hace la IA por ti
-  const aiBoxY = 398;
-  doc.roundedRect(40, aiBoxY, contentWidth, 120, 8)
+  const aiBoxY = currentY + 4;
+  doc.roundedRect(40, aiBoxY, contentWidth, 105, 8)
     .fillAndStroke(colors.accentBlueBg, colors.accentBlueBorder);
 
-  doc.font('Helvetica-Bold').fontSize(10.5).fillColor(colors.navyHighlight)
-    .text('¿Que hace exactamente el Asistente de IA de Jobflow?', 56, aiBoxY + 14);
+  doc.font('Helvetica-Bold').fontSize(10).fillColor(colors.navyHighlight)
+    .text('¿Que hace exactamente el Asistente de IA de Jobflow?', 56, aiBoxY + 12);
 
   const aiPoints = [
     '• Lee y resume la oferta: Extrae empresa, puesto, modalidad de trabajo y salario sugerido.',
@@ -229,8 +249,8 @@ async function generateFriendlyGuide() {
     '• Resume la empresa: Te brinda una breve descripcion de a que se dedica la compania para tu entrevista.'
   ];
   aiPoints.forEach((pt, i) => {
-    doc.font('Helvetica').fontSize(8.5).fillColor(colors.slateBody)
-      .text(pt, 56, aiBoxY + 36 + (i * 18));
+    doc.font('Helvetica').fontSize(8.2).fillColor(colors.slateBody)
+      .text(pt, 56, aiBoxY + 30 + (i * 16));
   });
 
   // ==========================================
@@ -239,10 +259,11 @@ async function generateFriendlyGuide() {
   doc.addPage();
   drawPageHeader('Seguimientos, Reportes y Consejos para tu Busqueda');
 
+  let page3Y = 36;
+
   // Paso 4: Alertas y Seguimiento
-  drawStepBox(
-    40,
-    96,
+  page3Y = drawStepBox(
+    page3Y,
     4,
     'Campana de Alertas y Envio de Correos de Seguimiento',
     'Uno de los secretos para conseguir entrevistas es hacer seguimiento a las empresas donde te postulaste:\n' +
@@ -254,9 +275,8 @@ async function generateFriendlyGuide() {
   );
 
   // Paso 5: Reportes y Planilla
-  drawStepBox(
-    146,
-    88,
+  page3Y = drawStepBox(
+    page3Y,
     5,
     'Descarga de Reportes en PDF y Vista de Lista',
     '• Pestaña "Lista": Te permite ver todas tus postulaciones como una planilla ordenada con buscador.\n' +
@@ -266,12 +286,12 @@ async function generateFriendlyGuide() {
   );
 
   // Consejos de Oro
-  const tipsY = 246;
-  doc.roundedRect(40, tipsY, contentWidth, 195, 8)
+  const tipsY = page3Y + 4;
+  doc.roundedRect(40, tipsY, contentWidth, 185, 8)
     .fillAndStroke(colors.successBg, colors.successBorder);
 
-  doc.font('Helvetica-Bold').fontSize(11).fillColor('#065F46')
-    .text('Consejos de Oro para Acelerar tu Insercion Laboral', 56, tipsY + 16);
+  doc.font('Helvetica-Bold').fontSize(10.5).fillColor('#065F46')
+    .text('Consejos de Oro para Acelerar tu Insercion Laboral', 56, tipsY + 14);
 
   const tipsList = [
     {
@@ -293,28 +313,28 @@ async function generateFriendlyGuide() {
   ];
 
   tipsList.forEach((tip, idx) => {
-    const itemY = tipsY + 42 + idx * 36;
-    doc.font('Helvetica-Bold').fontSize(9).fillColor('#065F46')
+    const itemY = tipsY + 36 + idx * 34;
+    doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#065F46')
       .text(tip.t, 56, itemY);
-    doc.font('Helvetica').fontSize(8.5).fillColor(colors.slateBody)
-      .text(tip.d, 56, itemY + 12, { width: contentWidth - 32 });
+    doc.font('Helvetica').fontSize(8).fillColor(colors.slateBody)
+      .text(tip.d, 56, itemY + 11, { width: contentWidth - 32 });
   });
 
   // Mensaje final inspirador
-  const finalY = 460;
-  doc.roundedRect(40, finalY, contentWidth, 75, 8)
+  const finalY = tipsY + 195;
+  doc.roundedRect(40, finalY, contentWidth, 70, 8)
     .fillAndStroke(colors.bgCard, colors.borderLight);
 
-  doc.font('Helvetica-Bold').fontSize(10).fillColor(colors.navyHighlight)
-    .text('¡Muchos exitos en tu busqueda laboral!', 56, finalY + 14);
+  doc.font('Helvetica-Bold').fontSize(9.5).fillColor(colors.navyHighlight)
+    .text('¡Muchos exitos en tu busqueda laboral!', 56, finalY + 12);
 
-  doc.font('Helvetica').fontSize(8.5).fillColor(colors.slateBody)
+  doc.font('Helvetica').fontSize(8.2).fillColor(colors.slateBody)
     .text(
       'Jobflow esta disenado para que cada paso de tu proceso cuente. Mantente proactivo, constante y preparado. ' +
       'Tu proxima gran oportunidad esta a solo unas postulaciones de distancia.',
       56,
-      finalY + 32,
-      { width: contentWidth - 32, lineGap: 3 }
+      finalY + 28,
+      { width: contentWidth - 32, lineGap: 2.5 }
     );
 
   // Numeración de páginas en el pie
