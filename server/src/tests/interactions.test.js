@@ -259,4 +259,66 @@ describe('POST /api/applications/:id/interactions - Registro de Interacciones y 
     expect(typeof mockApp.responseTimeDays).toBe('number');
     expect(mockApp.responseTimeDays).toBe(5);
   });
+
+  it('Registro de CHALLENGE_TECNICO: Cambia estado a ENTREVISTA si no estaba en OFERTA y guarda la nota', async () => {
+    const mockApp = createMockApplication({ status: 'CONTACTO' });
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .post(`/api/applications/${mockApp._id}/interactions`)
+      .send({
+        type: 'CHALLENGE_TECNICO',
+        notes: 'Challenge de React y Node entregado en repo de GitHub',
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.status).toBe('ENTREVISTA');
+    expect(res.body.interactions[1].type).toBe('CHALLENGE_TECNICO');
+    expect(res.body.interactions[1].notes).toBe('Challenge de React y Node entregado en repo de GitHub');
+  });
+
+  it('PUT /interactions/:interactionId: Permite editar notas y tipo de una interacción existente', async () => {
+    const mockApp = createMockApplication();
+    const interactionId = mockApp.interactions[0]._id;
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .put(`/api/applications/${mockApp._id}/interactions/${interactionId}`)
+      .send({
+        type: 'CHALLENGE_TECNICO',
+        notes: 'Notas actualizadas del challenge técnico',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(mockApp.interactions[0].notes).toBe('Notas actualizadas del challenge técnico');
+    expect(mockApp.save).toHaveBeenCalled();
+  });
+
+  it('DELETE /interactions/:interactionId: Permite eliminar una interacción del historial', async () => {
+    const mockApp = createMockApplication();
+    const interactionId = mockApp.interactions[0]._id;
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .delete(`/api/applications/${mockApp._id}/interactions/${interactionId}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(mockApp.interactions).toHaveLength(0);
+    expect(mockApp.save).toHaveBeenCalled();
+  });
+
+  it('DELETE /interactions/:interactionId con ID inexistente retorna 404', async () => {
+    const mockApp = createMockApplication();
+    const nonExistentInteractionId = new mongoose.Types.ObjectId();
+    vi.spyOn(Application, 'findById').mockResolvedValue(mockApp);
+
+    const res = await request(app)
+      .delete(`/api/applications/${mockApp._id}/interactions/${nonExistentInteractionId}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('Interacción no encontrada');
+  });
 });
+

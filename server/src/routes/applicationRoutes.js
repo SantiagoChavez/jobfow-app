@@ -6,6 +6,8 @@ import {
   updateApplicationStatus,
   deleteApplication,
   addInteraction,
+  updateInteraction,
+  deleteInteraction,
 } from '../controllers/applicationController.js';
 import { previewMatch } from '../controllers/matchController.js';
 import { protect } from '../middlewares/authMiddleware.js';
@@ -36,6 +38,11 @@ router.route('/:id/status')
 // Registro de interacciones: /api/applications/:id/interactions
 router.route('/:id/interactions')
   .post(addInteraction);
+
+// Edición y eliminación de interacciones individuales: /api/applications/:id/interactions/:interactionId
+router.route('/:id/interactions/:interactionId')
+  .put(updateInteraction)
+  .delete(deleteInteraction);
 
 export default router;
 
