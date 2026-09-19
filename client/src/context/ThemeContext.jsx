@@ -90,33 +90,41 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Cambiar tema explícitamente y sincronizar con backend y AuthContext
+  // Cambiar tema explícitamente o mediante función de actualización
   const setTheme = useCallback(
-    (newTheme) => {
-      if (newTheme !== 'dark' && newTheme !== 'light') return;
+    (themeOrUpdater) => {
+      setThemeState((currentTheme) => {
+        const nextTheme =
+          typeof themeOrUpdater === 'function' ? themeOrUpdater(currentTheme) : themeOrUpdater;
 
-      // Mantener ref sincronizado para que el effect de sesión no lo confunda con un cambio externo
-      prevUserThemeRef.current = newTheme;
-
-      // Actualizar estado local y DOM de forma inmediata
-      setThemeState(newTheme);
-      applyThemeToDom(newTheme);
-
-      try {
-        localStorage.setItem('jobflow_theme', newTheme);
-      } catch (err) {
-        console.warn('Error al persistir tema en localStorage:', err);
-      }
-
-      // Sincronizar AuthContext y backend si el usuario está conectado
-      if (isAuthenticated) {
-        if (updateUser) {
-          updateUser({ theme: newTheme });
+        if (nextTheme !== 'dark' && nextTheme !== 'light') {
+          return currentTheme;
         }
-        updateUserTheme(newTheme).catch((err) => {
-          console.warn('No se pudo sincronizar el tema con el servidor:', err.message);
-        });
-      }
+
+        // Mantener ref sincronizado para que el effect de sesión no lo confunda con un cambio externo
+        prevUserThemeRef.current = nextTheme;
+
+        // Actualizar DOM de forma inmediata
+        applyThemeToDom(nextTheme);
+
+        try {
+          localStorage.setItem('jobflow_theme', nextTheme);
+        } catch (err) {
+          console.warn('Error al persistir tema en localStorage:', err);
+        }
+
+        // Sincronizar AuthContext y backend si el usuario está conectado
+        if (isAuthenticated) {
+          if (updateUser) {
+            updateUser({ theme: nextTheme });
+          }
+          updateUserTheme(nextTheme).catch((err) => {
+            console.warn('No se pudo sincronizar el tema con el servidor:', err.message);
+          });
+        }
+
+        return nextTheme;
+      });
     },
     [isAuthenticated, updateUser]
   );
