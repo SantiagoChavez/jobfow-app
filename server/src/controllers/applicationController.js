@@ -5,6 +5,16 @@ import Application from '../models/Application.js';
 const VALID_STATUSES = ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'RECHAZADA', 'OFERTA'];
 const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'];
 const VALID_WORK_MODES = ['REMOTE', 'HYBRID', 'ON_SITE'];
+const VALID_INTERACTION_TYPES = [
+  'POSTULACION_ENVIADA',
+  'MENSAJE_ENVIADO',
+  'RESPUESTA_RECIBIDA',
+  'CHALLENGE_TECNICO',
+  'PRUEBA_TECNICA',
+  'ENTREVISTA',
+  'RECHAZO',
+  'OFERTA',
+];
 const MAX_ALL_QUERY_LIMIT = 1000; // Tope defensivo para evitar OOM
 
 /**
@@ -486,16 +496,7 @@ export const addInteraction = async (req, res) => {
     }
 
     // Validar que type esté dentro del enum permitido
-    const allowedTypes = [
-      'POSTULACION_ENVIADA',
-      'MENSAJE_ENVIADO',
-      'RESPUESTA_RECIBIDA',
-      'ENTREVISTA',
-      'RECHAZO',
-      'OFERTA',
-    ];
-
-    if (!type || !allowedTypes.includes(type)) {
+    if (!type || !VALID_INTERACTION_TYPES.includes(type)) {
       return res.status(400).json({
         success: false,
         error: 'Tipo de interacción inválido',
@@ -538,8 +539,8 @@ export const addInteraction = async (req, res) => {
       }
     }
 
-    // 2. Si es ENTREVISTA y no está en estado OFERTA
-    if (type === 'ENTREVISTA' && application.status !== 'OFERTA') {
+    // 2. Si es ENTREVISTA o CHALLENGE_TECNICO y no está en estado OFERTA
+    if ((type === 'ENTREVISTA' || type === 'CHALLENGE_TECNICO' || type === 'PRUEBA_TECNICA') && application.status !== 'OFERTA' && application.status !== 'ENTREVISTA') {
       application.status = 'ENTREVISTA';
     }
 
@@ -559,6 +560,136 @@ export const addInteraction = async (req, res) => {
       success: false,
       error: 'Error interno del servidor al registrar la interacción',
       message: 'Error interno del servidor al registrar la interacción',
+    });
+  }
+};
+
+/**
+ * @desc    Actualizar una interacción existente en una postulación
+ * @route   PUT /api/applications/:id/interactions/:interactionId
+ * @access  Private (requiere protect)
+ */
+export const updateInteraction = async (req, res) => {
+  try {
+    const { id, interactionId } = req.params;
+    const { type, date, notes } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(interactionId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'IDs inválidos proporcionados',
+        message: 'IDs inválidos proporcionados',
+      });
+    }
+
+    const application = await Application.findById(id);
+
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
+      return res.status(404).json({
+        success: false,
+        error: 'Postulación no encontrada',
+        message: 'Postulación no encontrada',
+      });
+    }
+
+    const interaction = application.interactions.id(interactionId);
+    if (!interaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Interacción no encontrada',
+        message: 'Interacción no encontrada',
+      });
+    }
+
+    if (type && VALID_INTERACTION_TYPES.includes(type)) {
+      interaction.type = type;
+    }
+    if (date !== undefined) {
+      interaction.date = parseSafeDate(date);
+    }
+    if (notes !== undefined) {
+      interaction.notes = typeof notes === 'string' ? notes.trim() : notes;
+    }
+
+    await application.save();
+
+    const appObj = application.toObject ? application.toObject() : application;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Interacción actualizada exitosamente',
+      data: application,
+      ...appObj,
+    });
+  } catch (error) {
+    console.error(`Error al actualizar interacción ${req.params.interactionId}:`, error);
+    return res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al actualizar la interacción',
+      message: 'Error interno del servidor al actualizar la interacción',
+    });
+  }
+};
+
+/**
+ * @desc    Eliminar una interacción de una postulación
+ * @route   DELETE /api/applications/:id/interactions/:interactionId
+ * @access  Private (requiere protect)
+ */
+export const deleteInteraction = async (req, res) => {
+  try {
+    const { id, interactionId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(interactionId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'IDs inválidos proporcionados',
+        message: 'IDs inválidos proporcionados',
+      });
+    }
+
+    const application = await Application.findById(id);
+
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
+      return res.status(404).json({
+        success: false,
+        error: 'Postulación no encontrada',
+        message: 'Postulación no encontrada',
+      });
+    }
+
+    const interactionExists = application.interactions.id(interactionId);
+    if (!interactionExists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Interacción no encontrada',
+        message: 'Interacción no encontrada',
+      });
+    }
+
+    application.interactions.pull({ _id: interactionId });
+    await application.save();
+
+    const appObj = application.toObject ? application.toObject() : application;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Interacción eliminada exitosamente',
+      data: application,
+      ...appObj,
+    });
+  } catch (error) {
+    console.error(`Error al eliminar interacción ${req.params.interactionId}:`, error);
+    return res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor al eliminar la interacción',
+      message: 'Error interno del servidor al eliminar la interacción',
     });
   }
 };
