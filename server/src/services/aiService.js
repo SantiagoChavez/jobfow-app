@@ -41,44 +41,61 @@ export const analyzeJobPosting = async (rawText, userProfile = '') => {
 
   // 1. Truncado de seguridad y neutralización de delimitadores para blindar contexto
   const sanitizedText = rawText.slice(0, 6000).replace(/"""/g, "'''").trim();
-  let profileText = '';
-  let githubUrl = process.env.CANDIDATE_GITHUB_URL || 'https://github.com/SantiagoChavez';
-  let linkedinUrl = process.env.CANDIDATE_LINKEDIN_URL || 'https://www.linkedin.com/in/santiago-chavez';
-  let candidateName = 'Santiago';
-  let candidateTitle = 'Full Stack Developer orientado a Backend';
-  let candidateBio = 'Reconvirtiéndose al mundo IT con formación formal en la Tecnicatura Universitaria en Programación (UTN) y Bootcamp Soy Henry. Posee amplia experiencia previa en otros campos que le permite aportar versatilidad, pragmatismo, proactividad y compromiso. Stack técnico: Node.js, Express, MongoDB, JavaScript, React, Git y diseño de APIs REST.';
+  let candidateName = '';
+  let candidateTitle = '';
+  let candidateBio = '';
+  let githubUrl = '';
+  let linkedinUrl = '';
+  let portfolioUrl = '';
+  let skillsList = '';
 
   if (typeof userProfile === 'object' && userProfile !== null) {
-    candidateName = userProfile.name || candidateName;
-    candidateTitle = userProfile.headline || candidateTitle;
-    candidateBio = userProfile.bio || candidateBio;
-    if (userProfile.links?.github) githubUrl = userProfile.links.github;
-    if (userProfile.links?.linkedin) linkedinUrl = userProfile.links.linkedin;
+    candidateName = userProfile.name?.trim() || '';
+    candidateTitle = userProfile.headline?.trim() || 'Desarrollador / Profesional IT';
+    candidateBio = userProfile.bio?.trim() || '';
+    githubUrl = userProfile.links?.github?.trim() || process.env.CANDIDATE_GITHUB_URL || '';
+    linkedinUrl = userProfile.links?.linkedin?.trim() || process.env.CANDIDATE_LINKEDIN_URL || '';
+    portfolioUrl = userProfile.links?.portfolio?.trim() || '';
 
-    const skillsList = Array.isArray(userProfile.skills) && userProfile.skills.length > 0
+    skillsList = Array.isArray(userProfile.skills) && userProfile.skills.length > 0
       ? userProfile.skills.join(', ')
-      : 'JavaScript, TypeScript, Node.js, Express, React, MongoDB, Git, REST APIs';
-
-    profileText = `${candidateName} es ${candidateTitle}.
-${candidateBio}
-Habilidades técnicas principales: ${skillsList}.
-Perfiles y enlaces:
-- GitHub: ${githubUrl}
-- LinkedIn: ${linkedinUrl}`;
+      : '';
   } else if (typeof userProfile === 'string' && userProfile.trim()) {
-    profileText = userProfile.slice(0, 2000).replace(/"""/g, "'''").trim();
-  } else {
-    profileText = `${candidateName} es ${candidateTitle}, ${candidateBio}
-Perfiles:
-- GitHub: ${githubUrl}
-- LinkedIn: ${linkedinUrl}`;
+    candidateBio = userProfile.slice(0, 2000).replace(/"""/g, "'''").trim();
+    candidateTitle = 'Desarrollador / Profesional IT';
   }
 
-  const basePitchTemplate = `Hola, espero tenga un excelente día.
-Soy ${candidateName}, ${candidateTitle} y me interesaría formar parte de su equipo. Mi perfil y trayectoria me permiten aportar versatilidad, pragmatismo y compromiso técnico a sus metas de desarrollo. Los invito a explorar mis proyectos en los enlaces que adjunto:
-• GitHub: ${githubUrl}
-• LinkedIn: ${linkedinUrl}
-Espero noticias positivas y desde ya muy agradecido por su tiempo; que tenga una muy buena semana.`;
+  // Si no se proporcionó nombre, usar saludo neutral
+  const displayName = candidateName || 'el postulante';
+  const displayTitle = candidateTitle || 'profesional en tecnología';
+
+  // Construir perfil contextual
+  let profileText = `Postulante: ${displayName} (${displayTitle}).`;
+  if (candidateBio) profileText += `\nBio / Trayectoria: ${candidateBio}`;
+  if (skillsList) profileText += `\nHabilidades técnicas declaradas: ${skillsList}`;
+
+  const professionalLinks = [];
+  if (githubUrl) professionalLinks.push(`- GitHub: ${githubUrl}`);
+  if (linkedinUrl) professionalLinks.push(`- LinkedIn: ${linkedinUrl}`);
+  if (portfolioUrl) professionalLinks.push(`- Portfolio: ${portfolioUrl}`);
+
+  if (professionalLinks.length > 0) {
+    profileText += `\nEnlaces profesionales:\n${professionalLinks.join('\n')}`;
+  }
+
+  // Construir plantilla base adaptativa según los enlaces reales del usuario
+  const pitchLinksBullets = [];
+  if (githubUrl) pitchLinksBullets.push(`• GitHub: ${githubUrl}`);
+  if (linkedinUrl) pitchLinksBullets.push(`• LinkedIn: ${linkedinUrl}`);
+  if (portfolioUrl) pitchLinksBullets.push(`• Portfolio: ${portfolioUrl}`);
+
+  const pitchLinksBlock = pitchLinksBullets.length > 0
+    ? `Los invito a explorar mis proyectos y trayectoria en mis enlaces profesionales:\n${pitchLinksBullets.join('\n')}`
+    : `Quedo a su entera disposición para conversar en detalle sobre mi experiencia y proyectos.`;
+
+  const basePitchTemplate = candidateName
+    ? `Hola, espero tenga un excelente día.\nSoy ${candidateName}, ${displayTitle} y me interesaría formar parte de su equipo. Mi perfil y trayectoria me permiten aportar versatilidad, pragmatismo y compromiso técnico a sus metas de desarrollo. ${pitchLinksBlock}\nEspero noticias positivas y desde ya muy agradecido por su tiempo; que tenga una muy buena semana.`
+    : `Hola, espero tenga un excelente día.\nMe interesaría postularme al rol de ${displayTitle} y formar parte de su equipo. Mi perfil y trayectoria me permiten aportar versatilidad, pragmatismo y compromiso técnico a sus metas de desarrollo. ${pitchLinksBlock}\nEspero noticias positivas y desde ya muy agradecido por su tiempo; que tenga una muy buena semana.`;
 
   const prompt = `
 Eres un Copiloto Senior de Búsqueda Laboral y Reclutamiento Técnico para la plataforma JobFlow.
@@ -111,7 +128,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
   "matchScore": número entero del 0 al 100 evaluando la afinidad entre los requisitos de la vacante y el perfil del postulante,
   "extractedSkills": ["array de strings con las tecnologías y habilidades requeridas por la empresa"],
   "missingSkills": ["array de strings con tecnologías secundarias o deseables que el postulante podría necesitar reforzar"],
-  "suggestedPitch": "Adaptación sutil y contextualizada de la Plantilla Base del Postulante para la empresa y rol detectados. DEBES conservar fielmente la identidad de ${candidateName}, su trayectoria profesional y los enlaces directos a GitHub (${githubUrl}) y LinkedIn (${linkedinUrl}), sin alterar sustancialmente la estructura original del mensaje."
+  "suggestedPitch": "Adaptación sutil y contextualizada de la Plantilla Base del Postulante para la empresa y rol detectados. DEBES conservar fielmente la identidad del postulante, su trayectoria y los enlaces profesionales provistos si existen (sin inventar URLs inexistentes), sin alterar sustancialmente la estructura original del mensaje."
 }
 `;
 

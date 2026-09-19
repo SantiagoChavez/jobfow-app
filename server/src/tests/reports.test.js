@@ -91,8 +91,8 @@ describe('GET /api/reports/pdf - Generación y Descarga de Reportes PDF', () => 
 
     const queryArg = findSpy.mock.calls[0][0];
     expect(queryArg.appliedAt).toBeDefined();
-    expect(queryArg.appliedAt.$gte).toEqual(new Date(fromDate));
-    expect(queryArg.appliedAt.$lte).toEqual(new Date(toDate));
+    expect(queryArg.appliedAt.$gte).toEqual(new Date(`${fromDate}T00:00:00.000Z`));
+    expect(queryArg.appliedAt.$lte).toEqual(new Date(`${toDate}T23:59:59.999Z`));
 
     expect(Buffer.isBuffer(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThan(0);

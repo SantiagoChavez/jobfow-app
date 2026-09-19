@@ -20,13 +20,14 @@ export const downloadApplicationsPdf = async (req, res) => {
     if (from || to) {
       filter.appliedAt = {};
       if (from) {
-        const fromDate = new Date(from);
+        const fromDate = from.includes('T') ? new Date(from) : new Date(`${from}T00:00:00.000Z`);
         if (!isNaN(fromDate.getTime())) {
           filter.appliedAt.$gte = fromDate;
         }
       }
       if (to) {
-        const toDate = new Date(to);
+        // Asegurar que abarque hasta el último milisegundo del día (23:59:59.999) para incluir las postulaciones de hoy
+        const toDate = to.includes('T') ? new Date(to) : new Date(`${to}T23:59:59.999Z`);
         if (!isNaN(toDate.getTime())) {
           filter.appliedAt.$lte = toDate;
         }
