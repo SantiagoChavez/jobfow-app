@@ -24,6 +24,10 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
   - Detección visual de eventos vacíos (sin notas): visualización directa del botón de eliminación en 1 clic para depurar eventos residuales o agregados por error, y opción de "+ Agregar nota" rápida.
   - Alertas de confirmación seguras previas a eliminar eventos con contenido importante.
 
+### Fixed
+- **Conmutación Instantánea de Modo Claro y Oscuro en Tiempo Real (`ThemeContext.jsx`):**
+  - Corrección en la función `setTheme` para admitir funciones de actualización de estado (`updater functions`), permitiendo que `toggleTheme` resuelva el tema siguiente ('light' o 'dark') de forma instantánea al hacer clic en el botón de la barra de navegación sin requerir recargar la página.
+
 ## [1.3.5] - 2026-09-19
 
 ### Fixed
