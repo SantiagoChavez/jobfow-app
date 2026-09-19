@@ -9,6 +9,22 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.5] - 2026-09-19
+
+### Fixed
+- **Desvinculación de Perfiles por Defecto en el Copiloto de IA (`aiService.js`):**
+  - Supresión de enlaces y biografías fijas hardcodeadas en la plantilla de pitch con IA, asegurando que los perfiles y enlaces profesionales (GitHub, LinkedIn, Portfolio) sean 100% dinámicos y exclusivos del usuario conectado.
+- **Corrección de Límite de Fecha en Reportes PDF (`reportController.js`):**
+  - Ajuste del filtro de rango de fechas (`$lte`) para abarcar el día completo hasta las 23:59:59.999Z, permitiendo que las postulaciones registradas en el día de la consulta se contabilicen y aparezcan en el reporte PDF.
+- **Corrección de Superposición de Textos en la Guía Rápida PDF (`generateFriendlyGuidePdf.js`):**
+  - Reestructuración del cálculo dinámico de altura de cajas de pasos (`drawStepBox`), eliminando la colisión entre el texto descriptivo y las etiquetas de consejos (TIPs).
+
+### Added & Changed
+- **Autenticación Directa en 1 Clic con Google en la Portada (`GoogleSignInButton.jsx`):**
+  - Implementación del botón nativo de Google Identity Services directamente en la Hero de bienvenida, permitiendo iniciar sesión o registrarse con Google en un solo clic sin pasar por formularios modales intermedios.
+- **Armonización de la Paleta de Colores (Executive Slate & Warm Amber):**
+  - Suavizado de contrastes en `tailwind.config.js` hacia tonos Slate y Ámbar cálido, transmitiendo orden, limpieza y calma visual profesional tanto en modo oscuro como en modo claro.
+
 ## [1.3.4] - 2026-09-16
 
 ### Fixed
