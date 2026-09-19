@@ -13,6 +13,7 @@ import {
   BuildingIcon,
   CheckCircleIcon,
   TrashIcon,
+  PencilIcon,
 } from './Icons.jsx';
 
 const STATUS_OPTIONS = [
@@ -26,6 +27,7 @@ const STATUS_OPTIONS = [
 const INTERACTION_TYPES = [
   { value: 'RESPUESTA_RECIBIDA', label: '⚡ Respuesta Recibida' },
   { value: 'ENTREVISTA', label: '📅 Entrevista' },
+  { value: 'CHALLENGE_TECNICO', label: '💻 Challenge / Prueba Técnica' },
   { value: 'MENSAJE_ENVIADO', label: '✉️ Mensaje / Seguimiento' },
   { value: 'OFERTA', label: '🎉 Oferta Recibida' },
   { value: 'RECHAZO', label: '🚫 Rechazo' },
@@ -38,6 +40,8 @@ export const ApplicationDetailModal = ({
   onClose,
   onStatusChange,
   onAddInteraction,
+  onUpdateInteraction,
+  onDeleteInteraction,
   onDelete,
 }) => {
   const { showToast } = useToast();
@@ -51,6 +55,16 @@ export const ApplicationDetailModal = ({
     notes: '',
   });
   const [submittingInteraction, setSubmittingInteraction] = useState(false);
+
+  // Estado de edición inline de una interacción existente
+  const [editingInteractionId, setEditingInteractionId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    type: 'RESPUESTA_RECIBIDA',
+    date: '',
+    notes: '',
+  });
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [deletingInteractionId, setDeletingInteractionId] = useState(null);
 
   useModalA11y(isOpen, onClose);
 
@@ -91,6 +105,56 @@ export const ApplicationDetailModal = ({
     }
   };
 
+  const handleStartEdit = (interaction) => {
+    setEditingInteractionId(interaction._id);
+    setEditForm({
+      type: interaction.type || 'RESPUESTA_RECIBIDA',
+      date: interaction.date
+        ? new Date(interaction.date).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+      notes: interaction.notes || '',
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingInteractionId(null);
+    setEditForm({ type: 'RESPUESTA_RECIBIDA', date: '', notes: '' });
+  };
+
+  const handleSaveEdit = async (interactionId) => {
+    if (!onUpdateInteraction) return;
+    try {
+      setIsSavingEdit(true);
+      await onUpdateInteraction(application._id, interactionId, {
+        type: editForm.type,
+        date: editForm.date ? new Date(editForm.date) : new Date(),
+        notes: editForm.notes.trim() || undefined,
+      });
+      setEditingInteractionId(null);
+    } catch (err) {
+      console.error('Error al actualizar interacción:', err);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleDeleteInteractionClick = async (interactionId, hasNotes) => {
+    if (!onDeleteInteraction) return;
+    if (hasNotes) {
+      if (!window.confirm('¿Seguro que deseas eliminar este evento del historial?')) {
+        return;
+      }
+    }
+    try {
+      setDeletingInteractionId(interactionId);
+      await onDeleteInteraction(application._id, interactionId);
+    } catch (err) {
+      console.error('Error al eliminar interacción:', err);
+    } finally {
+      setDeletingInteractionId(null);
+    }
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     return new Date(dateStr).toLocaleDateString('es-ES', {
@@ -100,6 +164,41 @@ export const ApplicationDetailModal = ({
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const getInteractionTypeLabel = (type) => {
+    switch (type) {
+      case 'CHALLENGE_TECNICO':
+      case 'PRUEBA_TECNICA':
+        return 'CHALLENGE / PRUEBA TÉCNICA';
+      case 'RESPUESTA_RECIBIDA':
+        return 'RESPUESTA RECIBIDA';
+      case 'ENTREVISTA':
+        return 'ENTREVISTA';
+      case 'MENSAJE_ENVIADO':
+        return 'MENSAJE / SEGUIMIENTO';
+      case 'OFERTA':
+        return 'OFERTA RECIBIDA';
+      case 'RECHAZO':
+        return 'RECHAZO';
+      case 'POSTULACION_ENVIADA':
+        return 'POSTULACIÓN ENVIADA';
+      default:
+        return (type || '').replace(/_/g, ' ');
+    }
+  };
+
+  const getNotesPlaceholder = (type) => {
+    if (type === 'CHALLENGE_TECNICO') {
+      return 'Ej: Challenge de Node/React, link a GitHub o feedback técnico recibido...';
+    }
+    if (type === 'ENTREVISTA') {
+      return 'Ej: Entrevista técnica con el líder de equipo sobre arquitectura...';
+    }
+    if (type === 'RECHAZO') {
+      return 'Ej: Correo de agradecimiento y descarte del proceso...';
+    }
+    return 'Ej: Respuesta recibida del equipo de recruiting o feedback...';
   };
 
   return (
@@ -361,7 +460,7 @@ export const ApplicationDetailModal = ({
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                    Notas / Feedback recibido
+                    Notas / Feedback recibido / Challenge
                   </label>
                   <input
                     type="text"
@@ -369,7 +468,7 @@ export const ApplicationDetailModal = ({
                     onChange={(e) =>
                       setInteractionForm({ ...interactionForm, notes: e.target.value })
                     }
-                    placeholder="Ej: Entrevista técnica con líder de equipo sobre Node.js y React..."
+                    placeholder={getNotesPlaceholder(interactionForm.type)}
                     className="w-full bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary"
                   />
                 </div>
@@ -378,7 +477,7 @@ export const ApplicationDetailModal = ({
                   <button
                     type="submit"
                     disabled={submittingInteraction}
-                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 dark:text-navy-base transition-all disabled:opacity-50"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 dark:text-navy-base transition-all disabled:opacity-50 shadow-sm"
                   >
                     {submittingInteraction ? 'Guardando...' : '+ Registrar Evento'}
                   </button>
@@ -390,24 +489,164 @@ export const ApplicationDetailModal = ({
                 {application.interactions && application.interactions.length > 0 ? (
                   [...application.interactions]
                     .reverse()
-                    .map((item, idx) => (
-                      <div key={idx} className="relative">
-                        <div className="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-amber-500 dark:bg-gold-primary border-2 border-white dark:border-navy-surface shadow-sm" />
-                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-base/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none">
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <span className="text-xs font-bold text-slate-900 dark:text-white">
-                              {item.type.replace(/_/g, ' ')}
-                            </span>
-                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                              {formatDate(item.date)}
-                            </span>
-                          </div>
-                          {item.notes && (
-                            <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">{item.notes}</p>
+                    .map((item, idx) => {
+                      const isEditing = editingInteractionId === item._id;
+                      const hasNotes = Boolean(item.notes && item.notes.trim());
+
+                      let dotColor = 'bg-amber-500 dark:bg-gold-primary';
+                      if (item.type === 'CHALLENGE_TECNICO' || item.type === 'PRUEBA_TECNICA') {
+                        dotColor = 'bg-indigo-500 dark:bg-indigo-400';
+                      } else if (item.type === 'RECHAZO') {
+                        dotColor = 'bg-rose-500 dark:bg-rose-400';
+                      } else if (item.type === 'OFERTA') {
+                        dotColor = 'bg-emerald-500 dark:bg-emerald-400';
+                      }
+
+                      return (
+                        <div key={item._id || idx} className="relative">
+                          <div className={`absolute -left-[23px] top-2.5 w-3 h-3 rounded-full ${dotColor} border-2 border-white dark:border-navy-surface shadow-sm`} />
+                          
+                          {isEditing ? (
+                            /* Formulario de Edición Inline */
+                            <div className="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-navy-base/90 border border-amber-500/40 dark:border-gold-primary/40 shadow-sm space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-amber-800 dark:text-gold-light flex items-center gap-1.5">
+                                  <PencilIcon className="w-3.5 h-3.5" />
+                                  Editar Evento
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={handleCancelEdit}
+                                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                  <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                                    Tipo
+                                  </label>
+                                  <select
+                                    value={editForm.type}
+                                    onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                                    className="w-full bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs text-slate-900 dark:text-white"
+                                  >
+                                    {INTERACTION_TYPES.map((t) => (
+                                      <option key={t.value} value={t.value}>
+                                        {t.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                                    Fecha
+                                  </label>
+                                  <input
+                                    type="date"
+                                    value={editForm.date}
+                                    onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                                    className="w-full bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs text-slate-900 dark:text-white"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                                  Notas / Feedback
+                                </label>
+                                <textarea
+                                  rows={2}
+                                  value={editForm.notes}
+                                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                                  placeholder={getNotesPlaceholder(editForm.type)}
+                                  className="w-full bg-white dark:bg-navy-surface border border-slate-300 dark:border-slate-700 rounded-xl p-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-none focus:outline-none focus:border-amber-500 dark:focus:border-gold-primary"
+                                />
+                              </div>
+
+                              <div className="flex items-center justify-end gap-2 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={handleCancelEdit}
+                                  className="px-3 py-1 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                  Cancelar
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isSavingEdit}
+                                  onClick={() => handleSaveEdit(item._id)}
+                                  className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 dark:text-navy-base transition-all disabled:opacity-50"
+                                >
+                                  {isSavingEdit ? 'Guardando...' : 'Guardar Cambios'}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Vista Normal de Tarjeta de Evento */
+                            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-navy-base/60 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-none group transition-all">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                    {getInteractionTypeLabel(item.type)}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                    • {formatDate(item.date)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartEdit(item)}
+                                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700/60 transition-colors"
+                                    title="Editar evento o notas"
+                                  >
+                                    <PencilIcon className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteInteractionClick(item._id, hasNotes)}
+                                    disabled={deletingInteractionId === item._id}
+                                    className="p-1 rounded-lg text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors disabled:opacity-50"
+                                    title="Eliminar este evento"
+                                  >
+                                    <TrashIcon className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {hasNotes ? (
+                                <p className="text-xs text-slate-700 dark:text-slate-300 mt-2 whitespace-pre-wrap leading-relaxed">
+                                  {item.notes}
+                                </p>
+                              ) : (
+                                <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-dashed border-slate-200 dark:border-slate-800/80 text-[11px] text-slate-400 dark:text-slate-500 italic">
+                                  <span>Sin notas registradas</span>
+                                  <div className="flex items-center gap-2 not-italic">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleStartEdit(item)}
+                                      className="text-sky-600 dark:text-sky-tech hover:underline font-semibold text-[11px]"
+                                    >
+                                      + Agregar nota
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteInteractionClick(item._id, false)}
+                                      className="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 font-semibold text-[11px] flex items-center gap-0.5"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                 ) : (
                   <p className="text-xs text-slate-400 dark:text-slate-500 italic">
                     Sin eventos registrados aún.
