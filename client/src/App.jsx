@@ -479,17 +479,17 @@ export function App() {
 
   return (
     <div className="relative min-h-screen text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200 selection:bg-amber-500/30 selection:text-slate-900 dark:selection:bg-gold-primary dark:selection:text-navy-base isolate">
-      {/* Fondo de oficina IT con desenfoque y overlay adaptable */}
+      {/* Fondo de oficina IT con desenfoque sutil y overlay nítido */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img
           src={fondoJobflow}
           alt="JobFlow Background"
-          className="w-full h-full object-cover scale-105 blur-md filter transform-gpu"
+          className="w-full h-full object-cover scale-105 blur-[1.5px] filter transform-gpu"
           loading="eager"
           fetchPriority="high"
         />
-        {/* Capa de tinte adaptativo a la paleta de JobFlow */}
-        <div className="absolute inset-0 bg-light-base/85 dark:bg-navy-base/85 backdrop-blur-[2px] transition-colors duration-200" />
+        {/* Capa de tinte adaptativo translúcido para mantener el contraste */}
+        <div className="absolute inset-0 bg-light-base/75 dark:bg-navy-base/80 transition-colors duration-200" />
       </div>
 
       {/* Navbar Superior con Campana y Menú de Usuario */}
