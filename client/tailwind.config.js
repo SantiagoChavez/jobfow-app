@@ -8,42 +8,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta Dark Mode: Plata y Plomo sobre Fondo Azul
-        'navy-base': '#091024', // Fondo azul noche profundo (preservado para contraste y futuras imágenes)
-        'navy-surface': '#161C24', // Gris plomo profundo (gunmetal) para tarjetas, columnas y modales
-        'navy-highlight': '#262F3D', // Gris plomo intermedio para hovers, bordes y separadores
-        'gold-primary': '#E2E8F0', // Gris plata platino brillante (reemplazo del amarillo oro)
-        'gold-light': '#FFFFFF', // Plata pulida resplandeciente para hovers
-        'gold-dark': '#94A3B8', // Plata grafito satinado para contrastes
-        'sky-tech': '#38BDF8', // Se mantiene (tags técnicos / radar)
-        'ice-blue': '#93C5FD', // Se mantiene
+        // Paleta Dark Mode: Cyber Cyan / Neón Eléctrico (Estilo OpenAI / Docker)
+        'navy-base': '#060C1B', // Azul medianoche espacial profundo
+        'navy-surface': '#0E172A', // Slate 900 con matiz azul noche para tarjetas y modales
+        'navy-highlight': '#1E2B45', // Azul noche intermedio para hovers y bordes de acento
+        'gold-primary': '#00E5FF', // Cian Neón hiperbrillante y vibrante (reemplazo del amarillo)
+        'gold-light': '#67E8F9', // Cian eléctrico luminoso para hovers
+        'gold-dark': '#0284C7', // Azul cian oceánico profundo
+        'sky-tech': '#38BDF8', // Celeste técnico
+        'ice-blue': '#93C5FD', // Azul hielo suave
 
-        // Mapeo armonizado de escala de acento (antes ámbar) a gama plata/plomo
+        // Mapeo armonizado de escala de acento a gama Cian Neón eléctrico
         amber: {
-          50: '#F8FAFC',
-          100: '#F1F5F9',
-          200: '#E2E8F0',
-          300: '#CBD5E1',
-          400: '#94A3B8',
-          500: '#64748B', // Plata plomo de acento
-          600: '#475569',
-          700: '#334155',
-          800: '#1E293B',
-          900: '#0F172A',
-          950: '#020617',
+          50: '#ECFEFF',
+          100: '#CFFAFE',
+          200: '#A5F3FC',
+          300: '#67E8F9',
+          400: '#22D3EE',
+          500: '#06B6D4', // Cian vibrante
+          600: '#0891B2',
+          700: '#0E7490',
+          800: '#155E75',
+          900: '#164E63',
+          950: '#083344',
         },
 
-        // Paleta Light Mode (Blanco Puro & Gris Plomo Ejecutivo)
+        // Paleta Light Mode (Blanco Puro & Azul Eléctrico)
         'light-base': '#F8FAFC',
         'light-surface': '#FFFFFF',
-        'light-surface-soft': '#F1F5F9',
+        'light-surface-soft': '#F0F9FF',
         'light-border': '#E2E8F0',
         'light-border-soft': '#F1F5F9',
         'light-text-primary': '#0F172A',
         'light-text-secondary': '#334155',
         'light-text-muted': '#64748B',
-        'light-brand-accent': '#475569',
-        'light-brand-gold': '#64748B',
+        'light-brand-accent': '#0284C7',
+        'light-brand-gold': '#0EA5E9',
         'light-brand-tech': '#0284C7',
       }
     },
