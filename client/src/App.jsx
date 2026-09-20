@@ -22,7 +22,6 @@ import {
   SparklesIcon,
   KanbanIcon,
   FileTextIcon,
-  GoogleIcon,
 } from './components/Icons.jsx';
 import {
   getApplications,
