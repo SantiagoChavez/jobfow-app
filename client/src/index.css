@@ -30,15 +30,15 @@
 
   /* Scrollbar en modo oscuro (html.dark) */
   .dark ::-webkit-scrollbar-track {
-    background: #0B1329;
+    background: #091024;
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: #1E3A8A;
+    background: #262F3D;
     border-radius: 9999px;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: #38BDF8;
+    background: #94A3B8;
   }
 }
