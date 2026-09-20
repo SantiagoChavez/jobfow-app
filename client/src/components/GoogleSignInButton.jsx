@@ -35,11 +35,14 @@ export const GoogleSignInButton = ({
     const renderGisButton = () => {
       if (window.google?.accounts?.id && containerRef.current) {
         try {
-          window.google.accounts.id.initialize({
-            client_id: clientId.trim(),
-            callback: handleCredential,
-            auto_select: false,
-          });
+          if (!window.__jobflow_gsi_initialized) {
+            window.google.accounts.id.initialize({
+              client_id: clientId.trim(),
+              callback: handleCredential,
+              auto_select: false,
+            });
+            window.__jobflow_gsi_initialized = true;
+          }
 
           containerRef.current.innerHTML = '';
           window.google.accounts.id.renderButton(containerRef.current, {

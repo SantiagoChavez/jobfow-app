@@ -9,6 +9,19 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.7] - 2026-09-20
+
+### Added & Changed
+- **Nueva Paleta Visual Cyber Cyan / Neón Eléctrico:**
+  - Renovación del estilo visual general hacia una estética de alta tecnología y gran vitalidad, combinando un fondo azul medianoche espacial (`#060C1B`) con superficies Slate oscuro (`#0E172A`) y acentos principales en **Cian Neón hiperbrillante** (`#00E5FF` / `#06B6D4`).
+  - Dinamización del icono de radar (`RadarIcon` en `Icons.jsx`), permitiendo que la aguja herede de forma fluida el color del acento activo mediante `currentColor`.
+  - Modernización del aura y resplandor de la pantalla principal (`App.jsx`) con degradados cian y celeste eléctrico.
+
+### Fixed & Optimized
+- **Prevención de Inicializaciones Múltiples de Google Identity Services (`GoogleSignInButton.jsx`):**
+  - Encapsulación síncrona con bandera de estado para evitar llamadas redundantes a `window.google.accounts.id.initialize` ante cambios de tema o re-renderizados, eliminando advertencias en la terminal de Vite.
+  - Limpieza de importaciones inactivas en `App.jsx`.
+
 ## [1.3.6] - 2026-09-19
 
 ### Added

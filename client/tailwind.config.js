@@ -8,28 +8,43 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta Dark Mode (Executive Slate & Warm Champagne Gold - Calma, Orden y Contraste Profesional)
-        'navy-base': '#0B1120', // Midnight slate profundo, suave a la vista
-        'navy-surface': '#1E293B', // Slate 800 elegante para tarjetas y modales
-        'navy-highlight': '#334155', // Slate 700 para hovers y bordes interactivos
-        'gold-primary': '#F59E0B', // Ámbar dorado cálido (elegante, sin estridencias)
-        'gold-light': '#FDE68A', // Ámbar pastel 200
-        'gold-dark': '#D97706', // Ámbar profundo 600
-        'sky-tech': '#38BDF8', // Sky 400 técnico
-        'ice-blue': '#93C5FD', // Ice blue suave
+        // Paleta Dark Mode: Cyber Cyan / Neón Eléctrico (Estilo OpenAI / Docker)
+        'navy-base': '#060C1B', // Azul medianoche espacial profundo
+        'navy-surface': '#0E172A', // Slate 900 con matiz azul noche para tarjetas y modales
+        'navy-highlight': '#1E2B45', // Azul noche intermedio para hovers y bordes de acento
+        'gold-primary': '#00E5FF', // Cian Neón hiperbrillante y vibrante (reemplazo del amarillo)
+        'gold-light': '#67E8F9', // Cian eléctrico luminoso para hovers
+        'gold-dark': '#0284C7', // Azul cian oceánico profundo
+        'sky-tech': '#38BDF8', // Celeste técnico
+        'ice-blue': '#93C5FD', // Azul hielo suave
 
-        // Paleta Light Mode (Modo Claro Ejecutivo - Blanco Puro & Slate Suave)
-        'light-base': '#F8FAFC', // Slate 50 descansado para el fondo
-        'light-surface': '#FFFFFF', // Blanco puro para tarjetas
-        'light-surface-soft': '#F1F5F9', // Slate 100 para contenedores secundarios
-        'light-border': '#E2E8F0', // Slate 200 para bordes nítidos
-        'light-border-soft': '#F1F5F9', // Slate 100 suave
-        'light-text-primary': '#0F172A', // Slate 900 de alto contraste
-        'light-text-secondary': '#334155', // Slate 700 para subtítulos
-        'light-text-muted': '#64748B', // Slate 500 para metadatos
-        'light-brand-accent': '#D97706', // Ámbar cálido de alto contraste
-        'light-brand-gold': '#F59E0B', // Ámbar dorado 500
-        'light-brand-tech': '#0284C7', // Azul cielo 600 nítido
+        // Mapeo armonizado de escala de acento a gama Cian Neón eléctrico
+        amber: {
+          50: '#ECFEFF',
+          100: '#CFFAFE',
+          200: '#A5F3FC',
+          300: '#67E8F9',
+          400: '#22D3EE',
+          500: '#06B6D4', // Cian vibrante
+          600: '#0891B2',
+          700: '#0E7490',
+          800: '#155E75',
+          900: '#164E63',
+          950: '#083344',
+        },
+
+        // Paleta Light Mode (Blanco Puro & Azul Eléctrico)
+        'light-base': '#F8FAFC',
+        'light-surface': '#FFFFFF',
+        'light-surface-soft': '#F0F9FF',
+        'light-border': '#E2E8F0',
+        'light-border-soft': '#F1F5F9',
+        'light-text-primary': '#0F172A',
+        'light-text-secondary': '#334155',
+        'light-text-muted': '#64748B',
+        'light-brand-accent': '#0284C7',
+        'light-brand-gold': '#0EA5E9',
+        'light-brand-tech': '#0284C7',
       }
     },
   },
