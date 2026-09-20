@@ -521,8 +521,8 @@ export function App() {
           <div className="py-8 md:py-16 flex flex-col items-center text-center max-w-3xl mx-auto animate-fade-in">
             {/* Emblema Central: Logo Radar con Glow Dorado + JobFlow */}
             <div className="relative flex items-center justify-center gap-3.5 sm:gap-4 mb-5 select-none group">
-              {/* Resplandor / Aura Dorada Suave */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/25 via-yellow-400/35 to-amber-500/25 dark:from-gold-primary/25 dark:via-yellow-300/30 dark:to-gold-primary/25 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              {/* Resplandor / Aura Cian Suave */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/25 via-sky-400/35 to-amber-500/25 dark:from-gold-primary/25 dark:via-sky-tech/30 dark:to-gold-primary/25 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
               {/* Contenedor del Radar Agrandado con relieve */}
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white dark:bg-navy-surface border border-amber-300/60 dark:border-gold-primary/50 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-xl shadow-amber-500/15 dark:shadow-gold-primary/20 transition-transform duration-300 group-hover:scale-105">
