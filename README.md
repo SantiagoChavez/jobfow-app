@@ -30,6 +30,7 @@ Jobflow nace para resolver un problema crítico en la búsqueda activa de empleo
 - [Enlaces de Ejecución (Demo en Vivo)](#-enlaces-de-ejecución-demo-en-vivo)
 - [Manual de Usuario & Guía de IA (PDF)](#-manual-de-usuario--especificación-del-copiloto-de-ia)
 - [Problema & Visión del Producto](#-problema--visión-del-producto)
+- [Galería Visual de la Plataforma](#-galería-visual-de-la-plataforma-visual-tour)
 - [Características del MVP](#-características-del-mvp)
 - [Arquitectura del Proyecto](#-arquitectura-del-proyecto)
 - [Estrategia de Ramas (Git Workflow)](#-estrategia-de-ramas-git-workflow)
@@ -64,6 +65,73 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 * **Dolor a resolver:** En procesos de acompañamiento y coaching laboral, suele exigirse un objetivo mínimo (por ejemplo, 2 postulaciones diarias registradas con evidencia de fechas, enlaces y respuestas). Registrarlo en hojas de cálculo o notas sueltas consume tiempo y no entrega métricas de valor.
 * **Usuario objetivo:** Desarrolladores en búsqueda activa que necesitan cargar aplicaciones de forma inmediata (mobile-first / web rápida).
 * **Propuesta de valor:** Carga veloz de ofertas, seguimiento en tablero Kanban, cálculo automático de tiempos de respuesta del mercado y generación de reportes semanales en PDF listos para enviar al coach o mentor.
+
+---
+
+## 📸 Galería Visual de la Plataforma (Visual Tour)
+
+<div align="center">
+  <h3>⚡ Tablero Inteligente Kanban & Seguimiento en Tiempo Real</h3>
+  <img src="./client/src/assets/panelPrincipal.png" alt="Tablero Principal y Kanban de JobFlow" width="900" />
+  <p><em>Vista central con métricas KPI, alertas prioritarias de seguimiento y tablero Kanban interactivo para arrastrar postulaciones.</em></p>
+</div>
+
+<br/>
+
+<div align="center">
+  <h3>📊 Vista de Tabla Interactiva & Filtros Avanzados</h3>
+  <img src="./client/src/assets/tabla.png" alt="Vista Tabla de JobFlow" width="900" />
+  <p><em>Gestión estructurada con ordenamiento, búsqueda por rol o empresa, badges de prioridad/modalidad y paginación en servidor.</em></p>
+</div>
+
+<br/>
+
+<table align="center" width="100%">
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <h4>🤖 Copiloto IA (Gemini) — Carga Rápida</h4>
+      <img src="./client/src/assets/nuevaPostulacion.png" alt="Modal Nueva Postulación con IA" width="440" />
+      <p><em>Extracción automática de datos, score de afinidad técnica y pitch personalizado con 1 clic.</em></p>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <h4>👤 Mi Perfil & Habilidades (GitHub / CV)</h4>
+      <img src="./client/src/assets/miPerfil.png" alt="Modal Mi Perfil Profesional y Skills" width="440" />
+      <p><em>Carga mágica de tecnologías escaneando repositorios públicos de GitHub o analizando el CV con IA.</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <h4>📄 Generador de Informes para Career Coach</h4>
+      <img src="./client/src/assets/reporte.png" alt="Modal Generador de Reportes PDF" width="440" />
+      <p><em>Exportación ejecutiva en PDF vectorial con filtros de períodos (7 días, 30 días, trimestre).</em></p>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <h4>ℹ️ Acerca de JobFlow & Stack Tecnológico</h4>
+      <img src="./client/src/assets/about.png" alt="Modal Acerca de JobFlow" width="440" />
+      <p><em>Arquitectura de componentes, tecnologías cloud utilizadas e información de autoría.</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <h4>🚪 Acceso y Onboarding Seguro (1-Click Google)</h4>
+      <img src="./client/src/assets/login.png" alt="Modal Iniciar Sesión" width="440" />
+      <p><em>Autenticación federada mediante Google Identity Services o credenciales tradicionales con JWT.</em></p>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <h4>🔑 Vinculación con Extensión de Chrome</h4>
+      <img src="./client/src/assets/jwk.png" alt="Copiar Token Extensión en Menú de Usuario" width="440" />
+      <p><em>Copia instantánea del token seguro para capturar ofertas laborales desde LinkedIn o Indeed.</em></p>
+    </td>
+  </tr>
+</table>
+
+<br/>
+
+<div align="center">
+  <h3>🌐 Portal de Bienvenida y Landing Page</h3>
+  <img src="./client/src/assets/home.png" alt="Landing Page de Bienvenida" width="900" />
+  <p><em>Punto de entrada accesible con acceso inmediato a Google OAuth y resumen interactivo de capacidades.</em></p>
+</div>
 
 ---
 
@@ -104,20 +172,20 @@ El proyecto sigue un flujo de ramificación ordenado para garantizar estabilidad
 
 ## 🎨 Diseño y Modelo de Referencia
 
-El diseño de la interfaz se basa en el documento de especificación visual [`modelo para jobflow.pdf`](docs/modelo%20para%20jobflow.pdf), adoptando el sistema estético **"Deep Cobalt & Crisp Gold"** con soporte completo para Tema Dual (Oscuro / Claro Armónico):
+El diseño de la interfaz se basa en el documento de especificación visual [`modelo para jobflow.pdf`](docs/modelo%20para%20jobflow.pdf), evolucionado a la identidad de vanguardia **"Cyber Cyan Neón & Midnight Navy"** con soporte de Tema Dual (Oscuro / Claro Armónico):
 
-* **Paleta Modo Oscuro (Deep Cobalt):**
-  * Fondo principal: `#0B1329` (`bg-navy-base`)
-  * Superficies y tarjetas: `#172554` (`bg-navy-surface`)
-  * Resaltados: `#1E3A8A` (`bg-navy-highlight`)
-  * Acentos dorados primarios: `#FACC15` (`text-gold-primary`)
-  * Variantes doradas: `#FEF08A` (light) y `#CA8A04` (dark)
+* **Paleta Modo Oscuro (Cyber Cyan Neón):**
+  * Fondo principal: `#060C1B` (`bg-navy-base`)
+  * Superficies y tarjetas: `#0E172A` (`bg-navy-surface`)
+  * Resaltados y bordes de acento: `#1E2B45` (`bg-navy-highlight`)
+  * Acentos cian primarios: `#00E5FF` (`gold-primary` Cyber Cyan Neón hiperbrillante)
+  * Variantes cian eléctricas: `#67E8F9` (luminoso) y `#0284C7` (oceánico profundo)
   * Acentos técnicos: `#38BDF8` (`sky-tech`) y `#93C5FD` (`ice-blue`)
 * **Paleta Modo Claro Armónico:**
-  * Fondo base: Tono hielo / slate descansado (`#f1f5f9` / `#e2e8f0`)
-  * Superficies y tarjetas: Blanco perlado cálido (`#ffffff` / `#f8fafc`) con sombras suaves y bordes cobalto tenues (`#cbd5e1`)
-  * Tipografía y títulos: Azul cobalto profundo y slate de alto contraste (`#0f172a`, `#1e293b`)
-  * Acentos de marca: Dorado ámbar cálido (`#b45309` / `#d97706`) y azul técnico (`#0284c7`)
+  * Fondo base con fotografía IT y overlay balanceado: `#F8FAFC` (`bg-light-base/40`) nítido y sin velos blanquecinos excesivos
+  * Superficies y tarjetas: Blanco puro (`#FFFFFF`) y suave (`#F0F9FF`) con sombras sutiles
+  * Tipografía y títulos: Slate de alto contraste (`#0F172A`, `#334155`)
+  * Acentos de marca: Azul tecnológico (`#0284C7`) y cian cielo (`#0EA5E9`)
 * **Vistas proyectadas en el modelo:**
   * **Dashboard:** Tarjetas resumen (Postulaciones, Entrevistas, Ofertas, Tasa de respuesta), gráfico de actividad y postulaciones por estado.
   * **Tablero Tracker (Kanban):** Columnas de estado (*Guardadas*, *Aplicadas*, *Entrevista*, *Oferta*, *Rechazada*).

@@ -9,6 +9,21 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.8] - 2026-09-24
+
+### Added & Enhanced
+- **Nuevo Banner Oficial con Paleta Cyber Cyan Neón (`Jobflow-banner`):**
+  - Actualización completa de la identidad gráfica del banner oficial en formatos SVG y PNG de alta resolución (540x220 px).
+  - Integración de degradados Cyber Cyan Neón (`#00E5FF`, `#67E8F9`, `#0284C7`) y azul medianoche espacial (`#060C1B`, `#0E172A`).
+- **Galería Visual de la Plataforma en Documentación (`README.md`, `GUIA_USUARIO.md`, `extension/README.md`):**
+  - Creación de la sección "Galería Visual de la Plataforma (Visual Tour)" en el `README.md` principal con capturas de alta definición del Dashboard Kanban, Vista de Tabla, Copiloto IA, Perfil y Skills, Reportes PDF, Onboarding y Acerca de JobFlow.
+  - Integración de capturas paso a paso en la Guía de Usuario (`docs/GUIA_USUARIO.md`) y en la guía de la extensión de Chrome (`extension/README.md`).
+
+### Fixed & Optimized
+- **Calibración del Filtro de Fondo en Modo Claro (`App.jsx`):**
+  - Reducción de la opacidad de la capa superior sobre la imagen de oficina IT de `bg-light-base/75` a `bg-light-base/40`.
+  - Eliminación del velo lechoso/blancuzco excesivo, logrando mayor profundidad visual, contraste y nitidez sin afectar la legibilidad del texto en modo claro.
+
 ## [1.3.7] - 2026-09-20
 
 ### Added & Changed

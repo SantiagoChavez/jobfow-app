@@ -60,6 +60,10 @@ Para instalar y probar la extensión localmente en tu navegador:
      * *(Tip: Si tienes abierta la pestaña de JobFlow Web, puedes pulsar "Detectar sesión" para que se autocomplete de inmediato).*
 4. Haz clic en **"Guardar Token"**. El indicador superior cambiará a **"Conectado"** en color verde.
 
+<p align="center">
+  <img src="../client/src/assets/jwk.png" alt="Obtener Token JWT desde el menú de usuario de JobFlow" width="600" />
+</p>
+
 ---
 
 ## 🔄 Actualizar la Extensión (Si ya la tenías instalada)
