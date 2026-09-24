@@ -1,6 +1,10 @@
 # 📘 Guía de Inicio Rápido de Jobflow
 ### *Tu copiloto inteligente para organizar postulaciones y conseguir empleo más rápido*
 
+<p align="center">
+  <img src="../client/src/assets/Jobflow-banner.png" alt="Jobflow - Radar & Career Tracker" width="500" />
+</p>
+
 ¡Te damos la bienvenida a **Jobflow**! Esta guía está diseñada para que cualquier persona —sin importar su perfil técnico— pueda aprovechar al máximo la plataforma desde el primer minuto.
 
 ---
@@ -28,6 +32,13 @@ Tus oportunidades de trabajo y métricas son confidenciales. Por eso, Jobflow cu
 2. Puedes ingresar al instante con el botón **"Continuar con Google"** o registrarte con tu correo electrónico y una contraseña segura.
 3. Una vez dentro, verás tu avatar o iniciales en el menú superior. Todas las postulaciones que cargues estarán vinculadas únicamente a tu cuenta.
 
+<p align="center">
+  <img src="../client/src/assets/home.png" alt="Pantalla de Bienvenida de JobFlow" width="750" />
+</p>
+<p align="center">
+  <img src="../client/src/assets/login.png" alt="Modal de Inicio de Sesión y Acceso con Google" width="360" />
+</p>
+
 ---
 
 ### Paso 2: Configura tu Perfil Profesional y Habilidades Dinámicas (GitHub & IA)
@@ -41,6 +52,10 @@ Para que el cálculo de afinidad técnica (**Match %**) y el **Pitch de Presenta
 4. Completa o revisa tus enlaces profesionales (**LinkedIn**, **GitHub**, **Portafolio Web**) y haz clic en **"Guardar Cambios"**.
 5. **¡Listo!** A partir de este momento, cada vacante que analices contrastará sus requerimientos contra tus habilidades reales.
 
+<p align="center">
+  <img src="../client/src/assets/miPerfil.png" alt="Modal Mi Perfil Profesional y Skills con GitHub e IA" width="460" />
+</p>
+
 ---
 
 ### Paso 3: Conoce tu Tablero de Oportunidades
@@ -53,6 +68,10 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
 5. 🚫 **Descartado:** Búsquedas finalizadas o que decidiste rechazar.
 
 > 💡 **Tip:** Puedes arrastrar y soltar cualquier tarjeta de una columna a otra con el mouse. El sistema actualizará el estado automáticamente sin que tengas que hacer nada más.
+
+<p align="center">
+  <img src="../client/src/assets/panelPrincipal.png" alt="Tablero Tracker Kanban y Alertas" width="800" />
+</p>
 
 ---
 
@@ -69,6 +88,10 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
    - **¡Lo mejor!** Redacta un **Pitch de Presentación Personalizado** dirigido al reclutador destacando tu perfil y tus enlaces profesionales.
 5. Si deseas, puedes retocar cualquier palabra en el cuadro de texto del pitch o copiarlo de inmediato con el botón **"Copiar Pitch"**.
 6. Haz clic en **"Guardar Postulación"**. ¡Y listo! Tu postulación ya está en el tablero.
+
+<p align="center">
+  <img src="../client/src/assets/nuevaPostulacion.png" alt="Modal Nueva Postulación con Autocompletar con IA" width="460" />
+</p>
 
 ---
 
@@ -94,12 +117,19 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 ---
 
 ### Paso 7: Vista de Tabla y Descarga de Reportes
-- Si prefieres ver tus postulaciones como una planilla ordenada, haz clic en la pestaña **"Lista"**.
+- Si prefieres ver tus postulaciones como una planilla ordenada, haz clic en la pestaña **"Tabla"** en la barra superior.
   - Puedes filtrar por empresa, rol, estado o prioridad.
   - Al pie de la tabla cuentas con paginación para navegar de forma cómoda y rápida.
 - Para descargar tu progreso, haz clic en **"Descargar Reporte"**:
-  - Puedes seleccionar el rango de fechas que deseas evaluar.
+  - Puedes seleccionar el rango de fechas que deseas evaluar (últimos 7 días, 30 días o trimestre).
   - Jobflow generará un documento PDF con tus estadísticas, porcentaje de respuesta y el detalle de tus postulaciones.
+
+<p align="center">
+  <img src="../client/src/assets/tabla.png" alt="Vista de Tabla Interactiva" width="800" />
+</p>
+<p align="center">
+  <img src="../client/src/assets/reporte.png" alt="Modal Descarga de Reporte PDF para Career Coach" width="400" />
+</p>
 
 ---
 
@@ -107,7 +137,7 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trabajar de día o de noche sin fatiga visual:
 
 - En la barra superior, busca el **botón de Sol / Luna**.
-- Al presionarlo, conmutarás instantáneamente entre el elegante tema nocturno **Deep Cobalt** y el suave **Modo Claro Armónico** (base hielo/slate descansada para los ojos).
+- Al presionarlo, conmutarás instantáneamente entre el elegante tema nocturno **Deep Cobalt / Cyber Cyan** y el descansado **Modo Claro Armónico** (base hielo/slate que evita el cansancio ocular).
 - Tu elección se guarda automáticamente en tu navegador y en tu perfil de usuario, para que siempre encuentres la interfaz como más te gusta.
 
 ---
@@ -132,11 +162,27 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
    - El indicador superior cambiará inmediatamente a **"Conectado"** (verde).
    - *(La extensión se conecta directamente a JobFlow Cloud para procesar y guardar las vacantes en tu cuenta de inmediato).*
 
+<p align="center">
+  <img src="../client/src/assets/jwk.png" alt="Opción Copiar Token Extensión destacada en el Menú de Usuario" width="750" />
+</p>
+
 3. **Capturar una vacante al instante:**
    - Navega a cualquier empleo en LinkedIn, Indeed, BambooHR o cualquier portal laboral.
    - Abre la extensión y haz clic en el botón dorado **"⚡ Capturar y Procesar con IA"**.
    - El sistema extraerá automáticamente el contenido de la vacante, la IA de Google Gemini analizará el perfil de la empresa y los requisitos requeridos, calculará tu afinidad y registrará la postulación directamente en tu **Tablero Kanban**.
    - Si estás en un portal con diseño atípico o iframes, simplemente selecciona el texto de la vacante con el ratón antes de presionar el botón y se procesará la selección.
+
+---
+
+### Paso 10: Conoce el Stack Tecnológico y Propósito (Acerca de JobFlow)
+Para conocer los detalles del sistema, tecnologías utilizadas y el equipo detrás de Jobflow:
+
+1. Haz clic en el botón **"ℹ️ Acerca de"** en la barra superior o dentro de tu menú de usuario.
+2. Accederás al panel con el desglose del stack tecnológico (React 19, Google Gemini AI, Tailwind CSS, Vite, Express 5, MongoDB Atlas y Google OAuth 2.0).
+
+<p align="center">
+  <img src="../client/src/assets/about.png" alt="Modal Acerca de JobFlow y Stack Tecnológico" width="450" />
+</p>
 
 ---
 

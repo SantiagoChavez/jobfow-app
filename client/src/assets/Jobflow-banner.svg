@@ -1,49 +1,79 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 220" width="100%" height="100%" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
   <defs>
-    <radialGradient id="bgVibrantNavy" cx="25%" cy="30%" r="90%">
-      <stop offset="0%" stop-color="#1E3A8A"/>
-      <stop offset="40%" stop-color="#172554"/>
-      <stop offset="100%" stop-color="#0B1329"/>
+    <!-- Fondo Cyber Navy Espacial Profundo -->
+    <radialGradient id="bgCyberNavy" cx="22%" cy="45%" r="95%">
+      <stop offset="0%" stop-color="#0F1F3D"/>
+      <stop offset="40%" stop-color="#060C1B"/>
+      <stop offset="100%" stop-color="#02050E"/>
     </radialGradient>
 
-    <linearGradient id="goldUltraCrisp" x1="0%" y1="0%" x2="0%" y2="100%">
+    <!-- Resplandor Neón Ambiental para el Radar -->
+    <radialGradient id="neonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.22"/>
+      <stop offset="70%" stop-color="#00E5FF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#00E5FF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Gradiente Cyber Cyan Neón para 'Flow' -->
+    <linearGradient id="cyberCyanCrisp" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="18%" stop-color="#FEF08A"/>
-      <stop offset="55%" stop-color="#FACC15"/>
-      <stop offset="100%" stop-color="#CA8A04"/>
+      <stop offset="22%" stop-color="#CFFAFE"/>
+      <stop offset="58%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#0284C7"/>
     </linearGradient>
 
-    <radialGradient id="radarSweep" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FDE047" stop-opacity="0.5"/>
-      <stop offset="50%" stop-color="#FACC15" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#1E3A8A" stop-opacity="0"/>
+    <!-- Barrido del Radar con Gama Neón Eléctrico -->
+    <radialGradient id="radarSweepCyber" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#06B6D4" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#060C1B" stop-opacity="0"/>
     </radialGradient>
   </defs>
 
-  <rect width="540" height="220" rx="20" fill="url(#bgVibrantNavy)" stroke="#3B82F6" stroke-width="1.5" stroke-opacity="0.6"/>
+  <!-- Tarjeta con Borde Neón Sutil -->
+  <rect width="540" height="220" rx="20" fill="url(#bgCyberNavy)" stroke="#00E5FF" stroke-width="1.5" stroke-opacity="0.45"/>
 
-  <!-- ISOTIPO RADAR -->
+  <!-- Halo de luz ambiental centrado en el radar -->
+  <circle cx="120" cy="110" r="95" fill="url(#neonGlow)"/>
+
+  <!-- ISOTIPO RADAR (Cyber Cyan Edition) -->
   <g transform="translate(65, 55)">
-    <circle cx="55" cy="55" r="52" fill="none" stroke="#60A5FA" stroke-width="1" stroke-opacity="0.3"/>
-    <circle cx="55" cy="55" r="36" fill="none" stroke="#60A5FA" stroke-width="1.2" stroke-opacity="0.5"/>
-    <circle cx="55" cy="55" r="20" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-opacity="0.8"/>
-    <line x1="55" y1="3" x2="55" y2="107" stroke="#60A5FA" stroke-width="1.2" stroke-dasharray="3 3" stroke-opacity="0.5"/>
-    <line x1="3" y1="55" x2="107" y2="55" stroke="#60A5FA" stroke-width="1.2" stroke-dasharray="3 3" stroke-opacity="0.5"/>
-    <path d="M 55 55 L 55 3 A 52 52 0 0 1 107 55 Z" fill="url(#radarSweep)"/>
-    <line x1="55" y1="55" x2="107" y2="55" stroke="#FACC15" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Anillos concéntricos -->
+    <circle cx="55" cy="55" r="52" fill="none" stroke="#0284C7" stroke-width="1" stroke-opacity="0.45"/>
+    <circle cx="55" cy="55" r="36" fill="none" stroke="#00E5FF" stroke-width="1.2" stroke-opacity="0.55"/>
+    <circle cx="55" cy="55" r="20" fill="none" stroke="#67E8F9" stroke-width="1.5" stroke-opacity="0.85"/>
+
+    <!-- Retícula guía -->
+    <line x1="55" y1="3" x2="55" y2="107" stroke="#38BDF8" stroke-width="1.2" stroke-dasharray="3 3" stroke-opacity="0.45"/>
+    <line x1="3" y1="55" x2="107" y2="55" stroke="#38BDF8" stroke-width="1.2" stroke-dasharray="3 3" stroke-opacity="0.45"/>
+
+    <!-- Haz de barrido angular -->
+    <path d="M 55 55 L 55 3 A 52 52 0 0 1 107 55 Z" fill="url(#radarSweepCyber)"/>
+
+    <!-- Aguja / Brazo de detección -->
+    <line x1="55" y1="55" x2="107" y2="55" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round"/>
     <line x1="55" y1="55" x2="105" y2="55" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round"/>
-    <circle cx="55" cy="55" r="6" fill="#FACC15" fill-opacity="0.3"/>
+
+    <!-- Centro del radar -->
+    <circle cx="55" cy="55" r="6" fill="#00E5FF" fill-opacity="0.35"/>
     <circle cx="55" cy="55" r="3.5" fill="#FFFFFF"/>
-    <circle cx="85" cy="28" r="10" fill="none" stroke="#FDE047" stroke-width="1" stroke-opacity="0.4"/>
-    <circle cx="85" cy="28" r="5.5" fill="none" stroke="#FDE047" stroke-width="1.2" stroke-opacity="0.8"/>
+
+    <!-- Detección de vacante / Objetivo activo con pulso -->
+    <circle cx="85" cy="28" r="10" fill="none" stroke="#00E5FF" stroke-width="1" stroke-opacity="0.4"/>
+    <circle cx="85" cy="28" r="5.5" fill="none" stroke="#67E8F9" stroke-width="1.2" stroke-opacity="0.85"/>
     <circle cx="85" cy="28" r="3" fill="#FFFFFF"/>
+
+    <!-- Vacante secundaria en rastreo -->
     <circle cx="34" cy="76" r="3.5" fill="#38BDF8"/>
   </g>
 
   <!-- TIPOGRAFÍA JOBFLOW -->
   <g transform="translate(210, 85)">
-    <text x="0" y="33" fill="#030712" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="900" letter-spacing="-0.5" opacity="0.6">Job<tspan>Flow</tspan></text>
-    <text x="0" y="32" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="900" letter-spacing="-0.5">Job<tspan fill="url(#goldUltraCrisp)">Flow</tspan></text>
-    <text x="2" y="58" fill="#93C5FD" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" letter-spacing="3.5">RADAR &amp; CAREER TRACKER</text>
+    <!-- Sombra de relieve -->
+    <text x="0" y="33" fill="#020612" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="900" letter-spacing="-0.5" opacity="0.7">Job<tspan>Flow</tspan></text>
+    <!-- Logotipo blanco puro + degradé Cyber Cyan -->
+    <text x="0" y="32" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="900" letter-spacing="-0.5">Job<tspan fill="url(#cyberCyanCrisp)">Flow</tspan></text>
+    <!-- Subtítulo técnico -->
+    <text x="2" y="58" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" letter-spacing="3.5">RADAR &amp; CAREER TRACKER</text>
   </g>
 </svg>
