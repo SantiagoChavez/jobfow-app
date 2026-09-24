@@ -488,8 +488,8 @@ export function App() {
           loading="eager"
           fetchPriority="high"
         />
-        {/* Capa de tinte adaptativo translúcido para mantener el contraste */}
-        <div className="absolute inset-0 bg-light-base/75 dark:bg-navy-base/80 transition-colors duration-200" />
+        {/* Capa de tinte adaptativo translúcido para mantener el contraste sin lavado blanquecino */}
+        <div className="absolute inset-0 bg-light-base/40 dark:bg-navy-base/80 transition-colors duration-200" />
       </div>
 
       {/* Navbar Superior con Campana y Menú de Usuario */}
