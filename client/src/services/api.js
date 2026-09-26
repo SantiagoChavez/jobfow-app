@@ -323,6 +323,24 @@ export async function extractProfileFromText(text) {
 }
 
 /**
+ * Generar mensaje de seguimiento / follow-up personalizado con IA
+ * @param {string|Object} applicationOrId - ID de la postulación o datos de la misma
+ * @param {Object} [options] - { tone, customInstructions }
+ * @returns {Promise<{ subject: string, message: string, shortNote: string }>}
+ */
+export async function generateFollowUpMessage(applicationOrId, options = {}) {
+  const payload = typeof applicationOrId === 'string'
+    ? { applicationId: applicationOrId, ...options }
+    : { application: applicationOrId, ...options };
+
+  const res = await request('/ai/follow-up', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return res.data || res;
+}
+
+/**
  * Chequeo silencioso de salud para precalentar el backend en plataformas gratuitas (ej. Render spin-down)
  */
 export async function pingBackend() {
@@ -348,6 +366,7 @@ export default {
   previewMatch,
   downloadPdfReport,
   analyzeJobWithAI,
+  generateFollowUpMessage,
   loginUser,
   registerUser,
   googleAuthUser,
@@ -358,3 +377,4 @@ export default {
   extractProfileFromText,
   pingBackend,
 };
+

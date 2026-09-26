@@ -67,6 +67,73 @@ export const analyzeJob = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Generar mensaje de seguimiento (follow-up) personalizado con IA
+ * @route   POST /api/ai/follow-up
+ * @access  Private
+ */
+export const generateFollowUp = async (req, res) => {
+  try {
+    const { applicationId, application: inlineApp, tone = 'CORDIAL', customInstructions = '' } = req.body;
+    let applicationData = inlineApp;
+
+    if (!applicationData && applicationId) {
+      const Application = (await import('../models/Application.js')).default;
+      const foundApp = await Application.findById(applicationId);
+      if (!foundApp) {
+        return res.status(404).json({
+          success: false,
+          error: 'Postulación no encontrada',
+          message: 'Postulación no encontrada',
+        });
+      }
+      applicationData = foundApp;
+    }
+
+    if (!applicationData) {
+      return res.status(400).json({
+        success: false,
+        error: 'Se requiere el ID de la postulación o el objeto de postulación.',
+        message: 'Se requiere el ID de la postulación o el objeto de postulación.',
+      });
+    }
+
+    let userProfile = null;
+    if (req.user) {
+      userProfile = {
+        name: req.user.name,
+        headline: req.user.headline || 'Full Stack Developer',
+        bio: req.user.bio || '',
+        skills: req.user.skills || [],
+        links: req.user.links || {},
+      };
+    }
+
+    const { generateFollowUpMessage } = await import('../services/aiService.js');
+    const result = await generateFollowUpMessage({
+      application: applicationData,
+      userProfile,
+      tone,
+      customInstructions,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result,
+    });
+  } catch (error) {
+    console.error('Error al generar follow-up con IA:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Error al generar el mensaje de seguimiento con IA.',
+      message: error.message || 'Error al generar el mensaje de seguimiento con IA.',
+    });
+  }
+};
+
 export default {
   analyzeJob,
+  generateFollowUp,
 };
+
