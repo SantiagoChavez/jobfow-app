@@ -16,6 +16,7 @@ import { generateFollowUpMessage, updateApplication } from '../services/api.js';
 import { createSafeMailto } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { getReminderMetrics } from '../utils/reminders.js';
 
 const FollowUpModalDialog = ({
   onClose,
@@ -41,14 +42,8 @@ const FollowUpModalDialog = ({
 
   useModalA11y(true, onClose);
 
-  // Calcular días transcurridos de forma segura
-  const appliedAt = application?.appliedAt;
-  const daysAgo = useMemo(() => {
-    if (!appliedAt) return 5;
-    const appliedTime = new Date(appliedAt).getTime();
-    if (isNaN(appliedTime)) return 5;
-    return Math.max(1, Math.floor((new Date().getTime() - appliedTime) / (1000 * 60 * 60 * 24)));
-  }, [appliedAt]);
+  // Calcular métricas de recordatorio y días transcurridos desde el último contacto
+  const reminderMetrics = useMemo(() => getReminderMetrics(application), [application]);
 
   const handleGenerate = useCallback(async (selectedTone = tone, instructions = customInstructions) => {
     if (!application) return;
@@ -158,7 +153,7 @@ const FollowUpModalDialog = ({
         notes: `Follow-up enviado (${tone}): "${shortNote || generatedMessage.slice(0, 120)}..."`,
       });
       setSavedInteraction(true);
-      showToast('¡Seguimiento registrado en la línea de tiempo!', 'success');
+      showToast('¡Seguimiento registrado! Próxima alerta reprogramada en 5 días.', 'success');
     } catch {
       showToast('Error al registrar interacción en el historial', 'error');
     }
@@ -193,7 +188,9 @@ const FollowUpModalDialog = ({
                   Mensaje de Seguimiento con IA
                 </h3>
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/10 text-amber-700 dark:text-gold-primary border border-amber-500/30">
-                  {daysAgo}d sin respuesta
+                  {reminderMetrics.hasFollowUpSent
+                    ? (reminderMetrics.daysSinceLastContact === 0 ? 'Último contacto hoy' : `Último contacto hace ${reminderMetrics.daysSinceLastContact}d`)
+                    : `${reminderMetrics.daysSinceLastContact}d sin respuesta`}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-md">

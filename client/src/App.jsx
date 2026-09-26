@@ -36,6 +36,7 @@ import {
   getAnalyticsSummary,
   pingBackend,
 } from './services/api.js';
+import { getReminderMetrics } from './utils/reminders.js';
 
 export function App() {
   // Autenticación global
@@ -457,13 +458,8 @@ export function App() {
   const remindersCount = useMemo(() => {
     return allApplications.filter((app) => {
       if (!['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'OFERTA'].includes(app.status)) return false;
-      if (app.status === 'ENTREVISTA' || app.status === 'OFERTA') return true;
-      if (app.status === 'CONTACTO') return true;
-      if (app.appliedAt) {
-        const days = Math.floor((new Date() - new Date(app.appliedAt)) / (1000 * 60 * 60 * 24));
-        if (days >= 5) return true;
-      }
-      return false;
+      const metrics = getReminderMetrics(app);
+      return metrics.isUrgent;
     }).length;
   }, [allApplications]);
 

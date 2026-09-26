@@ -1,5 +1,6 @@
 import React from 'react';
 import { ClockIcon, CalendarIcon, ChevronRightIcon } from './Icons.jsx';
+import { getReminderMetrics } from '../utils/reminders.js';
 
 export const UpcomingReminders = ({
   applications = [],
@@ -9,40 +10,31 @@ export const UpcomingReminders = ({
 }) => {
   // Postulaciones activas que requieren seguimiento
   const activeApps = applications.filter((app) =>
-    ['ENVIADA', 'CONTACTO', 'ENTREVISTA'].includes(app.status)
+    ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'OFERTA'].includes(app.status)
   );
 
-  const getDaysAgo = (dateStr) => {
-    if (!dateStr) return 0;
-    return Math.floor((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
-  };
-
-  // Filtrar las que llevan más de 4 días o están en entrevista
+  // Enriquecer con métricas de recordatorio dinámicas y cuenta regresiva
   const reminders = activeApps
     .map((app) => {
-      const days = getDaysAgo(app.appliedAt);
-      let alertType = 'normal';
-      let message = 'En espera de primer contacto';
-
-      if (app.status === 'ENTREVISTA') {
-        alertType = 'high';
-        message = 'Proceso activo: preparar preguntas técnicas';
-      } else if (app.status === 'CONTACTO') {
-        alertType = 'medium';
-        message = 'Hubo respuesta: verificar próximos pasos';
-      } else if (days >= 5) {
-        alertType = 'warning';
-        message = `Hace ${days} días sin respuesta: enviar seguimiento`;
-      }
-
+      const metrics = getReminderMetrics(app);
       return {
         ...app,
-        days,
-        alertType,
-        message,
+        days: metrics.daysSinceLastContact,
+        daysUntilNextAlert: metrics.daysUntilNextAlert,
+        urgencyLevel: metrics.urgencyLevel,
+        urgencyLabel: metrics.urgencyLabel,
+        message: metrics.message,
+        countdownText: metrics.countdownText,
+        isUrgent: metrics.isUrgent,
+        hasFollowUpSent: metrics.hasFollowUpSent,
       };
     })
-    .sort((a, b) => (b.status === 'ENTREVISTA' ? 1 : -1))
+    .sort((a, b) => {
+      const priorityWeights = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
+      const weightDiff = (priorityWeights[b.urgencyLevel] || 0) - (priorityWeights[a.urgencyLevel] || 0);
+      if (weightDiff !== 0) return weightDiff;
+      return b.days - a.days;
+    })
     .slice(0, 3);
 
   if (reminders.length === 0) {
@@ -100,7 +92,7 @@ export const UpcomingReminders = ({
             </div>
 
             <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[10px] font-bold">
-              {onOpenFollowUp && rem.days >= 5 ? (
+              {onOpenFollowUp && rem.isUrgent ? (
                 <button
                   type="button"
                   onClick={(e) => {
@@ -113,7 +105,9 @@ export const UpcomingReminders = ({
                   <span>✨ Follow-up</span>
                 </button>
               ) : (
-                <span className="text-slate-400 dark:text-slate-500 font-normal">{rem.days}d transcurridos</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                  <span>{rem.countdownText}</span>
+                </span>
               )}
 
               <span className="text-sky-600 dark:text-sky-tech group-hover:text-amber-600 dark:group-hover:text-gold-primary flex items-center">
