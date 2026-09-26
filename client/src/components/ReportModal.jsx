@@ -81,10 +81,10 @@ export const ReportModal = ({ isOpen, onClose }) => {
               Contenido del Reporte:
             </span>
             <ul className="text-[11px] text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
-              <li>Métricas consolidadas (Total, Entrevistas, Ofertas, Tasa de respuesta).</li>
-              <li>Tiempos de respuesta y empresas ágiles.</li>
-              <li>Tabla detallada de postulaciones en el período.</li>
-              <li>Diseño ejecutivo listo para entregar al mentor o coach.</li>
+              <li>Métricas y gráficos estadísticos (Embudo de conversión, modalidades y afinidad IA).</li>
+              <li>Bitácora personalizada por empresa con pitches enviados y propuestas.</li>
+              <li>Seguimiento de respuestas, feedback de reclutadores y tiempos de respuesta.</li>
+              <li>Tabla ejecutiva estructurada lista para entregar al Career Coach o mentor.</li>
             </ul>
           </div>
 
