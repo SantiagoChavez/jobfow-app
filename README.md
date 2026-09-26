@@ -57,6 +57,7 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 3. **Detección de Brechas de Conocimiento (Gap Analysis)**: Identifica las habilidades que dominás (`extractedSkills`) y lista las tecnologías secundarias o deseables a repasar antes de la entrevista técnica (`missingSkills`).
 4. **Resumen Ejecutivo de la Compañía**: Redacta una síntesis de 2 oraciones sobre el modelo de negocio, industria y cultura de la empresa para que el candidato llegue informado a la primera llamada.
 5. **Generador de Pitch de Presentación Personalizado**: Adapta la plantilla oficial del candidato (reconversión IT, versatilidad multidisciplinaria, formación académica en UTN y Soy Henry, y enlaces directos a sus perfiles de GitHub y LinkedIn) al contexto específico de la vacante, listo para enviar al reclutador con 1 clic.
+6. **Generador de Mensajes de Seguimiento (Follow-Up Inteligente)**: Para aquellas postulaciones con más de 5 días sin novedades, adapta el pitch y la propuesta técnica a 3 modalidades comunicativas (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`) con copia en 1 clic para LinkedIn/chat y apertura de correo con `mailto:`.
 
 ---
 
@@ -156,6 +157,9 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 - [x] **Autenticación Multiusuario y Google OAuth (Tarjeta 13):** Registro tradicional con bcrypt y JWT, inicio de sesión 1-click mediante Google Identity Services (`@google-auth-library`), persistencia de sesión segura y aislamiento de postulaciones por cuenta de usuario.
 - [x] **Modo Claro Armónico & Switch Dual (Tarjeta 14):** Selector de tema interactivo Sol/Luna en Navbar, paleta híbrida descansada (ice/slate con acentos dorados y cobalto), persistencia en `localStorage` y sincronización con perfil de usuario (`PATCH /api/auth/theme`).
 - [x] **Gestión de Perfil & Skills Dinámicas (Tarjeta 15):** Modal interactivo `ProfileModal` con gestor de chips, extracción automática de tecnologías desde repositorios de GitHub API, análisis inteligente de extracto de CV/LinkedIn con Gemini AI (`@google/genai`), cálculo personalizado de afinidad (Match %) y pitch de presentación IA adaptado al postulante.
+- [x] **Generador de Mensajes de Seguimiento con IA (Tarjeta 16 / v1.3.9):** Sistema de follow-up inteligente para postulaciones con alarmas de seguimiento (>5 días sin respuesta), adaptación dinámica del pitch principal con 3 tonalidades (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`), copia en 1 clic para LinkedIn/chat y registro automático de `MENSAJE_ENVIADO` en la cronología.
+- [x] **Reportes PDF Ejecutivos con Gráficos Vectoriales y Bitácora Personalizada (v1.3.9):** Exportación en PDF con 6 tarjetas KPI, gráficos vectoriales nativos (Embudo de conversión y Modalidad laboral) y Bitácora detallada por empresa (pitch enviado vs. feedback/respuesta del reclutador).
+- [x] **Lanzador de Escritorio e Ícono Nativo Windows (v1.3.9):** Scripts de inicio automático en segundo plano con apertura de navegador (`iniciar-jobflow.bat`) e instalador de accesos directos de escritorio con ícono multi-resolución Cyber Cyan Radar (`instalar-icono-escritorio.bat`).
 - [x] **Despliegue Full-Stack en la Nube (DevOps):** Frontend en Vercel con SPA routing (`vercel.json`), Backend en Render (`render.yaml`) y Base de Datos en MongoDB Atlas M0.
 
 ---
@@ -226,8 +230,11 @@ Jobflow-app/
 │   ├── scripts/                # content.js (extractor contextual y de selección)
 │   ├── assets/                 # Iconos oficiales (16x16, 48x48, 128x128)
 │   └── README.md               # Guía técnica de la extensión
+├── scripts/                    # Scripts de automatización y creación de accesos directos
+│   ├── crear-acceso-directo.ps1# Generador PowerShell de accesos directos .lnk
+│   └── build-multi-ico.ps1     # Compilador de archivos .ico multi-resolución
 ├── server/                     # Backend REST API (Node.js, Express 5, ES Modules)
-│   ├── scripts/                # Generadores de PDFs con PDFKit-Table
+│   ├── scripts/                # Generadores de PDFs con PDFKit
 │   ├── src/
 │   │   ├── config/             # Conexión MongoDB y catálogo de skills
 │   │   ├── controllers/        # Controladores (applications, auth, ai, reports, etc.)
@@ -238,6 +245,9 @@ Jobflow-app/
 │   │   ├── utils/              # Generador de tokens JWT
 │   │   └── server.js           # Servidor Express
 │   └── package.json
+├── iniciar-jobflow.bat         # Lanzador 1-clic con auto-arranque y apertura de navegador
+├── instalar-icono-escritorio.bat # Instalador de accesos directos con ícono nativo en Escritorio
+├── jobflow-radar.ico           # Ícono nativo multi-resolución Windows (256 a 16 px)
 ├── CHANGELOG.md                # Registro histórico de versiones
 └── README.md                   # Documentación principal
 ```
@@ -246,9 +256,9 @@ Jobflow-app/
 * **Frontend:** React 19, Vite 8, Tailwind CSS v3 (soporte Dual Dark/Light), PostCSS, Autoprefixer, Heroicons.
 * **Backend:** Node.js (>= v20), Express 5, ES Modules (`"type": "module"`).
 * **Autenticación & Seguridad:** JWT (`jsonwebtoken`), cifrado `bcryptjs`, Google Identity Services (`google-auth-library`).
-* **Testing:** Vitest 5, Supertest 7 (82 pruebas unitarias y de integración de endpoints automatizadas en 8 suites).
+* **Testing:** Vitest 5, Supertest 7 (89 pruebas unitarias y de integración de endpoints automatizadas en 8 suites).
 * **Inteligencia Artificial:** Google Gemini SDK (`@google/genai`), modelo `gemini-3.5-flash-lite`.
-* **Reportes:** PDFKit, PDFKit-Table (Generación vectorial en servidor).
+* **Reportes:** PDFKit (Generación vectorial con gráficos y tablas en servidor).
 * **Gestor de paquetes:** `pnpm` (v11+).
 * **Base de datos:** MongoDB Atlas / Mongoose 9 (Esquemas enriquecidos `User` y `Application` con índices y agregaciones).
 * **Utilidades:** `cors`, `dotenv`, `nodemon` (desarrollo backend).
@@ -319,12 +329,13 @@ Jobflow-app/
 | `GET` | `/api/applications` | Listar postulaciones con paginación (`page`, `limit`), ordenamiento (`sortBy`, `order`) y filtros combinados | ✅ Implementado y testeado |
 | `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
 | `POST` | `/api/ai/analyze-job` | Extraer datos de vacantes con Google Gemini y generar pitch sugerido | ✅ Implementado y testeado |
+| `POST` | `/api/ai/follow-up` | Generar mensaje de seguimiento personalizado con IA adaptado al pitch y tono (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`) | ✅ Implementado y testeado |
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
 | `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación, recalcular métricas y proteger degradación involuntaria de `OFERTA` (HTTP 409) | ✅ Implementado y testeado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
 | `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual y recalcular tiempos | ✅ Implementado y testeado |
 | `GET` | `/api/analytics/summary` | Resumen de métricas consolidadas (KPIs, distribución y tiempos) | ✅ Implementado y testeado |
-| `GET` | `/api/reports/pdf?from=...&to=...` | Generar y descargar reporte PDF estructurado con KPIs y tabla | ✅ Implementado y testeado |
+| `GET` | `/api/reports/pdf?from=...&to=...` | Generar y descargar reporte PDF estructurado con KPIs, gráficos vectoriales y bitácora por empresa | ✅ Implementado y testeado |
 
 ---
 
@@ -363,7 +374,16 @@ pnpm run dev
 ```
 * Cliente activo en: `http://localhost:5173`
 
-### 4. Instalar y Vincular la Extensión de Chrome (`/extension`)
+### 4. Lanzador de Escritorio & Accesos Directos para Windows (1-Clic)
+Para iniciar JobFlow localmente sin tener que abrir múltiples terminales manualmente:
+1. **Instalar Accesos Directos en el Escritorio:**
+   - Haz doble clic sobre [`instalar-icono-escritorio.bat`](instalar-icono-escritorio.bat).
+   - Se crearán en tu Escritorio de Windows los accesos directos `JobFlow (Local)` y `JobFlow (Web)` con el ícono oficial Cyber Cyan Radar (`jobflow-radar.ico`).
+2. **Ejecutar la Plataforma:**
+   - Haz doble clic en el acceso directo `JobFlow (Local)` (o ejecuta [`iniciar-jobflow.bat`](iniciar-jobflow.bat)).
+   - El script levantará automáticamente el Backend en segundo plano, el Frontend en segundo plano y abrirá de inmediato tu navegador web predeterminado en `http://localhost:5173`.
+
+### 5. Instalar y Vincular la Extensión de Chrome (`/extension`)
 Jobflow incluye una extensión oficial de navegador (Manifest V3) para capturar ofertas laborales desde LinkedIn, Indeed o cualquier portal web con 1 clic y procesarlas con Gemini AI:
 
 1. **Cargar la extensión en el navegador:**
@@ -386,16 +406,21 @@ Jobflow incluye una extensión oficial de navegador (Manifest V3) para capturar 
 
 ## 📜 Scripts Disponibles
 
+### Automatización y Lanzadores:
+* `iniciar-jobflow.bat`: Inicia Backend y Frontend en procesos de fondo y abre automáticamente el navegador en `http://localhost:5173`.
+* `instalar-icono-escritorio.bat`: Genera accesos directos con ícono nativo multi-resolución en el Escritorio de Windows y refresca la caché de íconos del sistema.
+
 ### En `/server`:
 * `pnpm run dev`: Inicia el servidor backend con recarga automática (`nodemon`).
 * `pnpm start`: Inicia el servidor en modo producción con Node nativo.
-* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest (82 tests en 8 suites).
+* `pnpm test`: Ejecuta la suite de pruebas unitarias y de integración con Vitest (89 tests en 8 suites).
 * `pnpm run test:watch`: Ejecuta las pruebas en modo interactivo/watch.
 
 ### En `/client`:
 * `pnpm run dev`: Inicia el servidor de desarrollo de Vite con HMR.
 * `pnpm run build`: Compila la aplicación frontend optimizada para producción.
 * `pnpm run preview`: Previsualiza la compilación de producción localmente.
+* `pnpm run lint`: Ejecuta el analizador estático Oxlint para verificar conformidad de código y accesibilidad.
 
 ---
 
@@ -426,6 +451,7 @@ Esta sección documenta los bugs, advertencias de compilador/linter y problemas 
 | **BUG-17** | `client/src/components/Footer.jsx` & `client/src/App.jsx` | Colisión y solapamiento de Footer con BottomNav en móviles (iPhone 8 Plus) | En dispositivos móviles con usuario autenticado, el footer fijo flotaba en `bottom-[52px]` apilándose con la barra de navegación `BottomNav` (`z-40`), causando que el botón central flotante `+` colisionara y tapara los textos del footer restando espacio útil de pantalla. | Se configuró el footer con visibilidad adaptativa (`hidden md:flex`) cuando `isAuthenticated === true`, reservando el borde inferior exclusivamente a la barra de navegación móvil `BottomNav`. En la landing pública se mantiene visible al pie. | 🟢 Resuelto |
 | **BUG-18** | `client/src/components/AboutModal.jsx` & `client/src/components/Icons.jsx` | Traducción automática errónea de 'SC' a 'Carolina del Sur' (Xiaomi Redmi Note / Chrome Android) | Los motores de traducción automática de navegadores móviles (como Google Chrome en Xiaomi/MIUI) detectaban el nodo de texto plano `SC` como abreviatura postal de "South Carolina", traduciéndolo forzosamente a "Carolina del Sur", lo que desbordaba y superponía el texto sobre el badge dorado del autor. | Se reemplazó el texto plano por el componente vectorial `SoftwareChavezIcon` con trazados SVG puros (`<path>`) y directivas estrictas `translate="no"` y `class="notranslate"`. Al carecer de nodos de texto DOM, resulta imposible para cualquier motor de traducción alterar la sigla corporativa. | 🟢 Resuelto |
 | **BUG-19** | `client/index.html`, `client/src/services/api.js`, `AuthModal.jsx`, `authController.js` | Demora en inicio de sesión con Google y falta de feedback visual (Cold Start / Latencia) | En producción (Vercel + Render), al iniciar sesión con Google se percibían varios segundos de retraso debido al reposo de Render (spin-down), la descarga en diferido del SDK de Google y la ausencia de indicador de carga inmediato tras seleccionar la cuenta en el popup. | 1) Se incorporó `pingBackend()` silencioso al montar la app para despertar Render mientras el usuario visita la landing. 2) Se añadieron directivas `preconnect` y precarga del script `gsi/client` en `index.html`. 3) Se implementó un overlay de carga inmediata con radar pulsante y mensaje informativo en el modal. 4) En el backend, se consolidó la consulta a MongoDB con `$or` indexado y se precalentó la caché de certificados públicos de Google en arranque. | 🟢 Resuelto |
+| **BUG-20** | `iniciar-jobflow.bat` & `scripts/crear-acceso-directo.ps1` | Bloqueo en terminal y retención de caché de íconos en Windows Shell | Al ejecutar el lanzador batch en Windows, las comillas escapadas en `cmd /c` provocaban error de sintaxis impidiendo la apertura automática del navegador. Asimismo, Windows Explorer retenía en caché el ícono antiguo de la extensión en los accesos directos `.lnk`. | 1) Se sustituyó la llamada en batch por `powershell -NoProfile -Command "Start-Process 'http://localhost:5173'"` garantizando apertura inmediata y confiable. 2) Se generó un archivo multi-resolución `jobflow-radar.ico` dedicado y se incorporó llamada a `ie4uinit.exe -show` y `SHChangeNotify` en el instalador de accesos directos para forzar el refresco de miniaturas en el explorador de Windows. | 🟢 Resuelto |
 
 ### 🛠️ Protocolo para Registro de Nuevas Incidencias
 Para documentar futuros bugs o comportamientos inesperados, utilizar la siguiente estructura:

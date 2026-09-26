@@ -43,24 +43,86 @@ export const downloadApplicationsPdf = async (req, res) => {
     // Consultar postulaciones filtradas
     const applications = await Application.find(filter).sort({ appliedAt: -1 });
 
-    // Calcular métricas básicas del período
+    // Calcular métricas completas del período para estadísticas y gráficos
     const totalApplications = applications.length;
-    const totalInterviews = applications.filter((app) =>
-      ['ENTREVISTA', 'OFERTA'].includes(app.status)
-    ).length;
-    const totalOffers = applications.filter((app) => app.status === 'OFERTA').length;
-    const totalResponded = applications.filter(
-      (app) => app.responseTimeDays !== null && app.responseTimeDays !== undefined
-    ).length;
+    const statusCounts = {
+      ENVIADA: 0,
+      CONTACTO: 0,
+      ENTREVISTA: 0,
+      RECHAZADA: 0,
+      OFERTA: 0,
+    };
+    const workModeCounts = {
+      REMOTE: 0,
+      HYBRID: 0,
+      ON_SITE: 0,
+    };
+    const priorityCounts = {
+      LOW: 0,
+      MEDIUM: 0,
+      HIGH: 0,
+    };
+
+    let totalResponseDays = 0;
+    let responseCount = 0;
+    let pitchSentCount = 0;
+    let totalMatchScore = 0;
+    let matchScoreCount = 0;
+
+    applications.forEach((app) => {
+      if (statusCounts[app.status] !== undefined) {
+        statusCounts[app.status]++;
+      }
+      if (workModeCounts[app.workMode] !== undefined) {
+        workModeCounts[app.workMode]++;
+      }
+      if (priorityCounts[app.priority] !== undefined) {
+        priorityCounts[app.priority]++;
+      }
+      if (app.responseTimeDays !== null && app.responseTimeDays !== undefined) {
+        totalResponseDays += app.responseTimeDays;
+        responseCount++;
+      }
+      if (app.suggestedPitch && app.suggestedPitch.trim().length > 0) {
+        pitchSentCount++;
+      }
+      if (typeof app.matchScore === 'number' && !isNaN(app.matchScore)) {
+        totalMatchScore += app.matchScore;
+        matchScoreCount++;
+      }
+    });
+
+    const totalInterviews = (statusCounts.ENTREVISTA || 0) + (statusCounts.OFERTA || 0);
+    const totalOffers = statusCounts.OFERTA || 0;
+    const totalResponded = responseCount > 0
+      ? responseCount
+      : (totalApplications - (statusCounts.ENVIADA || 0));
     const responseRate = totalApplications > 0
       ? Number(((totalResponded / totalApplications) * 100).toFixed(1))
       : 0;
+    const avgResponseTime = responseCount > 0
+      ? Number((totalResponseDays / responseCount).toFixed(1))
+      : null;
+    const pitchUsageRate = totalApplications > 0
+      ? Number(((pitchSentCount / totalApplications) * 100).toFixed(1))
+      : 0;
+    const avgMatchScore = matchScoreCount > 0
+      ? Math.round(totalMatchScore / matchScoreCount)
+      : null;
 
     const metrics = {
       totalApplications,
       totalInterviews,
       totalOffers,
+      totalResponded,
       responseRate,
+      avgResponseTime,
+      pitchSentCount,
+      pitchUsageRate,
+      avgMatchScore,
+      statusCounts,
+      workModeCounts,
+      priorityCounts,
     };
 
     // Generar buffer binario del PDF

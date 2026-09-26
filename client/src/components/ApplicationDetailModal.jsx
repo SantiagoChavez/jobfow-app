@@ -43,6 +43,7 @@ export const ApplicationDetailModal = ({
   onUpdateInteraction,
   onDeleteInteraction,
   onDelete,
+  onOpenFollowUp,
 }) => {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'timeline' | 'recruiter'
@@ -705,18 +706,35 @@ export const ApplicationDetailModal = ({
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-navy-base/60 flex items-center justify-between">
-          <button
-            onClick={() => {
-              if (window.confirm('¿Deseas eliminar esta postulación?')) {
-                onDelete(application._id);
-                onClose();
-              }
-            }}
-            className="flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 rounded-xl transition-colors font-semibold"
-          >
-            <TrashIcon className="w-4 h-4" />
-            Eliminar Postulación
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (window.confirm('¿Deseas eliminar esta postulación?')) {
+                  onDelete(application._id);
+                  onClose();
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 rounded-xl transition-colors font-semibold"
+            >
+              <TrashIcon className="w-4 h-4" />
+              <span>Eliminar</span>
+            </button>
+
+            {onOpenFollowUp && (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenFollowUp(application);
+                }}
+                className="flex items-center gap-1.5 text-xs text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-bold transition-all shadow-xs"
+                title="Generar mensaje de seguimiento personalizado con IA"
+              >
+                <SparklesIcon className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                <span>Follow-up con IA</span>
+              </button>
+            )}
+          </div>
+
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition-colors"

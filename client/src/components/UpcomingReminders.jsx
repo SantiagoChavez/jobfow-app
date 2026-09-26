@@ -5,6 +5,7 @@ export const UpcomingReminders = ({
   applications = [],
   onSelectApplication,
   onOpenReminders,
+  onOpenFollowUp,
 }) => {
   // Postulaciones activas que requieren seguimiento
   const activeApps = applications.filter((app) =>
@@ -98,9 +99,27 @@ export const UpcomingReminders = ({
               </p>
             </div>
 
-            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-end text-[10px] font-bold text-sky-600 dark:text-sky-tech group-hover:text-amber-600 dark:group-hover:text-gold-primary">
-              <span>Gestionar</span>
-              <ChevronRightIcon className="w-3 h-3" />
+            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[10px] font-bold">
+              {onOpenFollowUp && rem.days >= 5 ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenFollowUp(rem);
+                  }}
+                  className="px-2 py-0.5 rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-500/20 border border-cyan-500/30 flex items-center gap-1 transition-all"
+                  title="Generar mensaje de seguimiento con IA"
+                >
+                  <span>✨ Follow-up</span>
+                </button>
+              ) : (
+                <span className="text-slate-400 dark:text-slate-500 font-normal">{rem.days}d transcurridos</span>
+              )}
+
+              <span className="text-sky-600 dark:text-sky-tech group-hover:text-amber-600 dark:group-hover:text-gold-primary flex items-center">
+                <span>Gestionar</span>
+                <ChevronRightIcon className="w-3 h-3" />
+              </span>
             </div>
           </div>
         ))}

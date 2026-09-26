@@ -1,0 +1,406 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  CloseIcon,
+  SparklesIcon,
+  MailIcon,
+  CopyIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  RefreshIcon,
+  SendIcon,
+} from './Icons.jsx';
+import { generateFollowUpMessage } from '../services/api.js';
+import { createSafeMailto } from '../utils/mailto.js';
+import { useModalA11y } from '../hooks/useModalA11y.js';
+import { useToast } from '../context/ToastContext.jsx';
+
+export const FollowUpModal = ({
+  isOpen,
+  onClose,
+  application,
+  onAddInteraction,
+}) => {
+  const { showToast } = useToast();
+  const [tone, setTone] = useState('CORDIAL');
+  const [customInstructions, setCustomInstructions] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [generatedSubject, setGeneratedSubject] = useState('');
+  const [generatedMessage, setGeneratedMessage] = useState('');
+  const [shortNote, setShortNote] = useState('');
+  const [copiedFull, setCopiedFull] = useState(false);
+  const [copiedShort, setCopiedShort] = useState(false);
+  const [savedInteraction, setSavedInteraction] = useState(false);
+
+  useModalA11y(isOpen, onClose);
+
+  // Calcular días transcurridos de forma segura
+  const appliedAt = application?.appliedAt;
+  const daysAgo = useMemo(() => {
+    if (!appliedAt) return 5;
+    const appliedTime = new Date(appliedAt).getTime();
+    if (isNaN(appliedTime)) return 5;
+    return Math.max(1, Math.floor((new Date().getTime() - appliedTime) / (1000 * 60 * 60 * 24)));
+  }, [appliedAt]);
+
+  const handleGenerate = useCallback(async (selectedTone = tone, instructions = customInstructions) => {
+    if (!application) return;
+    try {
+      setLoading(true);
+      const res = await generateFollowUpMessage(application, {
+        tone: selectedTone,
+        customInstructions: instructions.trim(),
+      });
+      if (res) {
+        setGeneratedSubject(res.subject || `Seguimiento de postulación: ${application.role}`);
+        setGeneratedMessage(res.message || '');
+        setShortNote(res.shortNote || '');
+      }
+    } catch (err) {
+      console.error('Error al generar follow-up:', err);
+      showToast(err.message || 'Error al generar el mensaje con IA', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [application, tone, customInstructions, showToast]);
+
+  // Generar automáticamente al abrir el modal con una nueva postulación
+  useEffect(() => {
+    let isMounted = true;
+    if (isOpen && application) {
+      const run = async () => {
+        try {
+          setLoading(true);
+          const res = await generateFollowUpMessage(application, {
+            tone: 'CORDIAL',
+            customInstructions: '',
+          });
+          if (isMounted && res) {
+            setGeneratedSubject(res.subject || `Seguimiento de postulación: ${application.role}`);
+            setGeneratedMessage(res.message || '');
+            setShortNote(res.shortNote || '');
+          }
+        } catch (err) {
+          if (isMounted) {
+            console.error('Error al generar follow-up:', err);
+            showToast(err.message || 'Error al generar el mensaje con IA', 'error');
+          }
+        } finally {
+          if (isMounted) setLoading(false);
+        }
+      };
+      run();
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, application, showToast]);
+
+  if (!isOpen || !application) return null;
+
+  const recruiterEmail = application.recruiter?.email?.trim();
+  const recruiterName = application.recruiter?.name?.trim();
+  const companyName = application.company?.name || 'la empresa';
+
+  const handleCopyFull = async () => {
+    if (!generatedMessage) return;
+    try {
+      await navigator.clipboard.writeText(generatedMessage);
+      setCopiedFull(true);
+      showToast('¡Mensaje de seguimiento copiado al portapapeles!', 'success');
+      setTimeout(() => setCopiedFull(false), 2200);
+    } catch {
+      showToast('No se pudo copiar al portapapeles', 'error');
+    }
+  };
+
+  const handleCopyShort = async () => {
+    if (!shortNote) return;
+    try {
+      await navigator.clipboard.writeText(shortNote);
+      setCopiedShort(true);
+      showToast('¡Mensaje corto copiado para LinkedIn/Chat!', 'success');
+      setTimeout(() => setCopiedShort(false), 2200);
+    } catch {
+      showToast('No se pudo copiar al portapapeles', 'error');
+    }
+  };
+
+  const handleSaveToTimeline = async () => {
+    if (!onAddInteraction || savedInteraction) return;
+    try {
+      await onAddInteraction(application._id, {
+        type: 'MENSAJE_ENVIADO',
+        date: new Date(),
+        notes: `Follow-up enviado (${tone}): "${shortNote || generatedMessage.slice(0, 120)}..."`,
+      });
+      setSavedInteraction(true);
+      showToast('¡Seguimiento registrado en la línea de tiempo!', 'success');
+    } catch {
+      showToast('Error al registrar interacción en el historial', 'error');
+    }
+  };
+
+  const safeMailto = recruiterEmail && generatedMessage
+    ? createSafeMailto({
+        email: recruiterEmail,
+        subject: generatedSubject,
+        body: generatedMessage,
+      })
+    : null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-navy-base/80 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-navy-surface rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-2xl shadow-slate-900/20 dark:shadow-black/70 overflow-hidden flex flex-col max-h-[92vh] transition-colors">
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-navy-base/80 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
+              <SparklesIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Mensaje de Seguimiento con IA
+                </h3>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/10 text-amber-700 dark:text-gold-primary border border-amber-500/30">
+                  {daysAgo}d sin respuesta
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-md">
+                {companyName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{application.role}</span>
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <CloseIcon className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Contenido Scrollable */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
+          {/* Selectores de Tono */}
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+              Tono de Comunicación
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setTone('CORDIAL');
+                  handleGenerate('CORDIAL');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all flex flex-col items-center justify-center gap-0.5 ${
+                  tone === 'CORDIAL'
+                    ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 shadow-xs'
+                    : 'bg-slate-50 dark:bg-navy-base text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span>🤝 Cordial & Formal</span>
+                <span className="text-[9px] opacity-75 font-normal">Recomendado</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setTone('ENTHUSIASTIC');
+                  handleGenerate('ENTHUSIASTIC');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all flex flex-col items-center justify-center gap-0.5 ${
+                  tone === 'ENTHUSIASTIC'
+                    ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 shadow-xs'
+                    : 'bg-slate-50 dark:bg-navy-base text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span>🚀 Entusiasta</span>
+                <span className="text-[9px] opacity-75 font-normal">Foco en skills</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setTone('DIRECT');
+                  handleGenerate('DIRECT');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all flex flex-col items-center justify-center gap-0.5 ${
+                  tone === 'DIRECT'
+                    ? 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 shadow-xs'
+                    : 'bg-slate-50 dark:bg-navy-base text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span>⚡ Breve / Chat</span>
+                <span className="text-[9px] opacity-75 font-normal">LinkedIn / WhatsApp</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Asunto (para Email) */}
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Asunto sugerido
+            </label>
+            <input
+              type="text"
+              value={generatedSubject}
+              onChange={(e) => setGeneratedSubject(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-cyan-500"
+              placeholder="Asunto del correo de seguimiento..."
+            />
+          </div>
+
+          {/* Cuerpo Principal del Mensaje */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                Cuerpo del Mensaje Adaptado
+              </label>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => handleGenerate(tone)}
+                className="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 flex items-center gap-1 transition-colors disabled:opacity-50"
+              >
+                <RefreshIcon className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>{loading ? 'Redactando con IA...' : 'Regenerar'}</span>
+              </button>
+            </div>
+            <textarea
+              rows={6}
+              value={generatedMessage}
+              onChange={(e) => setGeneratedMessage(e.target.value)}
+              disabled={loading}
+              className="w-full bg-slate-50 dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs text-slate-800 dark:text-slate-200 font-sans leading-relaxed focus:outline-none focus:border-cyan-500 disabled:opacity-60 resize-none transition-all shadow-inner"
+              placeholder="Generando mensaje de seguimiento personalizado con Gemini IA..."
+            />
+          </div>
+
+          {/* Notas / Instrucciones adicionales */}
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Instrucciones adicionales para la IA (opcional)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={customInstructions}
+                onChange={(e) => setCustomInstructions(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleGenerate(tone, customInstructions);
+                  }
+                }}
+                className="flex-1 bg-slate-50 dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-500"
+                placeholder="Ej: Mencionar que publiqué un nuevo proyecto en GitHub..."
+              />
+              <button
+                type="button"
+                onClick={() => handleGenerate(tone, customInstructions)}
+                disabled={loading}
+                className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all disabled:opacity-50"
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+
+          {/* Versión Ultra Corta (LinkedIn / Chat) */}
+          {shortNote && (
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-navy-base/80 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+              <div className="space-y-1 min-w-0 flex-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  💬 Versión rápida para LinkedIn InMail / Chat:
+                </span>
+                <p className="text-xs text-slate-700 dark:text-slate-300 italic">
+                  "{shortNote}"
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyShort}
+                className="p-2 rounded-xl bg-white dark:bg-navy-surface hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1 flex-shrink-0 transition-all shadow-xs"
+                title="Copiar versión corta"
+              >
+                {copiedShort ? (
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
+                ) : (
+                  <CopyIcon className="w-4 h-4" />
+                )}
+                <span className="hidden sm:inline">{copiedShort ? '¡Copiado!' : 'Copiar'}</span>
+              </button>
+            </div>
+          )}
+
+          {/* Reclutador Destinatario */}
+          {recruiterEmail && (
+            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 p-2.5 rounded-xl">
+              <MailIcon className="w-4 h-4 text-sky-600 dark:text-sky-tech flex-shrink-0" />
+              <span>
+                Reclutador asignado: <strong className="text-slate-800 dark:text-slate-200">{recruiterName || recruiterEmail}</strong> ({recruiterEmail})
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer de Acciones */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-navy-base/80 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyFull}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-navy-surface hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 transition-all shadow-xs flex items-center gap-1.5"
+            >
+              {copiedFull ? (
+                <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
+              ) : (
+                <CopyIcon className="w-4 h-4" />
+              )}
+              <span>{copiedFull ? '¡Copiado!' : 'Copiar Mensaje'}</span>
+            </button>
+
+            {safeMailto && (
+              <a
+                href={safeMailto}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-white transition-all shadow-md shadow-sky-500/20 flex items-center gap-1.5"
+              >
+                <SendIcon className="w-4 h-4" />
+                <span>Abrir en Email</span>
+              </a>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onAddInteraction && (
+              <button
+                type="button"
+                disabled={savedInteraction}
+                onClick={handleSaveToTimeline}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {savedInteraction ? (
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
+                ) : (
+                  <ClockIcon className="w-4 h-4 text-indigo-500" />
+                )}
+                <span>{savedInteraction ? '¡Registrado!' : 'Guardar en Historial'}</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FollowUpModal;
