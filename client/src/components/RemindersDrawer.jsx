@@ -11,6 +11,7 @@ import {
 } from './Icons.jsx';
 import { createSafeMailto } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
+import { getReminderMetrics } from '../utils/reminders.js';
 
 const STATUS_BADGES = {
   ENVIADA: 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/30',
@@ -26,16 +27,6 @@ const STATUS_LABELS = {
   ENTREVISTA: 'Entrevista',
   OFERTA: 'Oferta Recibida',
   RECHAZADA: 'Descartado',
-};
-
-/**
- * Calcula días transcurridos de forma segura
- */
-const getDaysAgo = (dateStr) => {
-  if (!dateStr) return 0;
-  const parsed = new Date(dateStr);
-  if (Number.isNaN(parsed.getTime())) return 0;
-  return Math.max(0, Math.floor((new Date() - parsed) / (1000 * 60 * 60 * 24)));
 };
 
 /**
@@ -64,49 +55,25 @@ export const RemindersDrawer = ({
 
   useModalA11y(isOpen, onClose);
 
-  // Normalizar y enriquecer postulaciones activas con cálculo de criticidad
+  // Normalizar y enriquecer postulaciones activas con cálculo de criticidad y cuenta regresiva
   const processedReminders = useMemo(() => {
     const activeApps = applications.filter((app) =>
       ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'OFERTA'].includes(app.status)
     );
 
     return activeApps.map((app) => {
-      const days = getDaysAgo(app.appliedAt);
-      let urgencyLevel = 'LOW';
-      let urgencyLabel = 'En curso';
-      let message = 'Seguimiento programado';
-      let isUrgent = false;
-
-      if (app.status === 'ENTREVISTA') {
-        urgencyLevel = 'HIGH';
-        urgencyLabel = 'Entrevista';
-        message = 'Proceso activo: preparar preguntas técnicas y objetivos';
-      } else if (app.status === 'OFERTA') {
-        urgencyLevel = 'HIGH';
-        urgencyLabel = 'Oferta activa';
-        message = 'Oferta sobre la mesa: evaluar compensación y responder';
-      } else if (app.status === 'CONTACTO') {
-        urgencyLevel = 'MEDIUM';
-        urgencyLabel = 'Contacto';
-        message = 'Hubo respuesta: verificar siguientes pasos con el reclutador';
-      } else if (days >= 5) {
-        urgencyLevel = 'URGENT';
-        urgencyLabel = `Crítico (${days}d)`;
-        message = `Hace ${days} días sin novedad: enviar correo de seguimiento`;
-        isUrgent = true;
-      } else {
-        urgencyLevel = 'LOW';
-        urgencyLabel = `${days}d enviado`;
-        message = 'En espera de primer contacto o revisión del perfil';
-      }
-
+      const metrics = getReminderMetrics(app);
       return {
         ...app,
-        days,
-        urgencyLevel,
-        urgencyLabel,
-        message,
-        isUrgent,
+        days: metrics.daysSinceLastContact,
+        daysUntilNextAlert: metrics.daysUntilNextAlert,
+        urgencyLevel: metrics.urgencyLevel,
+        urgencyLabel: metrics.urgencyLabel,
+        message: metrics.message,
+        countdownText: metrics.countdownText,
+        isUrgent: metrics.isUrgent,
+        hasFollowUpSent: metrics.hasFollowUpSent,
+        lastContactDate: metrics.lastContactDate,
       };
     });
   }, [applications]);
@@ -314,10 +281,14 @@ export const RemindersDrawer = ({
                             {STATUS_LABELS[rem.status] || rem.status}
                           </span>
 
-                          {rem.isUrgent && (
+                          {rem.isUrgent ? (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-rose-500/15 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30 dark:border-rose-500/40 font-bold flex items-center gap-1">
                               <AlertCircleIcon className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                               <span>{rem.urgencyLabel}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1">
+                              <span>{rem.countdownText}</span>
                             </span>
                           )}
                         </div>
