@@ -286,7 +286,12 @@ export const generateFollowUpMessage = async ({
       body = `${greeting}\n\nEspero que se encuentre muy bien. Le escribo para realizar un cordial seguimiento sobre mi postulación al puesto de ${role}, enviada hace ${daysElapsed} días.\n\nReitero mi sincero interés en la oportunidad de formar parte de ${companyName} y contribuir al equipo con mi experiencia y compromiso técnico.\n\nQuedo a su entera disposición en caso de que requieran información adicional o para coordinar los siguientes pasos del proceso.${linksText}\n\nMuchas gracias por su tiempo y consideración.\n\nSaludos cordiales,\n${candidateName}\n${candidateTitle}`;
     }
 
-    const shortNote = `Hola ${recruiterName || 'equipo de ' + companyName}, ¿cómo estás? Te escribo para consultar cordialmente sobre el avance del proceso para ${role}. Sigo muy interesado en sumar mi perfil a ${companyName}. ¡Muchas gracias!`;
+    // Nota corta ajustada estrictamente a <= 200 caracteres para notas de conexión en LinkedIn
+    const shortGreeting = recruiterName ? `Hola ${recruiterName},` : `Hola equipo de ${companyName},`;
+    const cleanRole = role.length > 28 ? `${role.slice(0, 25)}...` : role;
+    const cleanCompany = companyName.length > 20 ? `${companyName.slice(0, 18)}...` : companyName;
+    const rawShort = `${shortGreeting} ¿cómo estás? Quería consultar sobre el proceso para ${cleanRole}. ¡Sigo con gran interés en sumarme a ${cleanCompany}! Saludos, ${candidateName}.`;
+    const shortNote = rawShort.length > 200 ? rawShort.slice(0, 197) + '...' : rawShort;
 
     return { subject, message: body, shortNote };
   };
@@ -298,7 +303,19 @@ export const generateFollowUpMessage = async ({
 
   const prompt = `
 Eres un Experto Senior en Comunicación Laboral y Reclutamiento IT para JobFlow.
-Tu objetivo es redactar un MENSAJE DE SEGUIMIENTO (Follow-up) altamente persuasivo, cordial, profesional y personalizado para un candidato que envió su postulación hace ${daysElapsed} días y aún no ha recibido respuesta.
+Tu objetivo es redactar dos versiones de un MENSAJE DE SEGUIMIENTO (Follow-up) para un candidato que envió su postulación hace ${daysElapsed} días:
+
+1. MENSAJE COMPLETO ("message"):
+- Extensión de 2 a 3 párrafos concisos, profesionales y persuasivos.
+- Ideal para Email o mensaje directo de LinkedIn/Chat.
+- Hace referencia respetuosa a la postulación enviada hace ${daysElapsed} días para el rol de ${role}.
+- Reafirma el interés genuino y valor técnico que ${candidateName} puede aportar a ${companyName}.
+- Tono solicitado: ${tone} (CORDIAL, ENTHUSIASTIC o DIRECT).
+
+2. NOTA CORTA DE CONEXIÓN ("shortNote"):
+- **REGLA CRÍTICA ESTRICTA: MÁXIMO 190 A 200 CARACTERES TOTALES (incluyendo espacios)**.
+- Diseñada específicamente para la "Nota de solicitud de contacto de LinkedIn", cuyo límite no permite más de 200 caracteres.
+- Debe ser ultra directa: Saludo breve + consulta amigable sobre el rol de ${role} en ${companyName} + interés del candidato.
 
 Contexto de la postulación:
 - Empresa: "${companyName}"
@@ -308,21 +325,14 @@ Contexto de la postulación:
 - Pitch inicial / Presentación previa: "${previousPitch || 'Postulación estándar'}"
 - Perfil del candidato: ${candidateName} (${candidateTitle})
 - Habilidades destacadas: ${skillsList}
-- Tono solicitado: ${tone} (CORDIAL, ENTHUSIASTIC o DIRECT)
+- Tono solicitado: ${tone}
 ${customInstructions ? `- Instrucciones adicionales del usuario: "${customInstructions}"` : ''}
-
-El mensaje debe:
-1. Saludar cordialmente al reclutador o equipo.
-2. Hacer referencia respetuosa a la postulación enviada hace ${daysElapsed} días para el puesto de ${role}.
-3. Reafirmar el interés genuino y valor que el candidato puede aportar a ${companyName}.
-4. Mantener una extensión ideal de 2 a 3 párrafos concisos y elegantes.
-5. Incluir una firma clara.
 
 Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguiente estructura:
 {
   "subject": "Asunto profesional para el correo electrónico",
   "message": "Cuerpo completo del mensaje de seguimiento adaptado",
-  "shortNote": "Versión ultra compacta de 2 líneas ideal para mensaje directo de LinkedIn o WhatsApp"
+  "shortNote": "Mensaje sintético de MÁXIMO 200 caracteres para nota de conexión en LinkedIn"
 }
 `;
 
@@ -342,6 +352,15 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguient
     const cleaned = extractJson(rawJson);
     const parsed = JSON.parse(cleaned);
 
+    let parsedShort = typeof parsed.shortNote === 'string' && parsed.shortNote.trim()
+      ? parsed.shortNote.trim()
+      : getFallbackFollowUp().shortNote;
+
+    // Garantía defensiva de corte si el LLM excede los 200 caracteres
+    if (parsedShort.length > 200) {
+      parsedShort = parsedShort.slice(0, 197) + '...';
+    }
+
     return {
       subject: typeof parsed.subject === 'string' && parsed.subject.trim()
         ? parsed.subject.trim()
@@ -349,9 +368,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguient
       message: typeof parsed.message === 'string' && parsed.message.trim()
         ? parsed.message.trim()
         : getFallbackFollowUp().message,
-      shortNote: typeof parsed.shortNote === 'string' && parsed.shortNote.trim()
-        ? parsed.shortNote.trim()
-        : getFallbackFollowUp().shortNote,
+      shortNote: parsedShort,
     };
   } catch (err) {
     console.warn('[AI Service] Error generando follow-up con Gemini, usando plantilla de respaldo:', err.message);
