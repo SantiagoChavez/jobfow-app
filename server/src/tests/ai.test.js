@@ -258,5 +258,46 @@ describe('POST /api/ai/analyze-job - Copiloto de Postulación con IA', () => {
       expect(res.body.data.matchScore).toBe(92);
     });
   });
+
+  describe('POST /api/ai/follow-up - Generación de Mensaje de Seguimiento con IA', () => {
+    it('Debe generar exitosamente un mensaje de seguimiento adaptado para una postulación', async () => {
+      const mockFollowUpResponse = {
+        subject: 'Seguimiento de postulación: Fullstack Dev — Santiago Chavez',
+        message: 'Hola equipo de MeLi, les escribo para dar seguimiento a mi postulación...',
+        shortNote: 'Hola, consulto sobre el avance del proceso para Fullstack Dev.',
+      };
+
+      vi.spyOn(aiService, 'generateFollowUpMessage').mockResolvedValue(mockFollowUpResponse);
+
+      const res = await request(app)
+        .post('/api/ai/follow-up')
+        .send({
+          application: {
+            company: { name: 'Mercado Libre' },
+            role: 'Fullstack Dev',
+            appliedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+            suggestedPitch: 'Pitch original enviado...',
+          },
+          tone: 'CORDIAL',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.subject).toContain('Seguimiento');
+      expect(res.body.data.message).toContain('MeLi');
+      expect(res.body.data.shortNote).toBeDefined();
+    });
+
+    it('Debe responder 400 Bad Request si no se proporciona ni applicationId ni application', async () => {
+      const res = await request(app)
+        .post('/api/ai/follow-up')
+        .send({});
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('Se requiere el ID de la postulación');
+    });
+  });
 });
+
 

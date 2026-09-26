@@ -9,6 +9,29 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.3.9] - 2026-09-26
+
+### Added & Enhanced
+- **Generador Inteligente de Mensajes de Seguimiento (Follow-Up) con IA (`FollowUpModal.jsx`, `aiService.js`, `aiRoutes.js`):**
+  - Sistema de re-contacto asistido por IA para postulaciones que superaron el umbral de alarma (>5 días sin respuesta del reclutador).
+  - Algoritmo de adaptación inteligente en backend (`POST /api/ai/follow-up`) que toma el pitch principal del postulante y lo reescribe manteniendo el tono profesional y la afinidad con la empresa y el rol.
+  - Selector de 3 modalidades de comunicación: `CORDIAL` (profesional y cortés), `ENTHUSIASTIC` (enérgico y proactivo) y `DIRECT` (conciso y directo al punto), con soporte para instrucciones personalizadas.
+  - Acciones rápidas de 1 clic: Copia del mensaje completo (para LinkedIn/Email), copia de nota corta sintetizada (para chat/WhatsApp), apertura del cliente de correo con `mailto:` seguro y botón **"💾 Guardar en Historial"** que registra automáticamente la interacción `MENSAJE_ENVIADO` en la cronología.
+  - Integración de triggers en el Drawer de Recordatorios (`RemindersDrawer.jsx`), Alertas Rápidas (`UpcomingReminders.jsx`), Modal de Detalle (`ApplicationDetailModal.jsx`) y panel principal.
+- **Reportes PDF Ejecutivos con Gráficos Vectoriales y Bitácora Detallada por Empresa (`pdfService.js`, `reportController.js`):**
+  - Rediseño de alta fidelidad del exportador en PDF con 6 tarjetas de métricas KPI: Total postulaciones, Entrevistas agendadas, Ofertas obtenidas, Tasa de respuesta (%), Tiempo promedio de respuesta en días y Cobertura de pitch personalizado (%).
+  - Renderizado vectorial de gráficos estadísticos nativos con PDFKit: Gráfico de embudo de conversión por estados (*Guardadas* ➔ *Aplicadas* ➔ *Entrevista* ➔ *Oferta*) y Gráfico de distribución por modalidad de trabajo (*Remoto*, *Híbrido*, *Presencial*) y afinidad técnica.
+  - Sección **"Bitácora Detallada por Empresa"**: Registro individualizado para cada postulación con el pitch/propuesta enviado, respuestas recibidas con feedback de recruiters, tiempo de respuesta en días y notas del historial.
+- **Lanzador de Escritorio e Ícono Cyber Cyan Nativo para Windows (`iniciar-jobflow.bat`, `instalar-icono-escritorio.bat`, `jobflow-radar.ico`):**
+  - Script `iniciar-jobflow.bat` para iniciar Backend (`http://localhost:5000`) y Frontend (`http://localhost:5173`) en segundo plano y abrir automáticamente el navegador web predeterminado en `http://localhost:5173`.
+  - Script instalador `instalar-icono-escritorio.bat` y generador PowerShell `scripts/crear-acceso-directo.ps1` para crear accesos directos en el Escritorio con icono multi-resolución (256x256 a 16x16) `jobflow-radar.ico` y refresco automático de la caché de iconos del explorador de Windows (`SHChangeNotify` / `ie4uinit.exe`).
+  - Unificación de la identidad gráfica del radar en favicon (`favicon.svg`, `favicon.ico`) y en los activos de la extensión de Chrome (`icon16.png`, `icon48.png`, `icon128.png`).
+
+### Tested
+- **Suite de Pruebas Automatizadas Extendida a 89 Tests (100% Passing):**
+  - Incorporación de pruebas para `POST /api/ai/follow-up` en `ai.test.js` y validación de generación de reportes enriquecidos en `reports.test.js`.
+  - 89 pruebas unitarias y de integración pasando satisfactoriamente en 8 suites de Vitest.
+
 ## [1.3.8] - 2026-09-24
 
 ### Added & Enhanced

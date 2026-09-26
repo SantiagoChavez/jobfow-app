@@ -10,6 +10,7 @@ import KanbanBoard from './components/KanbanBoard.jsx';
 import ApplicationTable from './components/ApplicationTable.jsx';
 import QuickAddModal from './components/QuickAddModal.jsx';
 import ApplicationDetailModal from './components/ApplicationDetailModal.jsx';
+import FollowUpModal from './components/FollowUpModal.jsx';
 import ReportModal from './components/ReportModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
@@ -65,6 +66,7 @@ export function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
+  const [followUpApp, setFollowUpApp] = useState(null);
 
   // Precalentamiento temprano y silencioso del backend (mitigación de spin-down en Render)
   useEffect(() => {
@@ -653,6 +655,7 @@ export function App() {
               applications={allApplications}
               onSelectApplication={(app) => setSelectedApp(app)}
               onOpenReminders={() => setIsRemindersDrawerOpen(true)}
+              onOpenFollowUp={(app) => setFollowUpApp(app)}
             />
 
             {/* Barra de Filtros y Selector de Vista */}
@@ -730,6 +733,15 @@ export function App() {
         onUpdateInteraction={handleUpdateInteraction}
         onDeleteInteraction={handleDeleteInteraction}
         onDelete={handleDeleteApplication}
+        onOpenFollowUp={(app) => setFollowUpApp(app)}
+      />
+
+      {/* Modal: Mensaje de Seguimiento con IA (Follow-up) */}
+      <FollowUpModal
+        application={followUpApp}
+        isOpen={Boolean(followUpApp)}
+        onClose={() => setFollowUpApp(null)}
+        onAddInteraction={handleAddInteraction}
       />
 
       {/* Modal: Descargar Reporte PDF */}
@@ -746,6 +758,10 @@ export function App() {
         onSelectApplication={(app) => {
           setIsRemindersDrawerOpen(false);
           setSelectedApp(app);
+        }}
+        onOpenFollowUp={(app) => {
+          setIsRemindersDrawerOpen(false);
+          setFollowUpApp(app);
         }}
       />
 
@@ -768,3 +784,4 @@ export function App() {
 }
 
 export default App;
+

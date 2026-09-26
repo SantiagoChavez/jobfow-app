@@ -225,6 +225,142 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
   return normalized;
 };
 
+/**
+ * Genera un mensaje de seguimiento / follow-up profesional con IA adaptado a una postulación
+ * @param {Object} params
+ * @param {Object} params.application - Objeto de la postulación
+ * @param {Object} [params.userProfile] - Perfil del postulante
+ * @param {string} [params.tone='CORDIAL'] - 'CORDIAL' | 'ENTHUSIASTIC' | 'DIRECT'
+ * @param {string} [params.customInstructions=''] - Instrucciones adicionales
+ * @returns {Promise<{ subject: string, message: string, shortNote: string }>}
+ */
+export const generateFollowUpMessage = async ({
+  application = {},
+  userProfile = null,
+  tone = 'CORDIAL',
+  customInstructions = '',
+} = {}) => {
+  const companyName = application.company?.name || 'la empresa';
+  const role = application.role || 'el puesto postulado';
+  const recruiterName = application.recruiter?.name?.trim() || '';
+  const previousPitch = application.suggestedPitch?.trim() || '';
+
+  // Calcular días transcurridos
+  let daysElapsed = 5;
+  if (application.appliedAt) {
+    const diffTime = Math.abs(Date.now() - new Date(application.appliedAt).getTime());
+    daysElapsed = Math.max(1, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+  }
+
+  const candidateName = userProfile?.name?.trim() || 'Santiago Chavez';
+  const candidateTitle = userProfile?.headline?.trim() || 'Full Stack Developer';
+  const skillsList = Array.isArray(userProfile?.skills) && userProfile.skills.length > 0
+    ? userProfile.skills.slice(0, 5).join(', ')
+    : 'React, Node.js, JavaScript';
+
+  const githubUrl = userProfile?.links?.github || '';
+  const linkedinUrl = userProfile?.links?.linkedin || '';
+  const portfolioUrl = userProfile?.links?.portfolio || '';
+
+  const linksArr = [];
+  if (portfolioUrl) linksArr.push(`Portfolio: ${portfolioUrl}`);
+  if (githubUrl) linksArr.push(`GitHub: ${githubUrl}`);
+  if (linkedinUrl) linksArr.push(`LinkedIn: ${linkedinUrl}`);
+  const linksText = linksArr.length > 0 ? `\n\nEnlaces profesionales:\n${linksArr.join('\n')}` : '';
+
+  // Plantilla de respaldo (Fallback Offline)
+  const getFallbackFollowUp = () => {
+    const greeting = recruiterName
+      ? `Estimado/a ${recruiterName},`
+      : `Estimado equipo de selección de ${companyName},`;
+
+    const subject = `Seguimiento de postulación: ${role} — ${candidateName}`;
+
+    let body = '';
+    if (tone === 'DIRECT') {
+      body = `${greeting}\n\nEspero que estés teniendo una excelente semana. Te escribo para consultar sobre el estado del proceso para el rol de ${role} al cual me postulé hace ${daysElapsed} días.\n\nSigo con gran interés en sumarme a ${companyName}. Quedo a tu disposición ante cualquier consulta.${linksText}\n\n¡Muchas gracias por tu tiempo!\n\nSaludos cordiales,\n${candidateName}\n${candidateTitle}`;
+    } else if (tone === 'ENTHUSIASTIC') {
+      body = `${greeting}\n\n¡Espero que te encuentres muy bien! Me pongo en contacto para hacer un breve seguimiento de mi postulación al rol de ${role}, enviada hace ${daysElapsed} días.\n\nSigo sumamente entusiasmado con los desafíos técnicos de ${companyName} y convencido de que mi experiencia en ${skillsList} puede aportar valor inmediato al equipo.\n\nQuedo a total disposición para coordinar una llamada o responder cualquier duda sobre mi perfil.${linksText}\n\n¡Excelente semana y muchas gracias!\n\nSaludos cordiales,\n${candidateName}\n${candidateTitle}`;
+    } else {
+      // CORDIAL por defecto
+      body = `${greeting}\n\nEspero que se encuentre muy bien. Le escribo para realizar un cordial seguimiento sobre mi postulación al puesto de ${role}, enviada hace ${daysElapsed} días.\n\nReitero mi sincero interés en la oportunidad de formar parte de ${companyName} y contribuir al equipo con mi experiencia y compromiso técnico.\n\nQuedo a su entera disposición en caso de que requieran información adicional o para coordinar los siguientes pasos del proceso.${linksText}\n\nMuchas gracias por su tiempo y consideración.\n\nSaludos cordiales,\n${candidateName}\n${candidateTitle}`;
+    }
+
+    const shortNote = `Hola ${recruiterName || 'equipo de ' + companyName}, ¿cómo estás? Te escribo para consultar cordialmente sobre el avance del proceso para ${role}. Sigo muy interesado en sumar mi perfil a ${companyName}. ¡Muchas gracias!`;
+
+    return { subject, message: body, shortNote };
+  };
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || !apiKey.trim() || apiKey === 'tu_api_key_aqui') {
+    return getFallbackFollowUp();
+  }
+
+  const prompt = `
+Eres un Experto Senior en Comunicación Laboral y Reclutamiento IT para JobFlow.
+Tu objetivo es redactar un MENSAJE DE SEGUIMIENTO (Follow-up) altamente persuasivo, cordial, profesional y personalizado para un candidato que envió su postulación hace ${daysElapsed} días y aún no ha recibido respuesta.
+
+Contexto de la postulación:
+- Empresa: "${companyName}"
+- Puesto / Rol: "${role}"
+- Reclutador / Contacto: "${recruiterName || 'Equipo de Selección'}"
+- Días transcurridos desde postulación: ${daysElapsed} días
+- Pitch inicial / Presentación previa: "${previousPitch || 'Postulación estándar'}"
+- Perfil del candidato: ${candidateName} (${candidateTitle})
+- Habilidades destacadas: ${skillsList}
+- Tono solicitado: ${tone} (CORDIAL, ENTHUSIASTIC o DIRECT)
+${customInstructions ? `- Instrucciones adicionales del usuario: "${customInstructions}"` : ''}
+
+El mensaje debe:
+1. Saludar cordialmente al reclutador o equipo.
+2. Hacer referencia respetuosa a la postulación enviada hace ${daysElapsed} días para el puesto de ${role}.
+3. Reafirmar el interés genuino y valor que el candidato puede aportar a ${companyName}.
+4. Mantener una extensión ideal de 2 a 3 párrafos concisos y elegantes.
+5. Incluir una firma clara.
+
+Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguiente estructura:
+{
+  "subject": "Asunto profesional para el correo electrónico",
+  "message": "Cuerpo completo del mensaje de seguimiento adaptado",
+  "shortNote": "Versión ultra compacta de 2 líneas ideal para mensaje directo de LinkedIn o WhatsApp"
+}
+`;
+
+  try {
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+
+    const response = await ai.models.generateContent({
+      model: primaryModel,
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      },
+    });
+
+    const rawJson = response?.text || (typeof response?.candidates?.[0]?.content?.parts?.[0]?.text === 'string' ? response.candidates[0].content.parts[0].text : '{}');
+    const cleaned = extractJson(rawJson);
+    const parsed = JSON.parse(cleaned);
+
+    return {
+      subject: typeof parsed.subject === 'string' && parsed.subject.trim()
+        ? parsed.subject.trim()
+        : `Seguimiento de postulación: ${role} — ${candidateName}`,
+      message: typeof parsed.message === 'string' && parsed.message.trim()
+        ? parsed.message.trim()
+        : getFallbackFollowUp().message,
+      shortNote: typeof parsed.shortNote === 'string' && parsed.shortNote.trim()
+        ? parsed.shortNote.trim()
+        : getFallbackFollowUp().shortNote,
+    };
+  } catch (err) {
+    console.warn('[AI Service] Error generando follow-up con Gemini, usando plantilla de respaldo:', err.message);
+    return getFallbackFollowUp();
+  }
+};
+
 export default {
   analyzeJobPosting,
+  generateFollowUpMessage,
 };
+
