@@ -3,6 +3,7 @@ import {
   createApplication,
   getApplications,
   getApplicationById,
+  updateApplication,
   updateApplicationStatus,
   deleteApplication,
   addInteraction,
@@ -29,6 +30,8 @@ router.route('/')
 // Rutas por ID: /api/applications/:id
 router.route('/:id')
   .get(getApplicationById)
+  .put(updateApplication)
+  .patch(updateApplication)
   .delete(deleteApplication);
 
 // Cambio de estado: /api/applications/:id/status

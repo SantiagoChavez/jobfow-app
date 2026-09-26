@@ -96,6 +96,17 @@ export async function createApplication(applicationData) {
 }
 
 /**
+ * Actualizar datos generales de una postulación (contacto, empresa, notas, etc.)
+ */
+export async function updateApplication(id, applicationData) {
+  const res = await request(`/applications/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(applicationData),
+  });
+  return res.data || res;
+}
+
+/**
  * Actualizar estado de una postulación con soporte para confirmación forzada (force), notas y fecha
  * @param {string} id - ID de la postulación
  * @param {string} status - Nuevo estado
