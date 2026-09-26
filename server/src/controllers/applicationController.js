@@ -333,6 +333,93 @@ export const getApplicationById = async (req, res) => {
 };
 
 /**
+ * @desc    Actualizar campos generales de una postulación (empresa, rol, reclutador, notas, etc.)
+ * @route   PUT /api/applications/:id o PATCH /api/applications/:id
+ * @access  Private (requiere protect)
+ */
+export const updateApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de postulación inválido',
+      });
+    }
+
+    const application = await Application.findById(id);
+
+    if (
+      !application ||
+      (req.user && application.user && application.user.toString() !== req.user._id.toString())
+    ) {
+      return res.status(404).json({
+        success: false,
+        message: 'Postulación no encontrada',
+      });
+    }
+
+    const {
+      company,
+      role,
+      status,
+      priority,
+      workMode,
+      salary,
+      experienceLevel,
+      recruiter,
+      jobUrl,
+      requirementsRaw,
+      extractedSkills,
+      suggestedPitch,
+      companySummary,
+      matchScore,
+    } = req.body;
+
+    if (company && typeof company === 'object') {
+      if (company.name && typeof company.name === 'string') application.company.name = company.name.trim();
+      if (company.website !== undefined) application.company.website = company.website ? company.website.trim() : undefined;
+      if (company.industry !== undefined) application.company.industry = company.industry ? company.industry.trim() : undefined;
+    }
+    if (role && typeof role === 'string') application.role = role.trim();
+    if (status && VALID_STATUSES.includes(status.trim().toUpperCase())) application.status = status.trim().toUpperCase();
+    if (priority && VALID_PRIORITIES.includes(priority.trim().toUpperCase())) application.priority = priority.trim().toUpperCase();
+    if (workMode && VALID_WORK_MODES.includes(workMode.trim().toUpperCase())) application.workMode = workMode.trim().toUpperCase();
+    if (salary !== undefined) application.salary = salary != null ? String(salary).trim() : undefined;
+    if (experienceLevel !== undefined) application.experienceLevel = experienceLevel != null ? String(experienceLevel).trim() : undefined;
+
+    if (recruiter !== undefined) {
+      application.recruiter = {
+        name: recruiter?.name !== undefined ? (recruiter.name ? recruiter.name.trim() : undefined) : application.recruiter?.name,
+        email: recruiter?.email !== undefined ? (recruiter.email ? recruiter.email.trim() : undefined) : application.recruiter?.email,
+      };
+    }
+
+    if (jobUrl !== undefined) application.jobUrl = jobUrl ? jobUrl.trim() : undefined;
+    if (requirementsRaw !== undefined) application.requirementsRaw = requirementsRaw;
+    if (Array.isArray(extractedSkills)) application.extractedSkills = extractedSkills;
+    if (suggestedPitch !== undefined) application.suggestedPitch = suggestedPitch ? suggestedPitch.trim() : undefined;
+    if (companySummary !== undefined) application.companySummary = companySummary ? companySummary.trim() : undefined;
+    if (matchScore !== undefined && typeof matchScore === 'number') application.matchScore = matchScore;
+
+    await application.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Postulación actualizada exitosamente',
+      data: application,
+    });
+  } catch (error) {
+    console.error(`Error al actualizar postulación ${req.params.id}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al actualizar la postulación',
+    });
+  }
+};
+
+/**
  * @desc    Actualizar el estado de una postulación con protección de degradación
  * @route   PATCH /api/applications/:id/status
  * @access  Private (requiere protect)

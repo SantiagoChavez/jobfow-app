@@ -8,14 +8,16 @@ import {
   ClockIcon,
   RefreshIcon,
   SendIcon,
+  ExternalLinkIcon,
+  LinkedInIcon,
+  UserIcon,
 } from './Icons.jsx';
-import { generateFollowUpMessage } from '../services/api.js';
+import { generateFollowUpMessage, updateApplication } from '../services/api.js';
 import { createSafeMailto } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { useToast } from '../context/ToastContext.jsx';
 
-export const FollowUpModal = ({
-  isOpen,
+const FollowUpModalDialog = ({
   onClose,
   application,
   onAddInteraction,
@@ -31,7 +33,13 @@ export const FollowUpModal = ({
   const [copiedShort, setCopiedShort] = useState(false);
   const [savedInteraction, setSavedInteraction] = useState(false);
 
-  useModalA11y(isOpen, onClose);
+  // Estados locales de contacto editable inicializados de forma pura
+  const [contactEmail, setContactEmail] = useState(application?.recruiter?.email || '');
+  const [contactName, setContactName] = useState(application?.recruiter?.name || '');
+  const [isSavingContact, setIsSavingContact] = useState(false);
+  const [contactSaved, setContactSaved] = useState(false);
+
+  useModalA11y(true, onClose);
 
   // Calcular días transcurridos de forma segura
   const appliedAt = application?.appliedAt;
@@ -63,43 +71,59 @@ export const FollowUpModal = ({
     }
   }, [application, tone, customInstructions, showToast]);
 
-  // Generar automáticamente al abrir el modal con una nueva postulación
+  // Generar automáticamente al montar el diálogo
   useEffect(() => {
     let isMounted = true;
-    if (isOpen && application) {
-      const run = async () => {
-        try {
-          setLoading(true);
-          const res = await generateFollowUpMessage(application, {
-            tone: 'CORDIAL',
-            customInstructions: '',
-          });
-          if (isMounted && res) {
-            setGeneratedSubject(res.subject || `Seguimiento de postulación: ${application.role}`);
-            setGeneratedMessage(res.message || '');
-            setShortNote(res.shortNote || '');
-          }
-        } catch (err) {
-          if (isMounted) {
-            console.error('Error al generar follow-up:', err);
-            showToast(err.message || 'Error al generar el mensaje con IA', 'error');
-          }
-        } finally {
-          if (isMounted) setLoading(false);
+    const run = async () => {
+      try {
+        setLoading(true);
+        const res = await generateFollowUpMessage(application, {
+          tone: 'CORDIAL',
+          customInstructions: '',
+        });
+        if (isMounted && res) {
+          setGeneratedSubject(res.subject || `Seguimiento de postulación: ${application.role}`);
+          setGeneratedMessage(res.message || '');
+          setShortNote(res.shortNote || '');
         }
-      };
-      run();
-    }
+      } catch (err) {
+        if (isMounted) {
+          console.error('Error al generar follow-up:', err);
+          showToast(err.message || 'Error al generar el mensaje con IA', 'error');
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    run();
     return () => {
       isMounted = false;
     };
-  }, [isOpen, application, showToast]);
+  }, [application, showToast]);
 
-  if (!isOpen || !application) return null;
-
-  const recruiterEmail = application.recruiter?.email?.trim();
-  const recruiterName = application.recruiter?.name?.trim();
   const companyName = application.company?.name || 'la empresa';
+
+  // Guardar contacto en la base de datos si el usuario lo completó aquí
+  const handleSaveContact = async () => {
+    if (!application._id) return;
+    try {
+      setIsSavingContact(true);
+      await updateApplication(application._id, {
+        recruiter: {
+          email: contactEmail.trim() || undefined,
+          name: contactName.trim() || undefined,
+        },
+      });
+      setContactSaved(true);
+      showToast('¡Datos de contacto guardados en la postulación!', 'success');
+      setTimeout(() => setContactSaved(false), 2500);
+    } catch (err) {
+      console.error('Error al guardar contacto:', err);
+      showToast('Error al guardar datos de contacto', 'error');
+    } finally {
+      setIsSavingContact(false);
+    }
+  };
 
   const handleCopyFull = async () => {
     if (!generatedMessage) return;
@@ -140,13 +164,19 @@ export const FollowUpModal = ({
     }
   };
 
-  const safeMailto = recruiterEmail && generatedMessage
+  // Generador seguro de URL mailto (funciona con email o sin email destinatario para abrir cliente)
+  const safeMailto = generatedMessage
     ? createSafeMailto({
-        email: recruiterEmail,
+        email: contactEmail.trim(),
         subject: generatedSubject,
         body: generatedMessage,
       })
     : null;
+
+  // Búsqueda inteligente en LinkedIn para contactar al recruiter o equipo de selección
+  const linkedInSearchUrl = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(
+    `${companyName} ${contactName.trim() || 'recruiter talent'}`
+  )}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-navy-base/80 backdrop-blur-sm animate-fade-in">
@@ -174,13 +204,107 @@ export const FollowUpModal = ({
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Cerrar modal"
           >
             <CloseIcon className="w-5 h-5" />
           </button>
         </div>
 
         {/* Contenido Scrollable */}
-        <div className="p-5 space-y-4 overflow-y-auto flex-1">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+          {/* Canales y Destinatario de Contacto */}
+          <div className="p-4 rounded-2xl bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-tech flex items-center gap-1.5">
+                <MailIcon className="w-4 h-4" />
+                ¿A dónde enviar este seguimiento?
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                Email • LinkedIn • Portal de Empleo
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                  <MailIcon className="w-3 h-3 text-slate-400" />
+                  Correo del Recruiter / Empresa:
+                </label>
+                <input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="ej: recruiter@empresa.com"
+                  className="w-full bg-white dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                  <UserIcon className="w-3 h-3 text-slate-400" />
+                  Nombre del Recruiter (opcional):
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    placeholder="ej: María López"
+                    className="flex-1 bg-white dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-500"
+                  />
+                  {(contactEmail !== (application.recruiter?.email || '') || contactName !== (application.recruiter?.name || '')) && (
+                    <button
+                      type="button"
+                      onClick={handleSaveContact}
+                      disabled={isSavingContact}
+                      className="px-2.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-navy-base text-[11px] font-bold flex items-center gap-1 transition-all flex-shrink-0"
+                      title="Guardar contacto en la postulación"
+                    >
+                      {contactSaved ? <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-900" /> : null}
+                      <span>{contactSaved ? 'Guardado' : 'Guardar'}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Accesos directos a portales */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              {safeMailto && (
+                <a
+                  href={safeMailto}
+                  className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 font-bold flex items-center gap-1.5 transition-all text-[11px]"
+                >
+                  <SendIcon className="w-3.5 h-3.5" />
+                  <span>{contactEmail ? `Abrir Email a ${contactEmail}` : 'Abrir en mi Cliente de Correo'}</span>
+                </a>
+              )}
+
+              <a
+                href={linkedInSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-xl bg-blue-600/10 hover:bg-blue-600/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 font-bold flex items-center gap-1.5 transition-all text-[11px]"
+              >
+                <LinkedInIcon className="w-3.5 h-3.5 text-blue-500" />
+                <span>Buscar en LinkedIn</span>
+                <ExternalLinkIcon className="w-3 h-3 opacity-70" />
+              </a>
+
+              {application.jobUrl && (
+                <a
+                  href={application.jobUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold flex items-center gap-1.5 transition-all text-[11px]"
+                >
+                  <span>Ir a la Oferta Original</span>
+                  <ExternalLinkIcon className="w-3 h-3 opacity-70" />
+                </a>
+              )}
+            </div>
+          </div>
+
           {/* Selectores de Tono */}
           <div>
             <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
@@ -333,21 +457,11 @@ export const FollowUpModal = ({
               </button>
             </div>
           )}
-
-          {/* Reclutador Destinatario */}
-          {recruiterEmail && (
-            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 p-2.5 rounded-xl">
-              <MailIcon className="w-4 h-4 text-sky-600 dark:text-sky-tech flex-shrink-0" />
-              <span>
-                Reclutador asignado: <strong className="text-slate-800 dark:text-slate-200">{recruiterName || recruiterEmail}</strong> ({recruiterEmail})
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Footer de Acciones */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-navy-base/80 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleCopyFull}
@@ -364,7 +478,7 @@ export const FollowUpModal = ({
             {safeMailto && (
               <a
                 href={safeMailto}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-400 text-white transition-all shadow-md shadow-sky-500/20 flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-navy-base transition-all shadow-md shadow-cyan-500/20 flex items-center gap-1.5"
               >
                 <SendIcon className="w-4 h-4" />
                 <span>Abrir en Email</span>
@@ -401,6 +515,11 @@ export const FollowUpModal = ({
       </div>
     </div>
   );
+};
+
+export const FollowUpModal = (props) => {
+  if (!props.isOpen || !props.application) return null;
+  return <FollowUpModalDialog key={props.application._id} {...props} />;
 };
 
 export default FollowUpModal;
