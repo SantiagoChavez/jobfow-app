@@ -375,11 +375,11 @@ const FollowUpModalDialog = ({
             />
           </div>
 
-          {/* Cuerpo Principal del Mensaje */}
+          {/* Cuerpo Principal del Mensaje (Email / InMail) */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                Cuerpo del Mensaje Adaptado
+                Mensaje Completo (Para Email o InMail sin límite)
               </label>
               <button
                 type="button"
@@ -392,13 +392,74 @@ const FollowUpModalDialog = ({
               </button>
             </div>
             <textarea
-              rows={6}
+              rows={5}
               value={generatedMessage}
               onChange={(e) => setGeneratedMessage(e.target.value)}
               disabled={loading}
               className="w-full bg-slate-50 dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs text-slate-800 dark:text-slate-200 font-sans leading-relaxed focus:outline-none focus:border-cyan-500 disabled:opacity-60 resize-none transition-all shadow-inner"
               placeholder="Generando mensaje de seguimiento personalizado con Gemini IA..."
             />
+          </div>
+
+          {/* Versión Corta para Nota de Conexión de LinkedIn (< 200 caracteres) */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-navy-base/80 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                <LinkedInIcon className="w-3.5 h-3.5 text-blue-500" />
+                Nota de Conexión LinkedIn (Límite estricto 200 caracteres)
+              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                    shortNote.length <= 200
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                      : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                  }`}
+                >
+                  {shortNote.length}/200 chars
+                </span>
+                {shortNote.length > 200 && (
+                  <button
+                    type="button"
+                    onClick={() => setShortNote(shortNote.slice(0, 197) + '...')}
+                    className="text-[10px] font-bold text-amber-500 hover:text-amber-400 underline"
+                  >
+                    Ajustar a 200
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <textarea
+              rows={2}
+              value={shortNote}
+              onChange={(e) => setShortNote(e.target.value)}
+              className={`w-full bg-white dark:bg-navy-surface border rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 leading-relaxed focus:outline-none resize-none transition-all ${
+                shortNote.length > 200
+                  ? 'border-rose-500 focus:border-rose-500'
+                  : 'border-slate-200 dark:border-slate-700 focus:border-cyan-500'
+              }`}
+              placeholder="Nota ultra corta para solicitud de contacto en LinkedIn..."
+            />
+
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                Ideal para pegar al presionar "Añadir una nota" al conectar en LinkedIn.
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyShort}
+                disabled={!shortNote}
+                className="px-3 py-1.5 rounded-xl bg-white dark:bg-navy-surface hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs disabled:opacity-50"
+              >
+                {copiedShort ? (
+                  <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <CopyIcon className="w-3.5 h-3.5" />
+                )}
+                <span>{copiedShort ? '¡Copiado!' : 'Copiar Nota (LinkedIn)'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Notas / Instrucciones adicionales */}
@@ -430,33 +491,6 @@ const FollowUpModalDialog = ({
               </button>
             </div>
           </div>
-
-          {/* Versión Ultra Corta (LinkedIn / Chat) */}
-          {shortNote && (
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-navy-base/80 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
-              <div className="space-y-1 min-w-0 flex-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                  💬 Versión rápida para LinkedIn InMail / Chat:
-                </span>
-                <p className="text-xs text-slate-700 dark:text-slate-300 italic">
-                  "{shortNote}"
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleCopyShort}
-                className="p-2 rounded-xl bg-white dark:bg-navy-surface hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1 flex-shrink-0 transition-all shadow-xs"
-                title="Copiar versión corta"
-              >
-                {copiedShort ? (
-                  <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
-                ) : (
-                  <CopyIcon className="w-4 h-4" />
-                )}
-                <span className="hidden sm:inline">{copiedShort ? '¡Copiado!' : 'Copiar'}</span>
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Footer de Acciones */}
