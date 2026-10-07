@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobFlow — Capturador de Vacantes</title>
+  <title>JobFlow — Capturador de Vacantes y Reclutadores</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -47,8 +47,14 @@
         <p class="field-hint">En JobFlow Web: Menú superior ➔ Perfil ➔ "Copiar Token Extensión".</p>
       </div>
 
+      <div class="field-group">
+        <label for="apiUrlInput" class="field-label">URL del Backend API</label>
+        <input type="text" id="apiUrlInput" class="form-input" placeholder="https://jobfow-api.onrender.com o http://localhost:5000">
+        <p class="field-hint">Usa http://localhost:5000 para pruebas locales o la URL de Render.</p>
+      </div>
+
       <div class="settings-actions">
-        <button id="saveSettingsBtn" class="btn-secondary">Guardar Token</button>
+        <button id="saveSettingsBtn" class="btn-secondary">Guardar Ajustes</button>
         <button id="closeSettingsBtn" class="btn-ghost">Cerrar</button>
       </div>
     </section>
@@ -73,11 +79,53 @@
         </div>
       </div>
 
+      <!-- Formulario de Reclutador Detectado (Visible solo cuando es un perfil de reclutador) -->
+      <div id="recruiterDetectedCard" class="recruiter-card hidden">
+        <div class="recruiter-card-header">
+          <span class="recruiter-badge">👤 Perfil de Reclutador Detectado</span>
+        </div>
+        
+        <div class="field-group">
+          <label class="field-label">Reclutador / Destinatario:</label>
+          <input type="text" id="recruiterNameInput" class="form-input" placeholder="Nombre del reclutador">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Cargo / Titular:</label>
+          <input type="text" id="recruiterRoleInput" class="form-input" placeholder="Ej. Senior IT Recruiter">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Empresa:</label>
+          <input type="text" id="recruiterCompanyInput" class="form-input" placeholder="Nombre de la empresa (Ej. Globant)">
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label class="field-label">Canal:</label>
+            <select id="recruiterChannelSelect" class="form-select">
+              <option value="LINKEDIN_DM">LinkedIn (Mensaje)</option>
+              <option value="LINKEDIN_NOTE">Nota Conexión (&le;200)</option>
+              <option value="COLD_EMAIL">Email en Frío</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Tono:</label>
+            <select id="recruiterToneSelect" class="form-select">
+              <option value="CORDIAL">Cordial</option>
+              <option value="DIRECT">Directo</option>
+              <option value="ENTHUSIASTIC">Entusiasta</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <!-- Botón de Acción Principal -->
       <div class="action-section">
         <button id="captureBtn" class="btn-primary">
           <span class="btn-icon">⚡</span>
-          <span class="btn-text">Capturar y Procesar con IA</span>
+          <span id="captureBtnText" class="btn-text">Capturar y Procesar con IA</span>
         </button>
       </div>
 
@@ -95,12 +143,13 @@
         <div class="success-header">
           <div class="check-icon">✓</div>
           <div class="success-title-box">
-            <h3 class="success-title">¡Guardada en JobFlow!</h3>
-            <span class="success-subtitle">Postulación añadida a tu Kanban</span>
+            <h3 id="successTitle" class="success-title">¡Guardada en JobFlow!</h3>
+            <span id="successSubtitle" class="success-subtitle">Postulación añadida a tu Kanban</span>
           </div>
         </div>
 
-        <div class="result-body">
+        <!-- Resultado Vacante Tradicional -->
+        <div id="vacancyResultBody" class="result-body">
           <div class="result-row">
             <span class="result-label">Empresa:</span>
             <strong id="resultCompany" class="result-value">-</strong>
@@ -126,11 +175,44 @@
           </div>
         </div>
 
+        <!-- Resultado Contacto Directo / Pitch -->
+        <div id="recruiterResultBody" class="result-body hidden">
+          <div class="result-row">
+            <span class="result-label">Reclutador:</span>
+            <strong id="resultRecruiterName" class="result-value">-</strong>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Empresa:</span>
+            <strong id="resultRecruiterCompany" class="result-value">-</strong>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Estado:</span>
+            <span class="badge badge-cyan">Columna CONTACTO</span>
+          </div>
+
+          <!-- Caja de Pitch Generado -->
+          <div class="pitch-preview-box">
+            <div class="pitch-box-header">
+              <span class="pitch-label">✨ Pitch Generado con IA:</span>
+              <button id="copyPitchBtn" class="btn-copy-sm">📋 Copiar</button>
+            </div>
+            <textarea id="resultPitchText" class="pitch-textarea" readonly rows="4"></textarea>
+            
+            <div id="shortNoteBox" class="short-note-box hidden">
+              <div class="pitch-box-header">
+                <span class="pitch-label">⚡ Nota Conexión (&le;200):</span>
+                <button id="copyShortNoteBtn" class="btn-copy-sm">📋 Copiar Nota</button>
+              </div>
+              <textarea id="resultShortNoteText" class="pitch-textarea" readonly rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
         <div class="success-actions">
           <button id="openJobflowBtn" class="btn-secondary">
             <span>Abrir en JobFlow Web</span> ↗
           </button>
-          <button id="resetCaptureBtn" class="btn-ghost">Capturar otra</button>
+          <button id="resetCaptureBtn" class="btn-ghost">Capturar otro</button>
         </div>
       </div>
 
@@ -139,7 +221,7 @@
         <span class="alert-icon">✕</span>
         <div class="alert-content">
           <strong id="errorTitle">Ocurrió un error</strong>
-          <p id="errorMessage" class="error-desc">No se pudo procesar la vacante.</p>
+          <p id="errorMessage" class="error-desc">No se pudo procesar la información.</p>
           <div class="error-actions">
             <button id="retryBtn" class="btn-retry">Reintentar</button>
             <button id="errorSettingsBtn" class="btn-settings-fix">⚙️ Ajustes</button>
@@ -150,8 +232,8 @@
 
     <!-- Footer Discreto -->
     <footer class="footer">
-      <span>JobFlow • Gemini 3.5 Flash Lite</span>
-      <span id="versionLabel">v1.0.3</span>
+      <span>JobFlow • Gemini AI Copilot</span>
+      <span id="versionLabel">v1.0.4</span>
     </footer>
   </div>
 

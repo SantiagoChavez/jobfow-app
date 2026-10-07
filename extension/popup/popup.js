@@ -1,11 +1,11 @@
 /**
  * Jobflow — Popup Controller (Manifest V3)
- * Conexión directa a JobFlow Cloud, extracción de ofertas con IA y guardado en la cuenta del usuario.
+ * Captura inteligente de vacantes y perfiles de reclutadores con IA (Google Gemini).
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Configuración de endpoints oficiales
-  const JOBFLOW_API_URL = 'https://jobfow-api.onrender.com';
+  // Configuración de endpoints oficiales (personalizables en ajustes)
+  let JOBFLOW_API_URL = 'https://jobfow-api.onrender.com';
   const JOBFLOW_WEB_URL = 'https://jobfow-app.vercel.app';
 
   // Elementos DOM
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toggleSettingsBtn = document.getElementById('toggleSettingsBtn');
   const settingsSection = document.getElementById('settingsSection');
   const jwtTokenInput = document.getElementById('jwtTokenInput');
+  const apiUrlInput = document.getElementById('apiUrlInput');
   const toggleTokenVisibilityBtn = document.getElementById('toggleTokenVisibilityBtn');
   const syncFromTabBtn = document.getElementById('syncFromTabBtn');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
@@ -27,12 +28,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   const noTokenAlert = document.getElementById('noTokenAlert');
   const openSettingsLink = document.getElementById('openSettingsLink');
 
+  // Sección Reclutador
+  const recruiterDetectedCard = document.getElementById('recruiterDetectedCard');
+  const recruiterNameInput = document.getElementById('recruiterNameInput');
+  const recruiterRoleInput = document.getElementById('recruiterRoleInput');
+  const recruiterCompanyInput = document.getElementById('recruiterCompanyInput');
+  const recruiterChannelSelect = document.getElementById('recruiterChannelSelect');
+  const recruiterToneSelect = document.getElementById('recruiterToneSelect');
+
   const captureBtn = document.getElementById('captureBtn');
+  const captureBtnText = document.getElementById('captureBtnText');
   const loadingState = document.getElementById('loadingState');
   const loadingStatusText = document.getElementById('loadingStatusText');
   const progressFill = document.getElementById('progressFill');
 
+  // Sección Éxito
   const successState = document.getElementById('successState');
+  const successTitle = document.getElementById('successTitle');
+  const successSubtitle = document.getElementById('successSubtitle');
+
+  const vacancyResultBody = document.getElementById('vacancyResultBody');
   const resultCompany = document.getElementById('resultCompany');
   const resultRole = document.getElementById('resultRole');
   const resultWorkMode = document.getElementById('resultWorkMode');
@@ -40,6 +55,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resultScore = document.getElementById('resultScore');
   const skillsContainer = document.getElementById('skillsContainer');
   const skillsTags = document.getElementById('skillsTags');
+
+  const recruiterResultBody = document.getElementById('recruiterResultBody');
+  const resultRecruiterName = document.getElementById('resultRecruiterName');
+  const resultRecruiterCompany = document.getElementById('resultRecruiterCompany');
+  const resultPitchText = document.getElementById('resultPitchText');
+  const copyPitchBtn = document.getElementById('copyPitchBtn');
+  const shortNoteBox = document.getElementById('shortNoteBox');
+  const resultShortNoteText = document.getElementById('resultShortNoteText');
+  const copyShortNoteBtn = document.getElementById('copyShortNoteBtn');
+
   const openJobflowBtn = document.getElementById('openJobflowBtn');
   const resetCaptureBtn = document.getElementById('resetCaptureBtn');
 
@@ -50,13 +75,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentTab = null;
   let activeToken = '';
+  let extractedDataCache = null;
+  let isRecruiterMode = false;
 
-  // 1. Cargar token persistente
+  // 1. Cargar token y configuración persistente
   const loadConfig = async () => {
     return new Promise((resolve) => {
-      chrome.storage.local.get(['jobflow_token'], (items) => {
+      chrome.storage.local.get(['jobflow_token', 'jobflow_api_url'], (items) => {
         activeToken = items.jobflow_token || '';
+        if (items.jobflow_api_url) {
+          JOBFLOW_API_URL = items.jobflow_api_url.trim().replace(/\/+$/, '');
+        }
         jwtTokenInput.value = activeToken;
+        if (apiUrlInput) apiUrlInput.value = JOBFLOW_API_URL;
         updateConnectionUI();
         resolve();
       });
@@ -76,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // 2. Obtener información de la pestaña activa
+  // 2. Obtener información de la pestaña activa e inspeccionar contenido inicial
   const initActiveTab = async () => {
     try {
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -89,8 +120,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           const urlObj = new URL(currentTab.url);
           tabDomainBadge.textContent = urlObj.hostname.replace('www.', '');
 
-          // Si es un portal laboral reconocido, destacar badge
-          if (urlObj.hostname.includes('linkedin')) {
+          // Detectar portal
+          if (urlObj.hostname.includes('linkedin.com/in/') || currentTab.url.includes('/in/')) {
+            sourceBadge.textContent = 'LinkedIn Perfil';
+            sourceBadge.classList.remove('hidden');
+          } else if (urlObj.hostname.includes('linkedin')) {
             sourceBadge.textContent = 'LinkedIn Jobs';
             sourceBadge.classList.remove('hidden');
           } else if (urlObj.hostname.includes('indeed')) {
@@ -99,21 +133,48 @@ document.addEventListener('DOMContentLoaded', async () => {
           } else if (urlObj.hostname.includes('bamboohr')) {
             sourceBadge.textContent = 'BambooHR';
             sourceBadge.classList.remove('hidden');
-          } else if (urlObj.hostname.includes('glassdoor')) {
-            sourceBadge.textContent = 'Glassdoor';
-            sourceBadge.classList.remove('hidden');
           }
 
-          // Si estamos en Jobflow Web, autocompletar sesión si está abierta
-          if (urlObj.hostname.includes('vercel.app') || urlObj.hostname.includes('jobflow')) {
+          // Si estamos en Jobflow Web, sincronizar sesión
+          if (urlObj.hostname.includes('vercel.app') || urlObj.hostname.includes('localhost') || urlObj.hostname.includes('jobflow')) {
             checkJobflowWebSession(currentTab.id);
           }
+
+          // Inspección rápida de la página para detectar reclutador automáticamente
+          await probePageContent(currentTab.id);
         } catch {
           tabDomainBadge.textContent = 'Navegador';
         }
       }
     } catch (err) {
       console.error('Error al inspeccionar pestaña activa:', err);
+    }
+  };
+
+  // Inspeccionar si es reclutador o vacante
+  const probePageContent = async (tabId) => {
+    try {
+      extractedDataCache = await new Promise((resolve) => {
+        chrome.tabs.sendMessage(tabId, { action: 'EXTRACT_JOB' }, (response) => {
+          if (chrome.runtime.lastError) resolve(null);
+          else resolve(response);
+        });
+      });
+
+      if (extractedDataCache && extractedDataCache.isRecruiter && extractedDataCache.recruiter) {
+        isRecruiterMode = true;
+        recruiterDetectedCard.classList.remove('hidden');
+        recruiterNameInput.value = extractedDataCache.recruiter.name || '';
+        recruiterRoleInput.value = extractedDataCache.recruiter.role || '';
+        recruiterCompanyInput.value = extractedDataCache.recruiter.companyName || '';
+        captureBtnText.textContent = '✨ Generar Pitch & Guardar Contacto';
+      } else {
+        isRecruiterMode = false;
+        recruiterDetectedCard.classList.add('hidden');
+        captureBtnText.textContent = 'Capturar y Procesar con IA';
+      }
+    } catch (err) {
+      console.warn('Error en sondeo de pestaña:', err);
     }
   };
 
@@ -131,20 +192,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     } catch {
-      // Ignorar errores si la pestaña no responde
+      // Ignorar errores
     }
   };
 
-  // 3. Guardar token de autenticación
+  // 3. Guardar ajustes y token
   const saveSettings = () => {
     const tokenVal = jwtTokenInput.value.trim();
+    const apiUrlVal = apiUrlInput ? apiUrlInput.value.trim().replace(/\/+$/, '') : JOBFLOW_API_URL;
 
     chrome.storage.local.set(
       {
         jobflow_token: tokenVal,
+        jobflow_api_url: apiUrlVal,
       },
       () => {
         activeToken = tokenVal;
+        if (apiUrlVal) JOBFLOW_API_URL = apiUrlVal;
         updateConnectionUI();
         settingsSection.classList.add('hidden');
         errorState.classList.add('hidden');
@@ -152,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   };
 
-  // 4. Inyección segura de content script si la pestaña no responde
+  // Inyección de fallback
   const ensureContentScriptInjected = async (tabId) => {
     try {
       await chrome.scripting.executeScript({
@@ -164,73 +228,166 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // 5. Flujo principal: Capturar, Procesar con Gemini y Guardar en JobFlow
+  // 4. Flujo Principal: Captura & Procesamiento
   const handleCapture = async () => {
     if (!currentTab || !currentTab.id) {
       showError('Error de Navegación', 'No se pudo identificar la pestaña activa del navegador.');
       return;
     }
 
-    // Verificar token
     if (!activeToken || activeToken.trim().length < 20) {
       settingsSection.classList.remove('hidden');
       showError(
         'Token de Autenticación Requerido',
-        'Por favor abre Ajustes (⚙️) e ingresa tu token de Jobflow para asociar las postulaciones a tu cuenta.'
+        'Por favor abre Ajustes (⚙️) e ingresa tu token de Jobflow para asociar las postulaciones o contactos a tu cuenta.'
       );
       return;
     }
 
-    // Resetear estados
     errorState.classList.add('hidden');
     successState.classList.add('hidden');
     captureBtn.disabled = true;
     loadingState.classList.remove('hidden');
 
-    // Paso 1: Extrayendo contenido
-    updateLoadingStep('Extrayendo texto de la oferta...', '25%');
+    updateLoadingStep('Extrayendo datos de la página...', '25%');
 
-    let extractedData = null;
-    try {
-      extractedData = await new Promise((resolve) => {
-        chrome.tabs.sendMessage(currentTab.id, { action: 'EXTRACT_JOB' }, (response) => {
-          if (chrome.runtime.lastError) {
-            resolve(null);
-          } else {
-            resolve(response);
-          }
-        });
-      });
-
-      // Si falló la comunicación, intentar inyectar y reintentar
-      if (!extractedData) {
-        await ensureContentScriptInjected(currentTab.id);
-        extractedData = await new Promise((resolve) => {
-          chrome.tabs.sendMessage(currentTab.id, { action: 'EXTRACT_JOB' }, (response) => {
-            if (chrome.runtime.lastError) {
-              resolve(null);
-            } else {
-              resolve(response);
-            }
+    let pageData = extractedDataCache;
+    if (!pageData) {
+      try {
+        pageData = await new Promise((resolve) => {
+          chrome.tabs.sendMessage(currentTab.id, { action: 'EXTRACT_JOB' }, (res) => {
+            if (chrome.runtime.lastError) resolve(null);
+            else resolve(res);
           });
         });
+
+        if (!pageData) {
+          await ensureContentScriptInjected(currentTab.id);
+          pageData = await new Promise((resolve) => {
+            chrome.tabs.sendMessage(currentTab.id, { action: 'EXTRACT_JOB' }, (res) => {
+              if (chrome.runtime.lastError) resolve(null);
+              else resolve(res);
+            });
+          });
+        }
+      } catch (err) {
+        console.error('Error al extraer:', err);
       }
-    } catch (err) {
-      console.error('Error al extraer:', err);
     }
 
-    if (!extractedData || !extractedData.success || !extractedData.text || extractedData.text.length < 20) {
+    // ==========================================
+    // MODO A: CONTACTO DIRECTO A RECLUTADOR
+    // ==========================================
+    if (isRecruiterMode || pageData?.isRecruiter) {
+      const recName = recruiterNameInput.value.trim() || pageData?.recruiter?.name || 'Reclutador';
+      const recRole = recruiterRoleInput.value.trim() || pageData?.recruiter?.role || 'Talent Acquisition';
+      const company = recruiterCompanyInput.value.trim() || pageData?.recruiter?.companyName || 'Empresa';
+      const channel = recruiterChannelSelect ? recruiterChannelSelect.value : 'LINKEDIN_DM';
+      const tone = recruiterToneSelect ? recruiterToneSelect.value : 'CORDIAL';
+
+      updateLoadingStep('Generando pitch personalizado con Gemini AI...', '60%');
+
+      try {
+        const pitchController = new AbortController();
+        const pitchTimeout = setTimeout(() => pitchController.abort(), 45000);
+
+        const pitchRes = await fetch(`${JOBFLOW_API_URL}/api/ai/direct-pitch`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${activeToken}`,
+          },
+          body: JSON.stringify({
+            recruiterName: recName,
+            recruiterRole: recRole,
+            companyName: company,
+            companyWebsite: currentTab.url,
+            companyInfo: pageData?.recruiter?.bio || '',
+            targetRole: 'Full Stack Developer',
+            channel,
+            tone,
+          }),
+          signal: pitchController.signal,
+        });
+
+        clearTimeout(pitchTimeout);
+        const pitchJson = await pitchRes.json().catch(() => ({}));
+        const pitchData = pitchJson.data || pitchJson;
+
+        updateLoadingStep('Guardando contacto en tu Kanban de JobFlow...', '85%');
+
+        const saveController = new AbortController();
+        const saveTimeout = setTimeout(() => saveController.abort(), 30000);
+
+        const appPayload = {
+          company: {
+            name: company,
+            website: currentTab.url,
+          },
+          role: `Contacto Directo: ${recName}`,
+          status: 'CONTACTO',
+          priority: 'MEDIUM',
+          workMode: 'REMOTE',
+          recruiter: {
+            name: recName,
+            role: recRole,
+            linkedinUrl: currentTab.url,
+            channel,
+          },
+          jobUrl: currentTab.url,
+          suggestedPitch: pitchData.pitch || '',
+          companySummary: pitchData.companySummary || '',
+          initialInteractionType: 'MENSAJE_ENVIADO',
+          notes: `Contacto directo vía LinkedIn a ${recName} (${recRole}).`,
+        };
+
+        const saveRes = await fetch(`${JOBFLOW_API_URL}/api/applications`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${activeToken}`,
+          },
+          body: JSON.stringify(appPayload),
+          signal: saveController.signal,
+        });
+
+        clearTimeout(saveTimeout);
+        const saveJson = await saveRes.json().catch(() => ({}));
+
+        if (!saveRes.ok) {
+          throw new Error(saveJson.message || saveJson.error || 'Error al guardar el contacto.');
+        }
+
+        updateLoadingStep('¡Completado!', '100%');
+        notifyJobflowTabs(company, recRole);
+
+        setTimeout(() => {
+          loadingState.classList.add('hidden');
+          captureBtn.disabled = false;
+          showRecruiterSuccess(recName, company, pitchData);
+        }, 350);
+      } catch (err) {
+        loadingState.classList.add('hidden');
+        captureBtn.disabled = false;
+        handleFetchError('Error al procesar contacto directo', err);
+      }
+      return;
+    }
+
+    // ==========================================
+    // MODO B: CAPTURA DE VACANTE TRADICIONAL
+    // ==========================================
+    if (!pageData || !pageData.text || pageData.text.length < 20) {
       loadingState.classList.add('hidden');
       captureBtn.disabled = false;
       showError(
-        'Texto de la vacante no detectado',
-        extractedData?.error || 'No se pudo extraer la descripción de la oferta en esta página. Por favor selecciona el texto de la vacante con el ratón e inténtalo de nuevo.'
+        'Texto no detectado',
+        pageData?.error || 'Por favor selecciona el texto de la oferta con el ratón e inténtalo de nuevo.'
       );
       return;
     }
 
-    // Paso 2: Análisis con Gemini
-    updateLoadingStep('Analizando con Inteligencia Artificial...', '60%');
+    updateLoadingStep('Analizando oferta con Inteligencia Artificial...', '60%');
 
     let aiResult = null;
     try {
@@ -244,63 +401,49 @@ document.addEventListener('DOMContentLoaded', async () => {
           Authorization: `Bearer ${activeToken}`,
         },
         body: JSON.stringify({
-          text: extractedData.text,
+          text: pageData.text,
         }),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
-
       const aiJson = await aiResponse.json().catch(() => ({}));
 
-      if (!aiResponse.ok || !aiJson.success) {
-        if (aiResponse.status === 401) {
-          throw new Error('Tu sesión ha expirado o el token no es válido. Actualízalo en Ajustes (⚙️).');
-        }
-        throw new Error(aiJson.message || aiJson.error || `Error del servidor (${aiResponse.status}) al analizar la vacante con IA.`);
+      if (!aiResponse.ok) {
+        throw new Error(aiJson.message || aiJson.error || 'Error al invocar la IA.');
       }
 
       aiResult = aiJson.data || aiJson;
-    } catch (err) {
-      loadingState.classList.add('hidden');
-      captureBtn.disabled = false;
-      handleFetchError('Error al analizar con IA', err);
-      return;
-    }
 
-    // Paso 3: Guardar en la base de datos de JobFlow
-    updateLoadingStep('Guardando en tu tablero Kanban...', '90%');
+      updateLoadingStep('Guardando en tu cuenta de Jobflow...', '85%');
 
-    try {
-      const companyName = (aiResult.companyName && aiResult.companyName.trim()) || 'Empresa Detectada';
-      const roleName = (aiResult.role && aiResult.role.trim()) || extractedData.title || 'Puesto Detectado';
-
-      const validWorkModes = ['REMOTE', 'HYBRID', 'ON_SITE'];
-      const workMode = validWorkModes.includes(aiResult.workMode) ? aiResult.workMode : 'REMOTE';
-
-      const validPriorities = ['LOW', 'MEDIUM', 'HIGH'];
-      const priority = validPriorities.includes(aiResult.priority) ? aiResult.priority : 'MEDIUM';
+      const companyName = aiResult.companyName?.trim() || 'Empresa Confidencial';
+      const roleName = aiResult.role?.trim() || 'Desarrollador / Profesional IT';
+      const workMode = ['REMOTE', 'HYBRID', 'ON_SITE'].includes(aiResult.workMode) ? aiResult.workMode : 'REMOTE';
+      const priority = ['LOW', 'MEDIUM', 'HIGH'].includes(aiResult.priority) ? aiResult.priority : 'MEDIUM';
 
       const applicationPayload = {
         company: {
           name: companyName,
-          website: aiResult.companyWebsite || '',
+          website: aiResult.companyWebsite || currentTab.url,
         },
         role: roleName,
         status: 'ENVIADA',
         priority,
         workMode,
-        salary: aiResult.salary ? String(aiResult.salary) : undefined,
-        companySummary: aiResult.companySummary || '',
-        matchScore: typeof aiResult.matchScore === 'number' ? aiResult.matchScore : null,
-        extractedSkills: Array.isArray(aiResult.extractedSkills) ? aiResult.extractedSkills : [],
-        requirementsRaw: extractedData.text.slice(0, 5000),
-        jobUrl: extractedData.url || currentTab.url,
-        suggestedPitch: aiResult.suggestedPitch || '',
+        salary: aiResult.salary || undefined,
+        jobUrl: currentTab.url,
+        requirementsRaw: pageData.text.slice(0, 5000),
+        extractedSkills: aiResult.extractedSkills || [],
+        suggestedPitch: aiResult.suggestedPitch || undefined,
+        companySummary: aiResult.companySummary || undefined,
+        matchScore: typeof aiResult.matchScore === 'number' ? aiResult.matchScore : undefined,
+        recruiter: pageData.recruiter || undefined,
+        notes: `Capturado desde extensión (${pageData.source || 'Web'}).`,
       };
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const saveController = new AbortController();
+      const saveTimeout = setTimeout(() => saveController.abort(), 30000);
 
       const saveResponse = await fetch(`${JOBFLOW_API_URL}/api/applications`, {
         method: 'POST',
@@ -309,53 +452,28 @@ document.addEventListener('DOMContentLoaded', async () => {
           Authorization: `Bearer ${activeToken}`,
         },
         body: JSON.stringify(applicationPayload),
-        signal: controller.signal,
+        signal: saveController.signal,
       });
 
-      clearTimeout(timeoutId);
-
+      clearTimeout(saveTimeout);
       const saveJson = await saveResponse.json().catch(() => ({}));
 
       if (!saveResponse.ok) {
-        if (saveResponse.status === 401) {
-          throw new Error('Tu sesión ha expirado o el token no es válido. Actualízalo en Ajustes (⚙️).');
-        }
-        throw new Error(saveJson.message || saveJson.error || `Error (${saveResponse.status}) al guardar la postulación en tu cuenta.`);
+        throw new Error(saveJson.message || saveJson.error || 'Error al guardar la postulación.');
       }
 
-      // Éxito total
       updateLoadingStep('¡Completado!', '100%');
-
-      // Notificar en tiempo real a todas las pestañas abiertas de JobFlow
-      try {
-        chrome.tabs.query({}, (tabs) => {
-          if (chrome.runtime.lastError || !tabs) return;
-          tabs.forEach((t) => {
-            if (t.url && (t.url.includes('localhost') || t.url.includes('vercel.app') || t.url.includes('jobflow') || t.url.includes('jobfow'))) {
-              chrome.tabs.sendMessage(t.id, {
-                action: 'NOTIFY_APPLICATION_SAVED',
-                company: companyName,
-                role: roleName,
-              }, () => {
-                // Silenciar error si la pestaña no tiene el content script activo
-                if (chrome.runtime.lastError) { /* noop */ }
-              });
-            }
-          });
-        });
-      } catch (notifyErr) {
-        console.warn('Error al notificar pestañas activas de Jobflow:', notifyErr);
-      }
+      notifyJobflowTabs(companyName, roleName);
 
       setTimeout(() => {
         loadingState.classList.add('hidden');
         captureBtn.disabled = false;
-        showSuccess(aiResult, companyName, roleName, workMode, priority);
-      }, 400);
+        showVacancySuccess(aiResult, companyName, roleName, workMode, priority);
+      }, 350);
     } catch (err) {
       loadingState.classList.add('hidden');
       captureBtn.disabled = false;
-      handleFetchError('Error al guardar en la app', err);
+      handleFetchError('Error al guardar vacante', err);
     }
   };
 
@@ -364,7 +482,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressFill.style.width = percentage;
   };
 
-  const showSuccess = (aiData, company, role, workMode, priority) => {
+  const notifyJobflowTabs = (company, role) => {
+    try {
+      chrome.tabs.query({}, (tabs) => {
+        if (chrome.runtime.lastError || !tabs) return;
+        tabs.forEach((t) => {
+          if (t.url && (t.url.includes('localhost') || t.url.includes('vercel.app') || t.url.includes('jobflow') || t.url.includes('jobfow'))) {
+            chrome.tabs.sendMessage(t.id, {
+              action: 'NOTIFY_APPLICATION_SAVED',
+              company,
+              role,
+            }, () => {
+              if (chrome.runtime.lastError) { /* noop */ }
+            });
+          }
+        });
+      });
+    } catch {
+      // Ignorar errores de notificación
+    }
+  };
+
+  const showRecruiterSuccess = (recName, company, pitchData) => {
+    successTitle.textContent = '¡Contacto Guardado en JobFlow!';
+    successSubtitle.textContent = 'Añadido a la columna CONTACTO con seguimiento';
+
+    vacancyResultBody.classList.add('hidden');
+    recruiterResultBody.classList.remove('hidden');
+
+    resultRecruiterName.textContent = recName;
+    resultRecruiterCompany.textContent = company;
+    resultPitchText.value = pitchData.pitch || 'Pitch generado exitosamente.';
+
+    if (pitchData.shortNote) {
+      resultShortNoteText.value = pitchData.shortNote;
+      shortNoteBox.classList.remove('hidden');
+    } else {
+      shortNoteBox.classList.add('hidden');
+    }
+
+    successState.classList.remove('hidden');
+  };
+
+  const showVacancySuccess = (aiData, company, role, workMode, priority) => {
+    successTitle.textContent = '¡Guardada en JobFlow!';
+    successSubtitle.textContent = 'Postulación añadida a tu Kanban';
+
+    recruiterResultBody.classList.add('hidden');
+    vacancyResultBody.classList.remove('hidden');
+
     resultCompany.textContent = company;
     resultRole.textContent = role;
 
@@ -377,7 +543,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const score = typeof aiData.matchScore === 'number' ? aiData.matchScore : 0;
     resultScore.textContent = `${score}% Match`;
 
-    // Renderizar tags de skills
     skillsTags.innerHTML = '';
     const skills = aiData.extractedSkills || aiData.keySkills || [];
     if (skills.length > 0) {
@@ -397,13 +562,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const handleFetchError = (title, err) => {
     let message = err.message || 'Ocurrió un error inesperado al comunicar con el servicio de Jobflow.';
-
     if (err.name === 'AbortError') {
-      message = 'Tiempo de espera agotado al comunicar con los servidores de JobFlow. Por favor verifica tu conexión y pulsa Reintentar.';
+      message = 'Tiempo de espera agotado al comunicar con los servidores. Reintenta.';
     } else if (err.message === 'Failed to fetch' || err instanceof TypeError) {
-      message = 'No se pudo establecer conexión con los servidores de JobFlow. Por favor verifica tu conexión a internet o reintenta en unos instantes.';
+      message = 'No se pudo conectar con los servidores de JobFlow. Verifica tu conexión o la URL en Ajustes.';
     }
-
     showError(title, message);
   };
 
@@ -413,7 +576,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     errorState.classList.remove('hidden');
   };
 
-  // Listeners
+  // Copiar Pitch
+  copyPitchBtn.addEventListener('click', async () => {
+    if (!resultPitchText.value) return;
+    try {
+      await navigator.clipboard.writeText(resultPitchText.value);
+      copyPitchBtn.textContent = '✓ ¡Copiado!';
+      setTimeout(() => (copyPitchBtn.textContent = '📋 Copiar'), 2000);
+    } catch {
+      copyPitchBtn.textContent = 'Error al copiar';
+    }
+  });
+
+  copyShortNoteBtn.addEventListener('click', async () => {
+    if (!resultShortNoteText.value) return;
+    try {
+      await navigator.clipboard.writeText(resultShortNoteText.value);
+      copyShortNoteBtn.textContent = '✓ ¡Copiado!';
+      setTimeout(() => (copyShortNoteBtn.textContent = '📋 Copiar Nota'), 2000);
+    } catch {
+      copyShortNoteBtn.textContent = 'Error al copiar';
+    }
+  });
+
+  // Listeners Generales
   toggleSettingsBtn.addEventListener('click', () => {
     settingsSection.classList.toggle('hidden');
   });
