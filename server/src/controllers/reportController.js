@@ -68,8 +68,21 @@ export const downloadApplicationsPdf = async (req, res) => {
     let pitchSentCount = 0;
     let totalMatchScore = 0;
     let matchScoreCount = 0;
+    let totalVacancies = 0;
+    let totalDirectOutreach = 0;
 
     applications.forEach((app) => {
+      const isDirect =
+        app.origin === 'DIRECT_OUTREACH' ||
+        app.status === 'CONTACTO' ||
+        Boolean(app.recruiter?.channel);
+
+      if (isDirect) {
+        totalDirectOutreach++;
+      } else {
+        totalVacancies++;
+      }
+
       if (statusCounts[app.status] !== undefined) {
         statusCounts[app.status]++;
       }
@@ -112,6 +125,8 @@ export const downloadApplicationsPdf = async (req, res) => {
 
     const metrics = {
       totalApplications,
+      totalVacancies,
+      totalDirectOutreach,
       totalInterviews,
       totalOffers,
       totalResponded,

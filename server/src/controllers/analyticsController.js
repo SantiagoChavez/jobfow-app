@@ -24,6 +24,56 @@ export const getAnalyticsSummary = async (req, res) => {
               $group: {
                 _id: null,
                 totalApplications: { $sum: 1 },
+                totalVacancies: {
+                  $sum: {
+                    $cond: [
+                      {
+                        $or: [
+                          { $eq: ['$origin', 'JOB_POSTING'] },
+                          {
+                            $and: [
+                              { $or: [{ $eq: ['$origin', null] }, { $eq: [{ $type: '$origin' }, 'missing'] }] },
+                              { $ne: ['$status', 'CONTACTO'] },
+                              { $or: [{ $eq: ['$recruiter.channel', null] }, { $eq: [{ $type: '$recruiter.channel' }, 'missing'] }] },
+                            ],
+                          },
+                        ],
+                      },
+                      1,
+                      0,
+                    ],
+                  },
+                },
+                totalDirectOutreach: {
+                  $sum: {
+                    $cond: [
+                      {
+                        $or: [
+                          { $eq: ['$origin', 'DIRECT_OUTREACH'] },
+                          {
+                            $and: [
+                              { $or: [{ $eq: ['$origin', null] }, { $eq: [{ $type: '$origin' }, 'missing'] }] },
+                              {
+                                $or: [
+                                  { $eq: ['$status', 'CONTACTO'] },
+                                  {
+                                    $and: [
+                                      { $ne: ['$recruiter.channel', null] },
+                                      { $ne: [{ $type: '$recruiter.channel' }, 'missing'] },
+                                      { $ne: ['$recruiter.channel', ''] },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      1,
+                      0,
+                    ],
+                  },
+                },
                 totalInterviews: {
                   $sum: {
                     $cond: [{ $in: ['$status', ['ENTREVISTA', 'OFERTA']] }, 1, 0],
@@ -125,6 +175,8 @@ export const getAnalyticsSummary = async (req, res) => {
     // 1. Extraer y procesar KPIs
     const kpiData = result?.kpiMetrics?.[0] || {};
     const totalApplications = kpiData.totalApplications || 0;
+    const totalVacancies = kpiData.totalVacancies || 0;
+    const totalDirectOutreach = kpiData.totalDirectOutreach || 0;
     const totalInterviews = kpiData.totalInterviews || 0;
     const totalOffers = kpiData.totalOffers || 0;
     const totalResponded = kpiData.totalResponded || 0;
@@ -135,6 +187,8 @@ export const getAnalyticsSummary = async (req, res) => {
 
     const kpis = {
       totalApplications,
+      totalVacancies,
+      totalDirectOutreach,
       totalInterviews,
       totalOffers,
       responseRate,

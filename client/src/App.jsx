@@ -9,6 +9,7 @@ import ViewToggle from './components/ViewToggle.jsx';
 import KanbanBoard from './components/KanbanBoard.jsx';
 import ApplicationTable from './components/ApplicationTable.jsx';
 import QuickAddModal from './components/QuickAddModal.jsx';
+import DirectContactModal from './components/DirectContactModal.jsx';
 import ApplicationDetailModal from './components/ApplicationDetailModal.jsx';
 import FollowUpModal from './components/FollowUpModal.jsx';
 import ReportModal from './components/ReportModal.jsx';
@@ -17,13 +18,13 @@ import ProfileModal from './components/ProfileModal.jsx';
 import AboutModal from './components/AboutModal.jsx';
 import { useToast } from './context/ToastContext.jsx';
 import { useAuth } from './context/AuthContext.jsx';
-import GoogleSignInButton from './components/GoogleSignInButton.jsx';
 import fondoJobflow from './assets/fondoJobflow.webp';
 import {
   RadarIcon,
   SparklesIcon,
   KanbanIcon,
   FileTextIcon,
+  SendHorizontalIcon,
 } from './components/Icons.jsx';
 import {
   getApplications,
@@ -62,6 +63,7 @@ export function App() {
 
   // Modales y Drawers
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDirectContactModalOpen, setIsDirectContactModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isRemindersDrawerOpen, setIsRemindersDrawerOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -477,17 +479,17 @@ export function App() {
 
   return (
     <div className="relative min-h-screen text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200 selection:bg-amber-500/30 selection:text-slate-900 dark:selection:bg-gold-primary dark:selection:text-navy-base isolate">
-      {/* Fondo de oficina IT con desenfoque sutil y overlay nítido */}
+      {/* Fondo de oficina IT con profundidad natural, bokeh moderado y tinte confort */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         <img
           src={fondoJobflow}
           alt="JobFlow Background"
-          className="w-full h-full object-cover scale-105 blur-[1.5px] filter transform-gpu"
+          className="w-full h-full object-cover scale-105 blur-[3.5px] saturate-[0.65] brightness-[0.92] contrast-[0.98] dark:saturate-100 dark:brightness-100 dark:contrast-100 dark:blur-[4px] filter transform-gpu transition-all duration-300"
           loading="eager"
           fetchPriority="high"
         />
-        {/* Capa de tinte adaptativo translúcido para mantener el contraste sin lavado blanquecino */}
-        <div className="absolute inset-0 bg-light-base/40 dark:bg-navy-base/80 transition-colors duration-200" />
+        {/* Capa de tinte adaptativo: sutil velo slate en modo claro para contraste y profundidad sin lavado blanquecino */}
+        <div className="absolute inset-0 bg-slate-900/20 dark:bg-navy-base/85 transition-colors duration-200" />
       </div>
 
       {/* Navbar Superior con Campana y Menú de Usuario */}
@@ -499,6 +501,13 @@ export function App() {
             openAuthModal('login');
           } else {
             setIsAddModalOpen(true);
+          }
+        }}
+        onOpenDirectContactModal={() => {
+          if (!isAuthenticated) {
+            openAuthModal('login');
+          } else {
+            setIsDirectContactModalOpen(true);
           }
         }}
         onOpenReportModal={() => {
@@ -527,103 +536,93 @@ export function App() {
       />
 
       {/* Contenido Principal */}
-      <main className={`flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 ${isAuthenticated ? 'pb-24 md:pb-16' : 'pb-16'}`}>
+      <main
+        className={`flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 pt-16 sm:pt-20 ${
+          isAuthenticated
+            ? 'pb-24 md:pb-16'
+            : 'pb-14 sm:pb-16 flex flex-col justify-center'
+        }`}
+      >
         {!isAuthenticated ? (
           /* Estado Desconectado / Landing de Bienvenida y Seguridad */
-          <div className="py-8 md:py-16 flex flex-col items-center text-center max-w-3xl mx-auto animate-fade-in">
-            {/* Emblema Central: Logo Radar con Glow Dorado + JobFlow */}
-            <div className="relative flex items-center justify-center gap-3.5 sm:gap-4 mb-5 select-none group">
-              {/* Resplandor / Aura Cian Suave */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/25 via-sky-400/35 to-amber-500/25 dark:from-gold-primary/25 dark:via-sky-tech/30 dark:to-gold-primary/25 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center animate-fade-in my-auto py-2 sm:py-4">
+            {/* Tarjeta Principal Hero */}
+            <div className="w-full py-6 sm:py-8 md:py-10 px-5 sm:px-10 md:px-12 rounded-2xl sm:rounded-3xl bg-white/90 dark:bg-navy-surface/60 backdrop-blur-lg border border-slate-200/80 dark:border-slate-800/60 shadow-2xl shadow-slate-900/15 dark:shadow-black/40 flex flex-col items-center text-center max-w-3xl mx-auto">
+              {/* Emblema Central: Logo Radar con Glow Dorado + JobFlow */}
+              <div className="relative flex items-center justify-center gap-2.5 sm:gap-4 mb-3 sm:mb-4 select-none group">
+                {/* Resplandor / Aura Cian Suave */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/25 via-sky-400/35 to-amber-500/25 dark:from-gold-primary/25 dark:via-sky-tech/30 dark:to-gold-primary/25 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-              {/* Contenedor del Radar Agrandado con relieve */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white dark:bg-navy-surface border border-amber-300/60 dark:border-gold-primary/50 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-xl shadow-amber-500/15 dark:shadow-gold-primary/20 transition-transform duration-300 group-hover:scale-105">
-                <RadarIcon className="w-10 h-10 sm:w-12 sm:h-12" />
+                {/* Contenedor del Radar con relieve */}
+                <div className="relative w-11 h-11 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white dark:bg-navy-surface border border-amber-300/60 dark:border-gold-primary/50 flex items-center justify-center text-amber-600 dark:text-gold-primary shadow-lg shadow-amber-500/15 dark:shadow-gold-primary/20 transition-transform duration-300 group-hover:scale-105">
+                  <RadarIcon className="w-6 h-6 sm:w-9 sm:h-9" />
+                </div>
+
+                {/* Nombre JobFlow centrado */}
+                <span className="relative text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                  Job<span className="text-amber-600 dark:text-gold-primary">Flow</span>
+                </span>
               </div>
 
-              {/* Nombre JobFlow centrado */}
-              <span className="relative text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                Job<span className="text-amber-600 dark:text-gold-primary">Flow</span>
-              </span>
-            </div>
-
-            {/* Badge de espacio privado */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 dark:bg-gold-primary/10 border border-amber-500/30 dark:border-gold-primary/30 text-amber-700 dark:text-gold-primary text-xs font-bold uppercase tracking-wider mb-4">
-              <SparklesIcon className="w-3.5 h-3.5" />
-              <span>Radar Inteligente • Tu Espacio Privado</span>
-            </div>
-
-            {/* Titular principal con tamaño equilibrado */}
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mb-4 max-w-2xl">
-              Gestiona tu búsqueda laboral con el poder de la <span className="text-amber-600 dark:text-gold-primary">Inteligencia Artificial</span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mb-8 max-w-2xl leading-relaxed">
-              Registra y dale seguimiento a tus postulaciones, autocompleta vacantes con Gemini AI, calcula afinidad técnica en tiempo real y descarga reportes PDF ejecutivos en un espacio seguro y exclusivo para tu perfil.
-            </p>
-
-            <div className="flex flex-col items-center gap-3.5 w-full sm:w-auto">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-                {/* Botón rápido y directo con Google (1 solo clic) */}
-                <GoogleSignInButton
-                  text="continue_with"
-                  buttonWidth={220}
-                  onFallbackClick={() => openAuthModal('login')}
-                />
-
-                {/* Botón Crear Cuenta con Correo */}
-                <button
-                  onClick={() => openAuthModal('register')}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl font-black text-sm bg-amber-500 hover:bg-amber-400 dark:bg-gold-primary dark:hover:bg-gold-light text-slate-950 shadow-lg shadow-amber-500/20 dark:shadow-gold-primary/20 hover:shadow-amber-500/30 dark:hover:shadow-gold-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Crear Cuenta Gratis
-                </button>
-
-                {/* Botón Iniciar Sesión */}
-                <button
-                  onClick={() => openAuthModal('login')}
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-sm bg-slate-100 dark:bg-navy-surface/60 border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-gold-primary/60 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Iniciar Sesión
-                </button>
+              {/* Badge de espacio privado */}
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-amber-500/10 dark:bg-gold-primary/10 border border-amber-500/30 dark:border-gold-primary/30 text-amber-700 dark:text-gold-primary text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 sm:mb-3">
+                <SparklesIcon className="w-3.5 h-3.5" />
+                <span>Radar Inteligente • Tu Espacio Privado</span>
               </div>
 
-              {/* Mensaje de apoyo para nuevos usuarios */}
-              <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 text-center">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Registro instantáneo en 1 clic disponible con Google o con tu correo</span>
+              {/* Titular principal con tamaño adaptativo */}
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mb-2 sm:mb-3 max-w-2xl px-1">
+                Gestiona tu búsqueda laboral con el poder de la <span className="text-amber-600 dark:text-gold-primary">Inteligencia Artificial</span>
+              </h1>
+
+              <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed px-1">
+                Registra y dale seguimiento a tus postulaciones, autocompleta vacantes con Gemini AI, calcula afinidad técnica en tiempo real y descarga reportes PDF ejecutivos en un espacio seguro y exclusivo para tu perfil.
               </p>
             </div>
 
-            {/* Tarjetas informativas de características */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 w-full text-left">
-              <div className="p-5 rounded-2xl bg-white dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-navy-highlight border border-slate-200 dark:border-slate-700 flex items-center justify-center text-sky-600 dark:text-sky-tech mb-3">
-                  <KanbanIcon className="w-5 h-5" />
+            {/* Tarjetas informativas de características (4 pilares clave) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mt-4 sm:mt-6 w-full text-left">
+              {/* 1. Kanban & Alertas */}
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/90 dark:bg-navy-surface/80 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-lg hover:border-sky-500/40 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 mb-2 sm:mb-2.5">
+                  <KanbanIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Tablero Kanban & Alertas</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Arrastra tus postulaciones por estado, registra eventos cronológicos y calcula tiempos de respuesta automáticamente.
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1">Tablero Kanban & Alertas</h3>
+                <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Arrastra tus postulaciones por estado, registra eventos cronológicos y calcula tiempos de inactividad automáticamente.
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-navy-highlight border border-slate-200 dark:border-slate-700 flex items-center justify-center text-amber-600 dark:text-gold-primary mb-3">
-                  <SparklesIcon className="w-5 h-5" />
+              {/* 2. Mensajes a Reclutadores */}
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/90 dark:bg-navy-surface/80 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-lg hover:border-cyan-500/40 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 mb-2 sm:mb-2.5">
+                  <SendHorizontalIcon className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Copiloto IA con Gemini</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Pega cualquier oferta laboral y extrae instantáneamente las habilidades clave, resumen y pitch de presentación.
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1">Mensajes a Reclutadores</h3>
+                <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Genera pitches para headhunters con IA, notas de conexión para LinkedIn y apertura directa en Gmail Web.
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white dark:bg-navy-surface/80 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-navy-highlight border border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3">
-                  <FileTextIcon className="w-5 h-5" />
+              {/* 3. Copiloto IA con Gemini */}
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/90 dark:bg-navy-surface/80 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-lg hover:border-amber-500/40 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-gold-primary mb-2 sm:mb-2.5">
+                  <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Reportes PDF & Métricas</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Analítica de conversión, empresas más ágiles y descarga de reportes ejecutivos en PDF para compartir con tu coach.
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1">Copiloto IA con Gemini</h3>
+                <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Pega cualquier oferta laboral y extrae habilidades clave, calcula afinidad técnica y genera mensajes de seguimiento.
+                </p>
+              </div>
+
+              {/* 4. Reportes PDF & Métricas */}
+              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/90 dark:bg-navy-surface/80 backdrop-blur-md border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-lg hover:border-emerald-500/40 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-2 sm:mb-2.5">
+                  <FileTextIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1">Reportes PDF & Métricas</h3>
+                <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Analítica de conversión de embudo, desglose por vacante vs contacto directo y exportación ejecutiva en PDF.
                 </p>
               </div>
             </div>
@@ -702,6 +701,7 @@ export function App() {
           currentView={currentView}
           setCurrentView={handleViewChange}
           onOpenAddModal={() => setIsAddModalOpen(true)}
+          onOpenDirectContactModal={() => setIsDirectContactModalOpen(true)}
           onOpenReportModal={() => setIsReportModalOpen(true)}
           onRefresh={() => {
             fetchAllData();
@@ -716,6 +716,13 @@ export function App() {
       <QuickAddModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onSave={handleSaveApplication}
+      />
+
+      {/* Modal: + Mensaje Directo a Reclutador */}
+      <DirectContactModal
+        isOpen={isDirectContactModalOpen}
+        onClose={() => setIsDirectContactModalOpen(false)}
         onSave={handleSaveApplication}
       />
 

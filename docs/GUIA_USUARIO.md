@@ -95,7 +95,27 @@ Tu pantalla principal cuenta con un tablero organizado en **5 columnas** que rep
 
 ---
 
-### Paso 5: Consultar y Copiar tu Pitch Guardado en Cualquier Momento
+### Paso 5: Contacto Directo y Mensajes a Reclutadores (+ Reclutador)
+Cuando encuentres un recruiter o headhunter en LinkedIn y quieras iniciar una conversación directa de alto impacto:
+
+1. Haz clic en el botón cian **"+ Mensaje a Reclutador"** en el Navbar superior.
+2. Ingresa los datos del contacto:
+   - **Empresa y Rol de interés**.
+   - **Nombre del Reclutador** y su **Email o Perfil de LinkedIn**.
+   - Tipo de contacto (*Headhunter*, *Talent Acquisition*, *Líder Técnico*, *Referido*).
+3. Presiona **"✨ Generar Pitch con IA"**: Gemini redactará un mensaje de presentación magnético basado en tus habilidades de perfil.
+4. Tienes a disposición:
+   - **Copiar Pitch** o **Copiar Nota LinkedIn** (adaptada al límite de 300 caracteres de conexión).
+   - **Abrir en Gmail Web**: Abre instantáneamente el redactor oficial de Gmail con el destinatario, asunto y mensaje listos para enviar en 1 clic.
+5. Haz clic en **"Registrar Contacto Directo"** y se integrará a tu flujo con métricas de conversión diferenciadas.
+
+<p align="center">
+  <img src="../client/src/assets/contactoDirecto.png" alt="Modal Mensaje Directo a Reclutador y Apertura en Gmail" width="460" />
+</p>
+
+---
+
+### Paso 6: Consultar y Copiar tu Pitch Guardado en Cualquier Momento
 A veces una empresa te contacta días o semanas después de que te postulaste y ya no recuerdas exactamente qué decía la vacante ni cómo presentarte.
 
 1. En el tablero o en la tabla, haz un clic sobre la tarjeta de la empresa.
@@ -106,17 +126,17 @@ A veces una empresa te contacta días o semanas después de que te postulaste y 
 
 ---
 
-### Paso 6: Campana de Alertas y Seguimiento sin Estrés
+### Paso 7: Campana de Alertas y Seguimiento sin Estrés
 Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las empresas donde te postulaste.
 
 - En la barra superior verás una **Campana con un número** que indica cuántas oportunidades necesitan tu atención.
 - Si una empresa lleva **más de 5 días en silencio**, aparecerá como *"Seguimiento Urgente"*.
 - Haz clic en la campana para abrir el panel lateral de recordatorios:
-  - Encontrarás el botón **"✉️ Enviar Correo"**: al presionarlo se abrirá tu programa de correo (Outlook, Gmail, etc.) con el email del reclutador, un asunto profesional y el texto de seguimiento ya redactado.
+  - Encontrarás el botón **"Abrir en Gmail"**: al presionarlo se abrirá directamente el redactor de Gmail Web con el email del reclutador, un asunto profesional y el texto de seguimiento ya redactado.
 
 ---
 
-### Paso 7: Vista de Tabla y Descarga de Reportes
+### Paso 8: Vista de Tabla y Descarga de Reportes
 - Si prefieres ver tus postulaciones como una planilla ordenada, haz clic en la pestaña **"Tabla"** en la barra superior.
   - Puedes filtrar por empresa, rol, estado o prioridad.
   - Al pie de la tabla cuentas con paginación para navegar de forma cómoda y rápida.
@@ -133,7 +153,7 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 
 ---
 
-### Paso 8: Personaliza tu Experiencia (Modo Claro & Oscuro)
+### Paso 9: Personaliza tu Experiencia (Modo Claro & Oscuro)
 Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trabajar de día o de noche sin fatiga visual:
 
 - En la barra superior, busca el **botón de Sol / Luna**.
@@ -142,7 +162,7 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
 
 ---
 
-### Paso 9: Captura en 1 Clic con la Extensión de Chrome (LinkedIn, Indeed, BambooHR & Glassdoor)
+### Paso 10: Captura en 1 Clic con la Extensión de Chrome (LinkedIn, Indeed, BambooHR & Glassdoor)
 ¿Quieres guardar empleos mientras navegas por LinkedIn, Indeed, BambooHR o Glassdoor sin tener que copiar y pegar manualmente? Utiliza la **Extensión oficial de Chrome de Jobflow**:
 
 1. **Instalar o Actualizar la extensión en el navegador:**
@@ -174,7 +194,7 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
 
 ---
 
-### Paso 10: Conoce el Stack Tecnológico y Propósito (Acerca de JobFlow)
+### Paso 11: Conoce el Stack Tecnológico y Propósito (Acerca de JobFlow)
 Para conocer los detalles del sistema, tecnologías utilizadas y el equipo detrás de Jobflow:
 
 1. Haz clic en el botón **"ℹ️ Acerca de"** en la barra superior o dentro de tu menú de usuario.

@@ -4,6 +4,8 @@ import { BriefcaseIcon, MessageIcon, CheckCircleIcon, SparklesIcon } from './Ico
 export const KPICards = ({ analytics, loading }) => {
   const kpis = analytics?.kpis || {
     totalApplications: 0,
+    totalVacancies: 0,
+    totalDirectOutreach: 0,
     totalInterviews: 0,
     totalOffers: 0,
     responseRate: 0,
@@ -11,11 +13,20 @@ export const KPICards = ({ analytics, loading }) => {
 
   const avgResponseDays = analytics?.responseMetrics?.avgResponseDays ?? null;
 
+  const totalVacancies = kpis.totalVacancies ?? 0;
+  const totalDirectOutreach = kpis.totalDirectOutreach ?? 0;
+
   const cards = [
     {
-      title: 'Postulaciones',
+      title: 'Total Gestiones',
       value: kpis.totalApplications,
-      subtitle: 'Enviadas en total',
+      subtitle: (
+        <span className="flex items-center gap-1.5 flex-wrap text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
+          <span className="text-sky-700 dark:text-sky-tech">💼 {totalVacancies} vacantes</span>
+          <span className="text-slate-300 dark:text-slate-600">•</span>
+          <span className="text-cyan-700 dark:text-cyan-300">💬 {totalDirectOutreach} directos</span>
+        </span>
+      ),
       icon: <BriefcaseIcon className="w-5 h-5 text-sky-600 dark:text-sky-tech" />,
       borderColor: 'border-slate-200 dark:border-sky-500/20',
       bgColor: 'bg-sky-50 dark:bg-sky-500/10',

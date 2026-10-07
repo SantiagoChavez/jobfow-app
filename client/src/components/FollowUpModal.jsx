@@ -11,9 +11,10 @@ import {
   ExternalLinkIcon,
   LinkedInIcon,
   UserIcon,
+  GoogleIcon,
 } from './Icons.jsx';
 import { generateFollowUpMessage, updateApplication } from '../services/api.js';
-import { createSafeMailto } from '../utils/mailto.js';
+import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { getReminderMetrics } from '../utils/reminders.js';
@@ -159,9 +160,17 @@ const FollowUpModalDialog = ({
     }
   };
 
-  // Generador seguro de URL mailto (funciona con email o sin email destinatario para abrir cliente)
+  // Generador seguro de URL mailto y Gmail Web (funciona con email o sin email destinatario para abrir cliente)
   const safeMailto = generatedMessage
     ? createSafeMailto({
+        email: contactEmail.trim(),
+        subject: generatedSubject,
+        body: generatedMessage,
+      })
+    : null;
+
+  const safeGmailWeb = generatedMessage
+    ? createGmailWebLink({
         email: contactEmail.trim(),
         subject: generatedSubject,
         body: generatedMessage,
@@ -267,13 +276,17 @@ const FollowUpModalDialog = ({
 
             {/* Accesos directos a portales */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-              {safeMailto && (
+              {safeGmailWeb && (
                 <a
-                  href={safeMailto}
-                  className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 font-bold flex items-center gap-1.5 transition-all text-[11px]"
+                  href={safeGmailWeb}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-navy-surface text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-navy-highlight border border-slate-200 dark:border-slate-700 hover:border-cyan-500/50 font-bold flex items-center gap-1.5 transition-all text-[11px] shadow-xs"
+                  title="Abrir redactor en Gmail Web con destinatario, asunto y mensaje precargados"
                 >
-                  <SendIcon className="w-3.5 h-3.5" />
-                  <span>{contactEmail ? `Abrir Email a ${contactEmail}` : 'Abrir en mi Cliente de Correo'}</span>
+                  <GoogleIcon className="w-3.5 h-3.5" />
+                  <span>{contactEmail ? `Abrir Gmail a ${contactEmail}` : 'Abrir en Gmail Web'}</span>
+                  <ExternalLinkIcon className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                 </a>
               )}
 
@@ -506,13 +519,17 @@ const FollowUpModalDialog = ({
               <span>{copiedFull ? '¡Copiado!' : 'Copiar Mensaje'}</span>
             </button>
 
-            {safeMailto && (
+            {safeGmailWeb && (
               <a
-                href={safeMailto}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-navy-base transition-all shadow-md shadow-cyan-500/20 flex items-center gap-1.5"
+                href={safeGmailWeb}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-navy-surface text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-navy-highlight border border-slate-200 dark:border-slate-700 hover:border-cyan-500/50 transition-all shadow-xs flex items-center gap-1.5"
+                title="Abrir redactor en Gmail Web con destinatario, asunto y mensaje precargados"
               >
-                <SendIcon className="w-4 h-4" />
-                <span>Abrir en Email</span>
+                <GoogleIcon className="w-4 h-4" />
+                <span>Abrir en Gmail</span>
+                <ExternalLinkIcon className="w-3 h-3 text-slate-400 dark:text-slate-500" />
               </a>
             )}
           </div>

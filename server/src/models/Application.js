@@ -90,6 +90,18 @@ const applicationSchema = new Schema(
         type: String,
         trim: true,
       },
+      role: {
+        type: String,
+        trim: true,
+      },
+      linkedinUrl: {
+        type: String,
+        trim: true,
+      },
+      channel: {
+        type: String,
+        trim: true,
+      },
     },
     jobUrl: {
       type: String,
@@ -125,6 +137,11 @@ const applicationSchema = new Schema(
       type: Number,
       default: null,
     },
+    origin: {
+      type: String,
+      enum: ['JOB_POSTING', 'DIRECT_OUTREACH'],
+      default: 'JOB_POSTING',
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -140,6 +157,8 @@ const applicationSchema = new Schema(
 // Índices para optimizar reportes y búsquedas
 applicationSchema.index({ user: 1, appliedAt: -1 });
 applicationSchema.index({ user: 1, status: 1 });
+applicationSchema.index({ user: 1, origin: 1 });
+applicationSchema.index({ origin: 1 });
 applicationSchema.index({ status: 1, appliedAt: -1 });
 applicationSchema.index({ priority: 1 });
 applicationSchema.index({ workMode: 1 });

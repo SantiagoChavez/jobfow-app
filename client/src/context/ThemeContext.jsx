@@ -93,38 +93,37 @@ export const ThemeProvider = ({ children }) => {
   // Cambiar tema explícitamente o mediante función de actualización
   const setTheme = useCallback(
     (themeOrUpdater) => {
+      let resolvedNextTheme;
       setThemeState((currentTheme) => {
-        const nextTheme =
+        const next =
           typeof themeOrUpdater === 'function' ? themeOrUpdater(currentTheme) : themeOrUpdater;
 
-        if (nextTheme !== 'dark' && nextTheme !== 'light') {
+        if (next !== 'dark' && next !== 'light') {
           return currentTheme;
         }
 
-        // Mantener ref sincronizado para que el effect de sesión no lo confunda con un cambio externo
-        prevUserThemeRef.current = nextTheme;
-
-        // Actualizar DOM de forma inmediata
-        applyThemeToDom(nextTheme);
+        resolvedNextTheme = next;
+        prevUserThemeRef.current = next;
+        applyThemeToDom(next);
 
         try {
-          localStorage.setItem('jobflow_theme', nextTheme);
+          localStorage.setItem('jobflow_theme', next);
         } catch (err) {
           console.warn('Error al persistir tema en localStorage:', err);
         }
 
-        // Sincronizar AuthContext y backend si el usuario está conectado
-        if (isAuthenticated) {
-          if (updateUser) {
-            updateUser({ theme: nextTheme });
-          }
-          updateUserTheme(nextTheme).catch((err) => {
-            console.warn('No se pudo sincronizar el tema con el servidor:', err.message);
-          });
-        }
-
-        return nextTheme;
+        return next;
       });
+
+      // Sincronizar AuthContext y backend fuera del ciclo de renderizado de React
+      if (resolvedNextTheme && isAuthenticated) {
+        if (updateUser) {
+          updateUser({ theme: resolvedNextTheme });
+        }
+        updateUserTheme(resolvedNextTheme).catch((err) => {
+          console.warn('No se pudo sincronizar el tema con el servidor:', err.message);
+        });
+      }
     },
     [isAuthenticated, updateUser]
   );

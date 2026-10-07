@@ -132,8 +132,90 @@ export const generateFollowUp = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Generar pitch de contacto directo adaptado al reclutador y empresa con IA
+ * @route   POST /api/ai/direct-pitch
+ * @access  Public (enriquecido con perfil si está autenticado)
+ */
+export const generateDirectPitch = async (req, res) => {
+  try {
+    const {
+      recruiterName,
+      recruiterRole,
+      companyName,
+      companyWebsite,
+      companyInfo,
+      targetRole,
+      channel = 'LINKEDIN_DM',
+      tone = 'CORDIAL',
+      customInstructions = '',
+      userProfile: explicitProfile,
+    } = req.body;
+
+    if (!companyName || typeof companyName !== 'string' || !companyName.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'El nombre de la empresa es obligatorio para generar el pitch de contacto.',
+        message: 'El nombre de la empresa es obligatorio para generar el pitch de contacto.',
+      });
+    }
+
+    let userProfile = explicitProfile;
+    if (!userProfile) {
+      let resolvedUser = req.user;
+      if (!resolvedUser && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+          const token = req.headers.authorization.split(' ')[1];
+          const decoded = jwt.verify(token, getJwtSecret());
+          resolvedUser = await User.findById(decoded.id).select('-password');
+        } catch {
+          // Ignorar y usar fallback neutral
+        }
+      }
+
+      if (resolvedUser) {
+        userProfile = {
+          name: resolvedUser.name,
+          headline: resolvedUser.headline || 'Full Stack Developer',
+          bio: resolvedUser.bio || '',
+          skills: resolvedUser.skills || [],
+          links: resolvedUser.links || {},
+        };
+      }
+    }
+
+    const { generateDirectOutreachPitch } = await import('../services/aiService.js');
+    const result = await generateDirectOutreachPitch({
+      recruiterName,
+      recruiterRole,
+      companyName,
+      companyWebsite,
+      companyInfo,
+      targetRole,
+      channel,
+      tone,
+      userProfile,
+      customInstructions,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result,
+    });
+  } catch (error) {
+    console.error('Error al generar pitch directo con IA:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Error al generar el pitch de contacto directo.',
+      message: error.message || 'Error al generar el pitch de contacto directo.',
+    });
+  }
+};
+
 export default {
   analyzeJob,
   generateFollowUp,
+  generateDirectPitch,
 };
 

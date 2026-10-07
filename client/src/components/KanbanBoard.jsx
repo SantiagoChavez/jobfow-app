@@ -153,8 +153,19 @@ export const KanbanBoard = ({
                                 {app.role}
                               </h5>
 
-                              {/* Badges de Estado / Modalidad / Prioridad */}
+                              {/* Badges de Origen / Estado / Modalidad / Prioridad */}
                               <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                                {(app.origin === 'DIRECT_OUTREACH' || app.recruiter?.channel) ? (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-cyan-50 text-cyan-800 border-cyan-300 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30 flex items-center gap-1 max-w-full truncate">
+                                    <span>💬</span>
+                                    <span className="truncate">{app.recruiter?.name ? `Directo: ${app.recruiter.name}` : 'Reclutador'}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-500/10 dark:text-sky-300 dark:border-sky-500/25 flex items-center gap-1">
+                                    <span>💼</span>
+                                    <span>Vacante</span>
+                                  </span>
+                                )}
                                 {app.priority && (
                                   <span
                                     className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
