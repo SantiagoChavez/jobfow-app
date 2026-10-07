@@ -49,7 +49,7 @@ export const GoogleSignInButton = ({
             theme: isDark ? 'filled_black' : 'outline',
             size: 'large',
             text,
-            shape: 'rectangular',
+            shape: 'pill',
             width: buttonWidth,
             logo_alignment: 'left',
           });
@@ -80,12 +80,16 @@ export const GoogleSignInButton = ({
 
   return (
     <div className={`inline-flex items-center justify-center min-h-[44px] ${className}`}>
-      <div ref={containerRef} className="flex items-center justify-center">
+      <div
+        ref={containerRef}
+        className="flex items-center justify-center rounded-xl overflow-hidden shadow-sm hover:shadow transition-all"
+        style={{ borderRadius: '0.75rem' }}
+      >
         {/* Fallback mientras carga el script de Google */}
         <button
           type="button"
           onClick={onFallbackClick}
-          className="px-5 py-2.5 rounded-xl font-bold text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white shadow-sm flex items-center justify-center gap-2.5"
+          className="w-[240px] sm:w-auto h-[44px] px-5 rounded-xl font-bold text-sm bg-white dark:bg-navy-surface border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-gold-primary/60 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white shadow-sm flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
         >
           <GoogleIcon className="w-4 h-4" />
           <span>{fallbackLabel}</span>

@@ -160,6 +160,7 @@ export const QuickAddModal = ({ isOpen, onClose, onSave }) => {
         suggestedPitch: (formData.suggestedPitch ? formData.suggestedPitch.trim() : aiInsight?.suggestedPitch) || undefined,
         companySummary: (formData.companySummary ? formData.companySummary.trim() : aiInsight?.companySummary) || undefined,
         matchScore: matchData?.matchScore != null ? matchData.matchScore : undefined,
+        origin: 'JOB_POSTING',
       });
 
       // Reset y cerrar
