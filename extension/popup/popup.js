@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const noTokenAlert = document.getElementById('noTokenAlert');
   const openSettingsLink = document.getElementById('openSettingsLink');
 
+  // Selector de Modo
+  const modeVacancyBtn = document.getElementById('modeVacancyBtn');
+  const modeRecruiterBtn = document.getElementById('modeRecruiterBtn');
+
   // Sección Reclutador
   const recruiterDetectedCard = document.getElementById('recruiterDetectedCard');
   const recruiterNameInput = document.getElementById('recruiterNameInput');
@@ -78,6 +82,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   let extractedDataCache = null;
   let isRecruiterMode = false;
 
+  // Cambiar entre Modo Vacante y Modo Reclutador
+  const setCaptureMode = (mode) => {
+    if (mode === 'recruiter') {
+      isRecruiterMode = true;
+      if (modeVacancyBtn) modeVacancyBtn.classList.remove('active');
+      if (modeRecruiterBtn) modeRecruiterBtn.classList.add('active', 'mode-recruiter');
+      recruiterDetectedCard.classList.remove('hidden');
+      captureBtnText.textContent = '✨ Generar Pitch & Guardar Contacto';
+    } else {
+      isRecruiterMode = false;
+      if (modeRecruiterBtn) modeRecruiterBtn.classList.remove('active', 'mode-recruiter');
+      if (modeVacancyBtn) modeVacancyBtn.classList.add('active');
+      recruiterDetectedCard.classList.add('hidden');
+      captureBtnText.textContent = '⚡ Capturar y Procesar con IA';
+    }
+  };
+
   // 1. Cargar token y configuración persistente
   const loadConfig = async () => {
     return new Promise((resolve) => {
@@ -121,9 +142,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           tabDomainBadge.textContent = urlObj.hostname.replace('www.', '');
 
           // Detectar portal
-          if (urlObj.hostname.includes('linkedin.com/in/') || currentTab.url.includes('/in/')) {
+          const isLinkedInProfile = urlObj.hostname.includes('linkedin.com') && currentTab.url.includes('/in/');
+          if (isLinkedInProfile) {
             sourceBadge.textContent = 'LinkedIn Perfil';
             sourceBadge.classList.remove('hidden');
+            setCaptureMode('recruiter');
           } else if (urlObj.hostname.includes('linkedin')) {
             sourceBadge.textContent = 'LinkedIn Jobs';
             sourceBadge.classList.remove('hidden');
@@ -140,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             checkJobflowWebSession(currentTab.id);
           }
 
-          // Inspección rápida de la página para detectar reclutador automáticamente
+          // Inspección rápida de la página para extraer datos
           await probePageContent(currentTab.id);
         } catch {
           tabDomainBadge.textContent = 'Navegador';
@@ -162,16 +185,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (extractedDataCache && extractedDataCache.isRecruiter && extractedDataCache.recruiter) {
-        isRecruiterMode = true;
-        recruiterDetectedCard.classList.remove('hidden');
+        setCaptureMode('recruiter');
         recruiterNameInput.value = extractedDataCache.recruiter.name || '';
         recruiterRoleInput.value = extractedDataCache.recruiter.role || '';
         recruiterCompanyInput.value = extractedDataCache.recruiter.companyName || '';
-        captureBtnText.textContent = '✨ Generar Pitch & Guardar Contacto';
+      } else if (currentTab?.url && (currentTab.url.includes('/in/') || currentTab.url.includes('linkedin.com/in/'))) {
+        setCaptureMode('recruiter');
       } else {
-        isRecruiterMode = false;
-        recruiterDetectedCard.classList.add('hidden');
-        captureBtnText.textContent = 'Capturar y Procesar con IA';
+        setCaptureMode('vacancy');
       }
     } catch (err) {
       console.warn('Error en sondeo de pestaña:', err);
@@ -326,6 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           },
           role: `Contacto Directo: ${recName}`,
           status: 'CONTACTO',
+          origin: 'DIRECT_OUTREACH',
           priority: 'MEDIUM',
           workMode: 'REMOTE',
           recruiter: {
@@ -335,10 +357,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             channel,
           },
           jobUrl: currentTab.url,
-          suggestedPitch: pitchData.pitch || '',
+          suggestedPitch: pitchData.pitch || pitchData.shortNote || '',
           companySummary: pitchData.companySummary || '',
           initialInteractionType: 'MENSAJE_ENVIADO',
-          notes: `Contacto directo vía LinkedIn a ${recName} (${recRole}).`,
+          notes: `Contacto directo vía ${
+            channel === 'LINKEDIN_DM'
+              ? 'LinkedIn (Mensaje/InMail)'
+              : channel === 'LINKEDIN_NOTE'
+              ? 'LinkedIn (Nota de conexión)'
+              : channel === 'COLD_EMAIL'
+              ? 'Email en frío'
+              : 'Outreach directo'
+          } a ${recName} (${recRole}).`,
         };
 
         const saveRes = await fetch(`${JOBFLOW_API_URL}/api/applications`, {
@@ -429,6 +459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         role: roleName,
         status: 'ENVIADA',
+        origin: 'JOB_POSTING',
         priority,
         workMode,
         salary: aiResult.salary || undefined,
@@ -598,6 +629,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       copyShortNoteBtn.textContent = 'Error al copiar';
     }
   });
+
+  // Listeners de Cambio de Modo
+  if (modeVacancyBtn) {
+    modeVacancyBtn.addEventListener('click', () => setCaptureMode('vacancy'));
+  }
+  if (modeRecruiterBtn) {
+    modeRecruiterBtn.addEventListener('click', () => setCaptureMode('recruiter'));
+  }
 
   // Listeners Generales
   toggleSettingsBtn.addEventListener('click', () => {
