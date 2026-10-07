@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Jobflow — Capturador Rápido de Vacantes",
-  "version": "1.0.3",
-  "description": "Captura y analiza ofertas de empleo con IA (Google Gemini) desde LinkedIn, Indeed, BambooHR y cualquier portal con un solo clic hacia tu tablero Kanban en Jobflow.",
+  "name": "JobFlow — Capturador de Vacantes y Reclutadores",
+  "version": "1.0.5",
+  "description": "Captura vacantes y perfiles de reclutadores con IA (Google Gemini) desde LinkedIn, Indeed, BambooHR y genera pitches personalizados directo a tu Kanban en JobFlow.",
   "icons": {
     "16": "assets/icon16.png",
     "48": "assets/icon48.png",
@@ -10,7 +10,7 @@
   },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Capturar Vacante para Jobflow",
+    "default_title": "JobFlow — Capturar Vacante o Reclutador",
     "default_icon": {
       "16": "assets/icon16.png",
       "48": "assets/icon48.png",
