@@ -88,6 +88,7 @@ export const ApplicationTable = ({
           <tr>
             <th className="py-3 px-4">Empresa</th>
             <th className="py-3 px-4">Puesto / Rol</th>
+            <th className="py-3 px-4">Tipo</th>
             <th className="py-3 px-4">Modalidad</th>
             <th className="py-3 px-4">Prioridad</th>
             <th className="py-3 px-4">Estado</th>
@@ -124,6 +125,19 @@ export const ApplicationTable = ({
               {/* Rol */}
               <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
                 {app.role}
+              </td>
+
+              {/* Tipo */}
+              <td className="py-3 px-4">
+                {app.origin === 'DIRECT_OUTREACH' || app.recruiter?.channel ? (
+                  <span className="px-2 py-0.5 rounded-full border text-[10px] font-bold bg-cyan-50 text-cyan-700 border-cyan-300 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30 inline-flex items-center gap-1 whitespace-nowrap">
+                    💬 Directo
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full border text-[10px] font-bold bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30 inline-flex items-center gap-1 whitespace-nowrap">
+                    💼 Vacante
+                  </span>
+                )}
               </td>
 
               {/* Modalidad */}

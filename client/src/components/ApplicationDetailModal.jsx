@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createSafeMailto } from '../utils/mailto.js';
+import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { useToast } from '../context/ToastContext.jsx';
 import {
@@ -14,6 +14,7 @@ import {
   CheckCircleIcon,
   TrashIcon,
   PencilIcon,
+  GoogleIcon,
 } from './Icons.jsx';
 
 const STATUS_OPTIONS = [
@@ -260,6 +261,15 @@ export const ApplicationDetailModal = ({
 
           {/* Badges de Información Rápida */}
           <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-200 dark:border-slate-800/80">
+            {application.origin === 'DIRECT_OUTREACH' || application.recruiter?.channel ? (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 flex items-center gap-1">
+                💬 Mensaje a Reclutador {application.recruiter?.channel ? `(${application.recruiter.channel})` : ''}
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-800 dark:bg-sky-500/15 dark:text-sky-300 border border-sky-300 dark:border-sky-500/30 flex items-center gap-1">
+                💼 Postulación a Vacante
+              </span>
+            )}
             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
               {application.workMode || 'REMOTE'}
             </span>
@@ -675,19 +685,24 @@ export const ApplicationDetailModal = ({
                   </div>
 
                   {application.recruiter.email && (
-                    <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-                        <MailIcon className="w-4 h-4 text-slate-400" />
-                        <span>{application.recruiter.email}</span>
+                    <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 min-w-0">
+                        <MailIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                        <span className="truncate">{application.recruiter.email}</span>
                       </div>
                       <a
-                        href={createSafeMailto({
+                        href={createGmailWebLink({
                           email: application.recruiter.email,
                           subject: `Seguimiento de postulación: ${application.role} - ${application.company?.name || ''}`,
                         })}
-                        className="px-3 py-1 rounded-lg text-xs font-bold bg-sky-500/10 text-sky-700 dark:text-sky-tech hover:bg-sky-500/20 border border-sky-500/30 transition-all"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-navy-surface text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-navy-highlight border border-slate-200 dark:border-slate-700 hover:border-cyan-500/50 transition-all shadow-xs flex items-center gap-1.5"
+                        title="Abrir redactor en Gmail Web con asunto precargado"
                       >
-                        Enviar Correo
+                        <GoogleIcon className="w-3.5 h-3.5" />
+                        <span>Abrir en Gmail</span>
+                        <ExternalLinkIcon className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                       </a>
                     </div>
                   )}

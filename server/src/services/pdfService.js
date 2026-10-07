@@ -161,23 +161,27 @@ export const generateApplicationsPdfReport = async (
 
   // 2. Bloque de 6 Cajas Métricas (KPI Cards - 2 filas)
   const totalApps = metrics.totalApplications || applications.length || 0;
+  const totalVacancies = metrics.totalVacancies !== undefined
+    ? metrics.totalVacancies
+    : applications.filter((a) => a.origin !== 'DIRECT_OUTREACH' && a.status !== 'CONTACTO' && !a.recruiter?.channel).length;
+  const totalDirectOutreach = metrics.totalDirectOutreach !== undefined
+    ? metrics.totalDirectOutreach
+    : applications.filter((a) => a.origin === 'DIRECT_OUTREACH' || a.status === 'CONTACTO' || Boolean(a.recruiter?.channel)).length;
   const totalInterviews = metrics.totalInterviews || 0;
   const totalOffers = metrics.totalOffers || 0;
   const responseRate = metrics.responseRate || 0;
   const avgResponseTime = metrics.avgResponseTime ? `${metrics.avgResponseTime} d` : 'N/A';
-  const pitchSentCount = metrics.pitchSentCount || 0;
-  const pitchUsageRate = metrics.pitchUsageRate || (totalApps > 0 ? Math.round((pitchSentCount / totalApps) * 100) : 0);
 
   const kpisRow1 = [
-    { label: 'Total Postulaciones', value: String(totalApps), color: '#1E3A8A' },
-    { label: 'Entrevistas / Proceso', value: String(totalInterviews), color: '#0284C7' },
-    { label: 'Ofertas Conseguidas', value: String(totalOffers), color: '#16A34A' },
+    { label: 'Total Gestiones', value: String(totalApps), sub: `${totalVacancies} Vac. • ${totalDirectOutreach} Directos`, color: '#1E3A8A' },
+    { label: 'Postulaciones a Vacantes', value: String(totalVacancies), sub: 'Procesos de oferta laboral', color: '#0284C7' },
+    { label: 'Mensajes a Reclutadores', value: String(totalDirectOutreach), sub: 'Outreach directo a recruiters', color: '#0EA5E9' },
   ];
 
   const kpisRow2 = [
-    { label: 'Tasa de Respuesta', value: `${responseRate}%`, color: '#CA8A04' },
-    { label: 'Tiempo Prom. Respuesta', value: avgResponseTime, color: '#6366F1' },
-    { label: 'Pitches de IA Enviados', value: `${pitchSentCount} (${pitchUsageRate}%)`, color: '#0EA5E9' },
+    { label: 'Entrevistas / Procesos', value: String(totalInterviews), sub: 'Screening y técnicas activas', color: '#CA8A04' },
+    { label: 'Ofertas Conseguidas', value: String(totalOffers), sub: 'Propuestas formales de empleo', color: '#16A34A' },
+    { label: 'Tasa de Respuesta', value: `${responseRate}%`, sub: avgResponseTime !== 'N/A' ? `Tiempo prom: ${avgResponseTime}` : 'Feedback de empresas', color: '#6366F1' },
   ];
 
   const kpiY1 = 88;
@@ -191,10 +195,14 @@ export const generateApplicationsPdfReport = async (
       doc.roundedRect(curX, startY, cardW, cardH, 4)
         .fillAndStroke('#F8FAFC', '#E2E8F0');
       doc.roundedRect(curX, startY, 3, cardH, 2).fill(kpi.color);
-      doc.font('Helvetica').fontSize(7).fillColor('#64748B')
-        .text(kpi.label, curX + 7, startY + 5, { width: cardW - 10 });
+      doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#64748B')
+        .text(kpi.label.toUpperCase(), curX + 7, startY + 4, { width: cardW - 10 });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0F172A')
-        .text(kpi.value, curX + 7, startY + 17, { width: cardW - 10 });
+        .text(kpi.value, curX + 7, startY + 13, { width: cardW - 10 });
+      if (kpi.sub) {
+        doc.font('Helvetica').fontSize(6).fillColor('#64748B')
+          .text(kpi.sub, curX + 7, startY + 25, { width: cardW - 10 });
+      }
     });
   };
 
@@ -317,26 +325,34 @@ export const generateApplicationsPdfReport = async (
     .text('📋 Tabla Resumen de Postulaciones', 40, tableTitleY);
 
   const tableRows = applications.length > 0
-    ? applications.map((app) => [
-        app.company?.name || 'N/A',
-        app.role || 'N/A',
-        STATUS_MAP[app.status] || app.status || 'Enviada',
-        WORK_MODE_MAP[app.workMode] || app.workMode || 'Remoto',
-        PRIORITY_MAP[app.priority] || app.priority || 'Media',
-        app.matchScore ? `${app.matchScore}%` : 'N/A',
-        formatDate(app.appliedAt),
-      ])
+    ? applications.map((app) => {
+        const isDirect =
+          app.origin === 'DIRECT_OUTREACH' ||
+          app.status === 'CONTACTO' ||
+          Boolean(app.recruiter?.channel);
+        const originText = isDirect ? 'Msj Directo' : 'Vacante';
+
+        return [
+          app.company?.name || 'N/A',
+          app.role || 'N/A',
+          originText,
+          STATUS_MAP[app.status] || app.status || 'Enviada',
+          WORK_MODE_MAP[app.workMode] || app.workMode || 'Remoto',
+          app.matchScore ? `${app.matchScore}%` : 'N/A',
+          formatDate(app.appliedAt),
+        ];
+      })
     : [['-', 'Sin postulaciones registradas en este período', '-', '-', '-', '-', '-']];
 
   const table = {
     headers: [
       { label: 'Empresa', width: 90, align: 'left', headerColor: '#1E3A8A', headerOpacity: 1 },
-      { label: 'Puesto / Rol', width: 125, align: 'left', headerColor: '#1E3A8A', headerOpacity: 1 },
-      { label: 'Estado', width: 68, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
-      { label: 'Modalidad', width: 65, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
-      { label: 'Prioridad', width: 55, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
+      { label: 'Puesto / Rol', width: 110, align: 'left', headerColor: '#1E3A8A', headerOpacity: 1 },
+      { label: 'Tipo', width: 65, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
+      { label: 'Estado', width: 65, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
+      { label: 'Modalidad', width: 55, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
       { label: 'Match', width: 45, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
-      { label: 'Fecha', width: 67, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
+      { label: 'Fecha', width: 65, align: 'center', headerColor: '#1E3A8A', headerOpacity: 1 },
     ],
     rows: tableRows,
   };
@@ -351,7 +367,7 @@ export const generateApplicationsPdfReport = async (
       doc.font('Helvetica').fontSize(7.5).fillColor('#1E293B');
     },
     padding: 4,
-    columnsSize: [90, 125, 68, 65, 55, 45, 67],
+    columnsSize: [90, 110, 65, 65, 55, 45, 65],
   });
 
   // =========================================================================
@@ -380,6 +396,11 @@ export const generateApplicationsPdfReport = async (
       const workModeLabel = WORK_MODE_MAP[app.workMode] || 'Remoto';
       const priorityLabel = PRIORITY_MAP[app.priority] || 'Media';
       const appliedDate = formatDate(app.appliedAt);
+      const isDirect =
+        app.origin === 'DIRECT_OUTREACH' ||
+        app.status === 'CONTACTO' ||
+        Boolean(app.recruiter?.channel);
+      const originLabel = isDirect ? 'Mensaje a Reclutador' : 'Postulación a Vacante';
       const pitchText = app.suggestedPitch && app.suggestedPitch.trim().length > 0
         ? app.suggestedPitch.trim()
         : null;
@@ -434,12 +455,12 @@ export const generateApplicationsPdfReport = async (
       // Sub-datos de la postulación
       let curY = cardStartY + 28;
       doc.font('Helvetica').fontSize(7).fillColor('#64748B');
-      let metaText = `Fecha de Postulación: ${appliedDate}  |  Modalidad: ${workModeLabel}  |  Prioridad: ${priorityLabel}`;
+      let metaText = `Tipo: ${originLabel}  |  Fecha: ${appliedDate}  |  Modalidad: ${workModeLabel}  |  Prioridad: ${priorityLabel}`;
       if (app.matchScore) {
-        metaText += `  |  Match Técnico: ${app.matchScore}%`;
+        metaText += `  |  Match: ${app.matchScore}%`;
       }
       if (app.recruiter?.name) {
-        metaText += `  |  Contacto: ${app.recruiter.name} ${app.recruiter.email ? `(${app.recruiter.email})` : ''}`;
+        metaText += `  |  Reclutador: ${app.recruiter.name} ${app.recruiter.channel ? `[${app.recruiter.channel}]` : ''} ${app.recruiter.email ? `(${app.recruiter.email})` : ''}`;
       }
       doc.text(metaText, 48, curY);
       curY += 12;

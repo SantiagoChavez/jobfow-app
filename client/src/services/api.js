@@ -352,6 +352,19 @@ export async function generateFollowUpMessage(applicationOrId, options = {}) {
 }
 
 /**
+ * Generar pitch de contacto directo a reclutador adaptado con IA
+ * @param {Object} directContactData - { recruiterName, recruiterRole, companyName, companyWebsite, companyInfo, targetRole, channel, tone, customInstructions, userProfile }
+ * @returns {Promise<{ pitch: string, shortNote: string, subject: string, companySummary: string }>}
+ */
+export async function generateDirectPitch(directContactData) {
+  const res = await request('/ai/direct-pitch', {
+    method: 'POST',
+    body: JSON.stringify(directContactData),
+  });
+  return res.data || res;
+}
+
+/**
  * Chequeo silencioso de salud para precalentar el backend en plataformas gratuitas (ej. Render spin-down)
  */
 export async function pingBackend() {
@@ -378,6 +391,7 @@ export default {
   downloadPdfReport,
   analyzeJobWithAI,
   generateFollowUpMessage,
+  generateDirectPitch,
   loginUser,
   registerUser,
   googleAuthUser,

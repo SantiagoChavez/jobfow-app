@@ -25,7 +25,9 @@
   ],
   "host_permissions": [
     "https://*.onrender.com/*",
-    "https://jobfow-app.vercel.app/*"
+    "https://jobfow-app.vercel.app/*",
+    "http://localhost:*/*",
+    "http://127.0.0.1:*/*"
   ],
   "content_scripts": [
     {

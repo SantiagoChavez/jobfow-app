@@ -8,8 +8,9 @@ import {
   AlertCircleIcon,
   UserIcon,
   SparklesIcon,
+  GoogleIcon,
 } from './Icons.jsx';
-import { createSafeMailto } from '../utils/mailto.js';
+import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { getReminderMetrics } from '../utils/reminders.js';
 
@@ -249,6 +250,14 @@ export const RemindersDrawer = ({
                     })
                   : null;
 
+                const safeGmailWebUrl = recruiterEmail
+                  ? createGmailWebLink({
+                      email: recruiterEmail,
+                      subject: mailSubject,
+                      body: mailBody,
+                    })
+                  : null;
+
                 return (
                   <div
                     key={rem._id}
@@ -329,15 +338,17 @@ export const RemindersDrawer = ({
                           </button>
                         )}
 
-                        {/* Botón de Contacto Rápido por Email (Trigger mailto:) */}
-                        {safeMailtoUrl ? (
+                        {/* Botón de Contacto Rápido por Email */}
+                        {safeGmailWebUrl ? (
                           <a
-                            href={safeMailtoUrl}
-                            className="px-2.5 py-1.5 rounded-xl bg-sky-500/10 dark:bg-sky-500/15 text-sky-700 dark:text-sky-tech hover:bg-sky-500/20 dark:hover:bg-sky-500/25 border border-sky-500/30 text-xs font-bold flex items-center gap-1 transition-all"
-                            title={`Enviar email a ${recruiterEmail}`}
+                            href={safeGmailWebUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-navy-surface text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-navy-highlight border border-slate-200 dark:border-slate-700 hover:border-cyan-500/50 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
+                            title={`Abrir redactor en Gmail Web para ${recruiterEmail}`}
                           >
-                            <MailIcon className="w-3.5 h-3.5" />
-                            <span>Email</span>
+                            <GoogleIcon className="w-3.5 h-3.5" />
+                            <span>Gmail</span>
                           </a>
                         ) : null}
                       </div>

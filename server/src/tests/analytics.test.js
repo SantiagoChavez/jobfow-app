@@ -38,6 +38,12 @@ describe('GET /api/analytics/summary - Analítica y Métricas (MongoDB Aggregati
     }
 
     const totalApplications = applications.length;
+    const totalVacancies = applications.filter((a) =>
+      a.origin === 'JOB_POSTING' || (!a.origin && a.status !== 'CONTACTO' && !a.recruiter?.channel)
+    ).length;
+    const totalDirectOutreach = applications.filter((a) =>
+      a.origin === 'DIRECT_OUTREACH' || a.status === 'CONTACTO' || Boolean(a.recruiter?.channel)
+    ).length;
     const totalInterviews = applications.filter((a) =>
       ['ENTREVISTA', 'OFERTA'].includes(a.status)
     ).length;
@@ -92,6 +98,8 @@ describe('GET /api/analytics/summary - Analítica y Métricas (MongoDB Aggregati
         kpiMetrics: [
           {
             totalApplications,
+            totalVacancies,
+            totalDirectOutreach,
             totalInterviews,
             totalOffers,
             totalResponded,
@@ -115,6 +123,8 @@ describe('GET /api/analytics/summary - Analítica y Métricas (MongoDB Aggregati
     expect(res.body).toEqual({
       kpis: {
         totalApplications: 0,
+        totalVacancies: 0,
+        totalDirectOutreach: 0,
         totalInterviews: 0,
         totalOffers: 0,
         responseRate: 0,
@@ -145,8 +155,10 @@ describe('GET /api/analytics/summary - Analítica y Métricas (MongoDB Aggregati
     expect(res.status).toBe(200);
 
     // 1. Verificación de KPIs
-    // Total: 5 | Entrevistas (ENTREVISTA + OFERTA): 3 | Ofertas: 1 | Con Respuesta: 4
+    // Total: 5 | Vacantes: 4 | Directos (status CONTACTO): 1 | Entrevistas (ENTREVISTA + OFERTA): 3 | Ofertas: 1 | Con Respuesta: 4
     expect(res.body.kpis.totalApplications).toBe(5);
+    expect(res.body.kpis.totalVacancies).toBe(4);
+    expect(res.body.kpis.totalDirectOutreach).toBe(1);
     expect(res.body.kpis.totalInterviews).toBe(3);
     expect(res.body.kpis.totalOffers).toBe(1);
 

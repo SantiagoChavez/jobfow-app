@@ -615,3 +615,121 @@ body {
 .ml-2 {
   margin-left: 8px;
 }
+
+/* Recruiter Profile Card */
+.recruiter-card {
+  background-color: var(--surface);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.recruiter-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recruiter-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #38BDF8;
+  background-color: rgba(56, 189, 248, 0.12);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.form-select {
+  width: 100%;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border);
+  color: var(--text-white);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  border-color: #38BDF8;
+}
+
+.badge-cyan {
+  background-color: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Pitch Preview Box */
+.pitch-preview-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pitch-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pitch-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #38BDF8;
+}
+
+.btn-copy-sm {
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-white);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-copy-sm:hover {
+  background-color: rgba(56, 189, 248, 0.2);
+  border-color: #38BDF8;
+  color: #38BDF8;
+}
+
+.pitch-textarea {
+  width: 100%;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-white);
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  resize: vertical;
+  outline: none;
+}
+
+.short-note-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
