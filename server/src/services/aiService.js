@@ -376,8 +376,192 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguient
   }
 };
 
+/**
+ * Genera un pitch de presentación y contacto directo personalizado para un reclutador con Google Gemini AI
+ * @param {Object} options
+ * @param {string} [options.recruiterName=''] - Nombre del reclutador
+ * @param {string} [options.recruiterRole=''] - Cargo del reclutador (ej: Talent Acquisition Partner)
+ * @param {string} [options.companyName=''] - Nombre de la empresa
+ * @param {string} [options.companyWebsite=''] - Web o LinkedIn de la empresa
+ * @param {string} [options.companyInfo=''] - Información o contexto sobre la empresa
+ * @param {string} [options.targetRole=''] - Rol o puesto al que aspira el postulante
+ * @param {string} [options.channel='LINKEDIN_DM'] - Canal (LINKEDIN_DM, LINKEDIN_NOTE, COLD_EMAIL, OTHER)
+ * @param {string} [options.tone='CORDIAL'] - Tono (CORDIAL, ENTHUSIASTIC, DIRECT)
+ * @param {Object|string} [options.userProfile=null] - Perfil del usuario
+ * @param {string} [options.customInstructions=''] - Instrucciones adicionales
+ * @returns {Promise<{ pitch: string, shortNote: string, subject: string, companySummary: string }>}
+ */
+export const generateDirectOutreachPitch = async ({
+  recruiterName = '',
+  recruiterRole = '',
+  companyName = '',
+  companyWebsite = '',
+  companyInfo = '',
+  targetRole = '',
+  channel = 'LINKEDIN_DM',
+  tone = 'CORDIAL',
+  userProfile = null,
+  customInstructions = '',
+} = {}) => {
+  const cleanCompany = companyName?.trim() || 'la empresa';
+  const cleanRecruiter = recruiterName?.trim() || '';
+  const cleanRecruiterRole = recruiterRole?.trim() || '';
+  const cleanRole = targetRole?.trim() || 'Desarrollador / Profesional IT';
+
+  const candidateName = userProfile?.name?.trim() || 'Santiago Chavez';
+  const candidateTitle = userProfile?.headline?.trim() || 'Full Stack Developer';
+  const skillsList = Array.isArray(userProfile?.skills) && userProfile.skills.length > 0
+    ? userProfile.skills.slice(0, 6).join(', ')
+    : 'React, Node.js, TypeScript, Express, MongoDB';
+
+  const githubUrl = userProfile?.links?.github || '';
+  const linkedinUrl = userProfile?.links?.linkedin || '';
+  const portfolioUrl = userProfile?.links?.portfolio || '';
+
+  const linksArr = [];
+  if (portfolioUrl) linksArr.push(`• Portfolio: ${portfolioUrl}`);
+  if (githubUrl) linksArr.push(`• GitHub: ${githubUrl}`);
+  if (linkedinUrl) linksArr.push(`• LinkedIn: ${linkedinUrl}`);
+  const linksText = linksArr.length > 0
+    ? `\n\nTe invito a explorar mis proyectos y trayectoria:\n${linksArr.join('\n')}`
+    : '';
+
+  // Fallback Offline Generator
+  const getFallbackDirectPitch = () => {
+    const greeting = cleanRecruiter
+      ? `Hola ${cleanRecruiter}, espero que te encuentres muy bien.`
+      : `Hola equipo de selección de ${cleanCompany}, espero que tengan un excelente día.`;
+
+    const emailGreeting = cleanRecruiter
+      ? `Estimado/a ${cleanRecruiter},`
+      : `Estimado equipo de selección de ${cleanCompany},`;
+
+    const subject = cleanRecruiter
+      ? `Interés en oportunidades de ${cleanRole} en ${cleanCompany} — ${candidateName}`
+      : `Candidatura espontánea: ${cleanRole} — ${candidateName}`;
+
+    let mainPitch = '';
+    if (channel === 'COLD_EMAIL') {
+      mainPitch = `${emailGreeting}\n\nEspero que se encuentre muy bien. Me pongo en contacto directamente porque sigo de cerca el trabajo de ${cleanCompany} y me interesa explorar la posibilidad de sumarme a su equipo de desarrollo como ${cleanRole}.\n\nCuento con experiencia trabajando con tecnologías como ${skillsList}, enfocándome en construir soluciones escalables, código limpio y aportar valor inmediato a los objetivos del equipo.${linksText}\n\nQuedo a su entera disposición en caso de que dispongan de 10-15 minutos para una breve conversación o si desean que les acerque mi CV actualizado.\n\nMuchas gracias por su tiempo y consideración.\n\nSaludos cordiales,\n${candidateName}\n${candidateTitle}`;
+    } else if (tone === 'DIRECT') {
+      mainPitch = `${greeting}\n\nVi tu perfil como ${cleanRecruiterRole || 'responsable de talento'} en ${cleanCompany} y quería escribirte directamente. Me especializo como ${candidateTitle} con foco en ${skillsList}.\n\nMe entusiasma mucho lo que están construyendo en ${cleanCompany} y me gustaría ponerme a disposición para oportunidades como ${cleanRole}.${linksText}\n\n¿Tendrías unos minutos esta semana para conversar o compartirte mi CV?\n\n¡Muchas gracias por tu tiempo!\n\nSaludos,\n${candidateName}`;
+    } else if (tone === 'ENTHUSIASTIC') {
+      mainPitch = `${greeting}\n\n¡Espero que estés teniendo una excelente semana! Sigo con gran admiración el crecimiento y proyectos de ${cleanCompany}. Como ${candidateTitle}, me apasiona resolver desafíos técnicos con ${skillsList}.\n\nMe encantaría conectar y evaluar si mi perfil puede ser de valor para el equipo en posiciones de ${cleanRole}.${linksText}\n\nQuedo a tu disposición para charlar cuando gustes.\n\n¡Un saludo cordial y muchas gracias!\n\n${candidateName}`;
+    } else {
+      // CORDIAL por defecto
+      mainPitch = `${greeting}\n\nMe pongo en contacto contigo al ver tu rol en ${cleanCompany}. Soy ${candidateName}, ${candidateTitle}, y me interesa mucho la oportunidad de colaborar en su equipo técnico aportando mi experiencia en ${skillsList}.\n\nConsidero que mi enfoque pragmático y compromiso con la calidad pueden ser un gran aporte para los desafíos de ${cleanCompany}.${linksText}\n\nDesde ya muchas gracias por tu tiempo; quedo a tu total disposición si surge una oportunidad o si deseas conocer más de mi perfil.\n\n¡Que tengas una muy buena semana!\n\nSaludos cordiales,\n${candidateName}`;
+    }
+
+    const shortGreeting = cleanRecruiter ? `Hola ${cleanRecruiter},` : `Hola equipo de ${cleanCompany},`;
+    const safeRole = cleanRole.length > 25 ? `${cleanRole.slice(0, 22)}...` : cleanRole;
+    const safeCompany = cleanCompany.length > 18 ? `${cleanCompany.slice(0, 15)}...` : cleanCompany;
+    let rawShort = `${shortGreeting} ¿cómo estás? Me gustaría conectar y ponerme a disposición para roles de ${safeRole} en ${safeCompany}. ¡Saludos!`;
+    if (rawShort.length > 200) {
+      rawShort = rawShort.slice(0, 197) + '...';
+    }
+
+    const companySummary = companyInfo
+      ? companyInfo.slice(0, 250)
+      : `${cleanCompany} es una empresa referente en su sector, orientada al crecimiento y la innovación tecnológica.`;
+
+    return {
+      pitch: mainPitch,
+      shortNote: rawShort,
+      subject,
+      companySummary,
+    };
+  };
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || !apiKey.trim() || apiKey === 'tu_api_key_aqui') {
+    return getFallbackDirectPitch();
+  }
+
+  let profileContext = `Candidato: ${candidateName} (${candidateTitle}).`;
+  if (userProfile?.bio) profileContext += `\nBio: ${userProfile.bio}`;
+  if (skillsList) profileContext += `\nStack técnico: ${skillsList}`;
+  if (linksArr.length > 0) profileContext += `\nEnlaces:\n${linksArr.join('\n')}`;
+
+  const prompt = `
+Eres un Experto Senior en Outbound Recruiting, Estrategias de Networking y Prospección Directa para Profesionales de Tecnología en JobFlow.
+Tu objetivo es generar un MENSAJE DE CONTACTO DIRECTO (Cold Outreach / Pitch) sumamente natural, persuasivo, profesional y personalizado para enviarle a un reclutador o líder técnico.
+
+Perfil del Candidato:
+"""
+${profileContext}
+"""
+
+Datos del Destinatario y la Empresa:
+- Reclutador / Destinatario: "${cleanRecruiter || 'Responsable de Selección / Tech Recruiter'}"
+- Cargo del Reclutador: "${cleanRecruiterRole || 'Talent Acquisition / Líder Técnico'}"
+- Empresa: "${cleanCompany}"
+- Sitio web / Enlace: "${companyWebsite || ''}"
+- Información / Contexto de la Empresa: "${companyInfo || 'Empresa de tecnología'}"
+- Rol de interés: "${cleanRole}"
+- Canal preferido: "${channel}" (LINKEDIN_DM = Mensaje directo de LinkedIn, LINKEDIN_NOTE = Nota de conexión <=200 caracteres, COLD_EMAIL = Correo formal)
+- Tono deseado: "${tone}" (CORDIAL, ENTHUSIASTIC o DIRECT)
+${customInstructions ? `- Instrucciones adicionales del usuario: "${customInstructions}"` : ''}
+
+REGLAS CRÍTICAS DE REDACCIÓN:
+1. "pitch": Mensaje principal optimizado para el canal y tono solicitados.
+   - Debe saludar al reclutador por su nombre de forma empática y natural.
+   - Debe justificar brevemente el motivo del contacto conectando las habilidades técnicas del candidato con el valor que aportaría a la empresa.
+   - Debe incluir los enlaces profesionales del candidato de forma orgánica.
+   - Debe incluir un Call To Action (CTA) claro, amable y de bajo compromiso (ej. "disponibilidad para una breve llamada o compartir CV").
+2. "shortNote": **LÍMITE ESTRICTO DE MÁXIMO 190-200 CARACTERES**. Para la nota de conexión de LinkedIn. Conciso, directo y educado.
+3. "subject": Asunto atractivo y profesional para correo electrónico si aplica.
+4. "companySummary": Resumen de 1-2 oraciones claras sobre a qué se dedica la empresa y qué la hace atractiva.
+
+Responde ÚNICAMENTE un objeto JSON estrictamente válido:
+{
+  "pitch": "Texto completo del mensaje directo personalizado",
+  "shortNote": "Mensaje corto de hasta 200 caracteres para nota de conexión",
+  "subject": "Asunto recomendado para email",
+  "companySummary": "Breve resumen contextual de la empresa"
+}
+`;
+
+  try {
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+
+    const response = await ai.models.generateContent({
+      model: primaryModel,
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+      },
+    });
+
+    const rawJson = response?.text || (typeof response?.candidates?.[0]?.content?.parts?.[0]?.text === 'string' ? response.candidates[0].content.parts[0].text : '{}');
+    const cleaned = extractJson(rawJson);
+    const parsed = JSON.parse(cleaned);
+
+    const fallback = getFallbackDirectPitch();
+
+    let parsedShort = typeof parsed.shortNote === 'string' && parsed.shortNote.trim()
+      ? parsed.shortNote.trim()
+      : fallback.shortNote;
+
+    if (parsedShort.length > 200) {
+      parsedShort = parsedShort.slice(0, 197) + '...';
+    }
+
+    return {
+      pitch: typeof parsed.pitch === 'string' && parsed.pitch.trim() ? parsed.pitch.trim() : fallback.pitch,
+      shortNote: parsedShort,
+      subject: typeof parsed.subject === 'string' && parsed.subject.trim() ? parsed.subject.trim() : fallback.subject,
+      companySummary: typeof parsed.companySummary === 'string' && parsed.companySummary.trim() ? parsed.companySummary.trim() : fallback.companySummary,
+    };
+  } catch (err) {
+    console.warn('[AI Service] Error generando pitch directo con Gemini, usando fallback:', err.message);
+    return getFallbackDirectPitch();
+  }
+};
+
 export default {
   analyzeJobPosting,
   generateFollowUpMessage,
+  generateDirectOutreachPitch,
 };
 

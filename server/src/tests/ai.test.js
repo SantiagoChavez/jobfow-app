@@ -298,6 +298,50 @@ describe('POST /api/ai/analyze-job - Copiloto de Postulación con IA', () => {
       expect(res.body.error).toContain('Se requiere el ID de la postulación');
     });
   });
+
+  describe('POST /api/ai/direct-pitch - Generación de Pitch para Mensaje Directo a Reclutador', () => {
+    it('Debe generar exitosamente un pitch adaptado al reclutador y empresa', async () => {
+      const mockDirectPitchResponse = {
+        pitch: 'Hola Florencia, me pongo en contacto contigo al ver tu rol en Auth0...',
+        shortNote: 'Hola Florencia, me gustaría conectar y sumarme como Senior Backend.',
+        subject: 'Interés en oportunidades de Senior Backend en Auth0 — Santiago',
+        companySummary: 'Auth0 es una empresa líder en gestión de identidades y autenticación.',
+      };
+
+      vi.spyOn(aiService, 'generateDirectOutreachPitch').mockResolvedValue(mockDirectPitchResponse);
+
+      const res = await request(app)
+        .post('/api/ai/direct-pitch')
+        .send({
+          recruiterName: 'Florencia',
+          recruiterRole: 'Tech Recruiter',
+          companyName: 'Auth0',
+          companyWebsite: 'https://auth0.com',
+          targetRole: 'Senior Backend Developer',
+          channel: 'LINKEDIN_DM',
+          tone: 'CORDIAL',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.pitch).toContain('Florencia');
+      expect(res.body.data.pitch).toContain('Auth0');
+      expect(res.body.data.shortNote.length).toBeLessThanOrEqual(200);
+      expect(res.body.data.companySummary).toContain('Auth0');
+    });
+
+    it('Debe responder 400 Bad Request si no se proporciona el nombre de la empresa', async () => {
+      const res = await request(app)
+        .post('/api/ai/direct-pitch')
+        .send({
+          recruiterName: 'Florencia',
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('El nombre de la empresa es obligatorio');
+    });
+  });
 });
 
 

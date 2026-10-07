@@ -5,6 +5,7 @@ import Application from '../models/Application.js';
 const VALID_STATUSES = ['ENVIADA', 'CONTACTO', 'ENTREVISTA', 'RECHAZADA', 'OFERTA'];
 const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'];
 const VALID_WORK_MODES = ['REMOTE', 'HYBRID', 'ON_SITE'];
+const VALID_ORIGINS = ['JOB_POSTING', 'DIRECT_OUTREACH'];
 const VALID_INTERACTION_TYPES = [
   'POSTULACION_ENVIADA',
   'MENSAJE_ENVIADO',
@@ -60,6 +61,7 @@ export const createApplication = async (req, res) => {
       suggestedPitch,
       companySummary,
       matchScore,
+      origin,
     } = req.body;
 
     // Validación de campos requeridos
@@ -79,14 +81,28 @@ export const createApplication = async (req, res) => {
 
     const safeAppliedAt = parseSafeDate(appliedAt);
 
+    const initialType = typeof req.body.initialInteractionType === 'string' && VALID_INTERACTION_TYPES.includes(req.body.initialInteractionType.trim().toUpperCase())
+      ? req.body.initialInteractionType.trim().toUpperCase()
+      : status?.trim().toUpperCase() === 'CONTACTO'
+        ? 'MENSAJE_ENVIADO'
+        : 'POSTULACION_ENVIADA';
+
     // Interacción inicial automática
     const initialInteraction = {
-      type: 'POSTULACION_ENVIADA',
+      type: initialType,
       date: safeAppliedAt,
       notes: notes && typeof notes === 'string' && notes.trim()
         ? notes.trim()
-        : 'Postulación inicial registrada',
+        : initialType === 'MENSAJE_ENVIADO'
+          ? `Mensaje directo enviado a ${recruiter?.name ? recruiter.name.trim() : 'reclutador'}`
+          : 'Postulación inicial registrada',
     };
+
+    const resolvedOrigin = typeof origin === 'string' && VALID_ORIGINS.includes(origin.trim().toUpperCase())
+      ? origin.trim().toUpperCase()
+      : (initialType === 'MENSAJE_ENVIADO' || (status && status.trim().toUpperCase() === 'CONTACTO') || recruiter?.channel)
+        ? 'DIRECT_OUTREACH'
+        : 'JOB_POSTING';
 
     const applicationData = {
       company: {
@@ -106,10 +122,14 @@ export const createApplication = async (req, res) => {
         : 'REMOTE',
       salary: salary != null ? String(salary).trim() : undefined,
       experienceLevel: experienceLevel != null ? String(experienceLevel).trim() : undefined,
+      origin: resolvedOrigin,
       recruiter: recruiter
         ? {
             name: recruiter.name ? recruiter.name.trim() : undefined,
             email: recruiter.email ? recruiter.email.trim() : undefined,
+            role: recruiter.role ? recruiter.role.trim() : undefined,
+            linkedinUrl: recruiter.linkedinUrl ? recruiter.linkedinUrl.trim() : undefined,
+            channel: recruiter.channel ? recruiter.channel.trim() : undefined,
           }
         : undefined,
       jobUrl: jobUrl ? jobUrl.trim() : undefined,
@@ -375,6 +395,7 @@ export const updateApplication = async (req, res) => {
       suggestedPitch,
       companySummary,
       matchScore,
+      origin,
     } = req.body;
 
     if (company && typeof company === 'object') {
@@ -386,6 +407,7 @@ export const updateApplication = async (req, res) => {
     if (status && VALID_STATUSES.includes(status.trim().toUpperCase())) application.status = status.trim().toUpperCase();
     if (priority && VALID_PRIORITIES.includes(priority.trim().toUpperCase())) application.priority = priority.trim().toUpperCase();
     if (workMode && VALID_WORK_MODES.includes(workMode.trim().toUpperCase())) application.workMode = workMode.trim().toUpperCase();
+    if (typeof origin === 'string' && VALID_ORIGINS.includes(origin.trim().toUpperCase())) application.origin = origin.trim().toUpperCase();
     if (salary !== undefined) application.salary = salary != null ? String(salary).trim() : undefined;
     if (experienceLevel !== undefined) application.experienceLevel = experienceLevel != null ? String(experienceLevel).trim() : undefined;
 
@@ -393,6 +415,9 @@ export const updateApplication = async (req, res) => {
       application.recruiter = {
         name: recruiter?.name !== undefined ? (recruiter.name ? recruiter.name.trim() : undefined) : application.recruiter?.name,
         email: recruiter?.email !== undefined ? (recruiter.email ? recruiter.email.trim() : undefined) : application.recruiter?.email,
+        role: recruiter?.role !== undefined ? (recruiter.role ? recruiter.role.trim() : undefined) : application.recruiter?.role,
+        linkedinUrl: recruiter?.linkedinUrl !== undefined ? (recruiter.linkedinUrl ? recruiter.linkedinUrl.trim() : undefined) : application.recruiter?.linkedinUrl,
+        channel: recruiter?.channel !== undefined ? (recruiter.channel ? recruiter.channel.trim() : undefined) : application.recruiter?.channel,
       };
     }
 
