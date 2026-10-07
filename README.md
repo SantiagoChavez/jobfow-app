@@ -95,21 +95,21 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
       <p><em>Extracción automática de datos, score de afinidad técnica y pitch personalizado con 1 clic.</em></p>
     </td>
     <td width="50%" align="center" valign="top">
-      <h4>👤 Mi Perfil & Habilidades (GitHub / CV)</h4>
-      <img src="./client/src/assets/miPerfil.png" alt="Modal Mi Perfil Profesional y Skills" width="440" />
-      <p><em>Carga mágica de tecnologías escaneando repositorios públicos de GitHub o analizando el CV con IA.</em></p>
+      <h4>✉️ Outreach a Reclutadores & Integración Gmail</h4>
+      <img src="./client/src/assets/contactoDirecto.png" alt="Modal Mensaje Directo a Reclutador con IA" width="440" />
+      <p><em>Generación de pitch para headhunters con IA, notas para LinkedIn y apertura directa en Gmail Web.</em></p>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center" valign="top">
+      <h4>👤 Mi Perfil & Habilidades (GitHub / CV)</h4>
+      <img src="./client/src/assets/miPerfil.png" alt="Modal Mi Perfil Profesional y Skills" width="440" />
+      <p><em>Carga mágica de tecnologías escaneando repositorios públicos de GitHub o analizando el CV con IA.</em></p>
+    </td>
+    <td width="50%" align="center" valign="top">
       <h4>📄 Generador de Informes para Career Coach</h4>
       <img src="./client/src/assets/reporte.png" alt="Modal Generador de Reportes PDF" width="440" />
       <p><em>Exportación ejecutiva en PDF vectorial con filtros de períodos (7 días, 30 días, trimestre).</em></p>
-    </td>
-    <td width="50%" align="center" valign="top">
-      <h4>ℹ️ Acerca de JobFlow & Stack Tecnológico</h4>
-      <img src="./client/src/assets/about.png" alt="Modal Acerca de JobFlow" width="440" />
-      <p><em>Arquitectura de componentes, tecnologías cloud utilizadas e información de autoría.</em></p>
     </td>
   </tr>
   <tr>
@@ -124,15 +124,19 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
       <p><em>Copia instantánea del token seguro para capturar ofertas laborales desde LinkedIn o Indeed.</em></p>
     </td>
   </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <h4>ℹ️ Acerca de JobFlow & Stack Tecnológico</h4>
+      <img src="./client/src/assets/about.png" alt="Modal Acerca de JobFlow" width="440" />
+      <p><em>Arquitectura de componentes, tecnologías cloud utilizadas e información de autoría.</em></p>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <h4>🌐 Portal de Bienvenida y Landing Page</h4>
+      <img src="./client/src/assets/home.png" alt="Landing Page de Bienvenida" width="440" />
+      <p><em>Punto de entrada accesible con acceso inmediato a Google OAuth y resumen interactivo de capacidades.</em></p>
+    </td>
+  </tr>
 </table>
-
-<br/>
-
-<div align="center">
-  <h3>🌐 Portal de Bienvenida y Landing Page</h3>
-  <img src="./client/src/assets/home.png" alt="Landing Page de Bienvenida" width="900" />
-  <p><em>Punto de entrada accesible con acceso inmediato a Google OAuth y resumen interactivo de capacidades.</em></p>
-</div>
 
 ---
 
