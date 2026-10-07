@@ -29,14 +29,39 @@ const PRIORITY_MAP = {
 };
 
 const INTERACTION_TYPE_MAP = {
-  POSTULACION_ENVIADA: '📤 Postulación Enviada',
-  MENSAJE_ENVIADO: '💬 Mensaje / Pitch Enviado',
-  RESPUESTA_RECIBIDA: '📥 Respuesta Recibida',
-  CHALLENGE_TECNICO: '💻 Challenge Técnico',
-  PRUEBA_TECNICA: '🧪 Prueba Técnica',
-  ENTREVISTA: '🎙️ Entrevista Agendada',
-  RECHAZO: '❌ Notificación de Rechazo',
-  OFERTA: '🎉 Propuesta / Oferta Recibida',
+  POSTULACION_ENVIADA: 'Postulacion Enviada',
+  MENSAJE_ENVIADO: 'Mensaje / Pitch Enviado',
+  RESPUESTA_RECIBIDA: 'Respuesta Recibida',
+  CHALLENGE_TECNICO: 'Challenge Tecnico',
+  PRUEBA_TECNICA: 'Prueba Tecnica',
+  ENTREVISTA: 'Entrevista Agendada',
+  RECHAZO: 'Notificacion de Rechazo',
+  OFERTA: 'Propuesta / Oferta Recibida',
+};
+
+/**
+ * Sanitiza texto eliminando emojis y caracteres fuera del juego de caracteres estándar de PDFKit (WinAnsi)
+ * para evitar caracteres extraños o corruptos en los reportes exportados.
+ */
+const sanitizePdfText = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '')
+    .replace(/[\u2600-\u27BF\uE000-\uF8FF\u200B-\u200D\uFE0E\uFE0F]/g, '')
+    .replace(/[^\x00-\xFF]/g, (char) => {
+      const map = {
+        '\u2018': "'",
+        '\u2019': "'",
+        '\u201C': '"',
+        '\u201D': '"',
+        '\u2013': '-',
+        '\u2014': '-',
+        '\u2022': '•',
+        '\u2026': '...',
+      };
+      return map[char] || '';
+    })
+    .trim();
 };
 
 /**
@@ -218,7 +243,7 @@ export const generateApplicationsPdfReport = async (
   doc.roundedRect(40, chartsY, chartBoxW, chartBoxH, 6)
     .fillAndStroke('#FFFFFF', '#E2E8F0');
   doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0B1329')
-    .text('📊 Distribución por Estado de Postulación', 48, chartsY + 8);
+    .text('Distribución por Estado de Postulación', 48, chartsY + 8);
 
   const statusCounts = metrics.statusCounts || {
     ENVIADA: applications.filter((a) => a.status === 'ENVIADA').length,
@@ -262,7 +287,7 @@ export const generateApplicationsPdfReport = async (
   doc.roundedRect(chart2X, chartsY, chartBoxW, chartBoxH, 6)
     .fillAndStroke('#FFFFFF', '#E2E8F0');
   doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0B1329')
-    .text('🎯 Modalidad & Afinidad Técnica (IA)', chart2X + 8, chartsY + 8);
+    .text('Modalidad & Afinidad Técnica (IA)', chart2X + 8, chartsY + 8);
 
   const workModeCounts = metrics.workModeCounts || {
     REMOTE: applications.filter((a) => a.workMode === 'REMOTE').length,
@@ -322,7 +347,7 @@ export const generateApplicationsPdfReport = async (
   // 4. Tabla Ejecutiva de Postulaciones (Página 1)
   const tableTitleY = chartsY + chartBoxH + 14;
   doc.font('Helvetica-Bold').fontSize(10).fillColor('#0B1329')
-    .text('📋 Tabla Resumen de Postulaciones', 40, tableTitleY);
+    .text('Tabla Resumen de Postulaciones', 40, tableTitleY);
 
   const tableRows = applications.length > 0
     ? applications.map((app) => {
@@ -333,8 +358,8 @@ export const generateApplicationsPdfReport = async (
         const originText = isDirect ? 'Msj Directo' : 'Vacante';
 
         return [
-          app.company?.name || 'N/A',
-          app.role || 'N/A',
+          sanitizePdfText(app.company?.name) || 'N/A',
+          sanitizePdfText(app.role) || 'N/A',
           originText,
           STATUS_MAP[app.status] || app.status || 'Enviada',
           WORK_MODE_MAP[app.workMode] || app.workMode || 'Remoto',
@@ -381,7 +406,7 @@ export const generateApplicationsPdfReport = async (
     doc.roundedRect(40, doc.y + 4, contentWidth, 32, 4)
       .fillAndStroke('#F8FAFC', '#E2E8F0');
     doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#1E3A8A')
-      .text('🎯 Bitácora de Comunicación & Seguimiento Personalizado', 50, doc.y + 10);
+      .text('Bitácora de Comunicación & Seguimiento Personalizado', 50, doc.y + 10);
     doc.font('Helvetica').fontSize(7.5).fillColor('#64748B')
       .text('Detalle individualizado por empresa: propuesta enviada / pitch de presentación y feedback o respuestas obtenidas.', 50, doc.y + 22);
 
@@ -389,8 +414,8 @@ export const generateApplicationsPdfReport = async (
 
     for (let i = 0; i < applications.length; i++) {
       const app = applications[i];
-      const companyName = app.company?.name || 'Empresa Confidencial';
-      const role = app.role || 'Puesto no especificado';
+      const companyName = sanitizePdfText(app.company?.name) || 'Empresa Confidencial';
+      const role = sanitizePdfText(app.role) || 'Puesto no especificado';
       const statusLabel = STATUS_MAP[app.status] || app.status || 'Enviada';
       const statusColor = STATUS_COLOR_MAP[app.status] || STATUS_COLOR_MAP.ENVIADA;
       const workModeLabel = WORK_MODE_MAP[app.workMode] || 'Remoto';
@@ -401,9 +426,10 @@ export const generateApplicationsPdfReport = async (
         app.status === 'CONTACTO' ||
         Boolean(app.recruiter?.channel);
       const originLabel = isDirect ? 'Mensaje a Reclutador' : 'Postulación a Vacante';
-      const pitchText = app.suggestedPitch && app.suggestedPitch.trim().length > 0
-        ? app.suggestedPitch.trim()
+      const rawPitch = app.suggestedPitch && app.suggestedPitch.trim().length > 0
+        ? sanitizePdfText(app.suggestedPitch.trim())
         : null;
+      const pitchText = rawPitch && rawPitch.length > 0 ? rawPitch : null;
 
       // Recolectar interacciones recibidas / respuestas
       const interactions = Array.isArray(app.interactions) ? app.interactions : [];
@@ -418,7 +444,7 @@ export const generateApplicationsPdfReport = async (
       let responsesEstimatedHeight = 24;
       if (responseInteractions.length > 0) {
         responseInteractions.forEach((inter) => {
-          const noteText = inter.notes ? `: ${inter.notes}` : '';
+          const noteText = inter.notes ? `: ${sanitizePdfText(inter.notes)}` : '';
           responsesEstimatedHeight += doc.heightOfString(noteText, { width: contentWidth - 30, lineGap: 2 }) + 14;
         });
       }
@@ -460,15 +486,16 @@ export const generateApplicationsPdfReport = async (
         metaText += `  |  Match: ${app.matchScore}%`;
       }
       if (app.recruiter?.name) {
-        metaText += `  |  Reclutador: ${app.recruiter.name} ${app.recruiter.channel ? `[${app.recruiter.channel}]` : ''} ${app.recruiter.email ? `(${app.recruiter.email})` : ''}`;
+        const recName = sanitizePdfText(app.recruiter.name);
+        metaText += `  |  Reclutador: ${recName} ${app.recruiter.channel ? `[${app.recruiter.channel}]` : ''} ${app.recruiter.email ? `(${app.recruiter.email})` : ''}`;
       }
       doc.text(metaText, 48, curY);
       curY += 12;
 
-      // 2. Sub-tarjeta: 📤 ¿Qué envié yo? (Pitch de Presentación)
+      // 2. Sub-tarjeta: Propuesta Enviada / Pitch
       const pitchBoxStartY = curY;
       doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#0369A1')
-        .text('📤 Propuesta Enviada / Pitch de Presentación:', 48, pitchBoxStartY);
+        .text('Propuesta Enviada / Pitch de Presentación:', 48, pitchBoxStartY);
       curY += 11;
 
       if (pitchText) {
@@ -488,16 +515,16 @@ export const generateApplicationsPdfReport = async (
         curY += 13;
       }
 
-      // 3. Sub-tarjeta: 📥 ¿Qué me respondieron? (Feedback y Respuestas)
+      // 3. Sub-tarjeta: Respuestas & Feedback
       doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#15803D')
-        .text('📥 Respuestas & Feedback de la Empresa:', 48, curY);
+        .text('Respuestas & Feedback de la Empresa:', 48, curY);
       curY += 11;
 
       if (responseInteractions.length > 0) {
         responseInteractions.forEach((inter) => {
           const typeLabel = INTERACTION_TYPE_MAP[inter.type] || inter.type;
           const interDate = formatDate(inter.date);
-          const notes = inter.notes ? `"${inter.notes}"` : 'Sin notas adicionales adjuntas.';
+          const notes = inter.notes ? `"${sanitizePdfText(inter.notes)}"` : 'Sin notas adicionales adjuntas.';
 
           doc.font('Helvetica-Bold').fontSize(7).fillColor('#1E293B')
             .text(`• [${interDate}] ${typeLabel}: `, 54, curY, { continued: true })
