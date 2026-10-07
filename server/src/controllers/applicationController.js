@@ -98,9 +98,16 @@ export const createApplication = async (req, res) => {
           : 'Postulación inicial registrada',
     };
 
+    const isDirectCandidate =
+      (typeof origin === 'string' && origin.trim().toUpperCase() === 'DIRECT_OUTREACH') ||
+      initialType === 'MENSAJE_ENVIADO' ||
+      (typeof status === 'string' && status.trim().toUpperCase() === 'CONTACTO') ||
+      Boolean(recruiter?.channel) ||
+      (typeof role === 'string' && role.trim().toLowerCase().startsWith('contacto directo'));
+
     const resolvedOrigin = typeof origin === 'string' && VALID_ORIGINS.includes(origin.trim().toUpperCase())
       ? origin.trim().toUpperCase()
-      : (initialType === 'MENSAJE_ENVIADO' || (status && status.trim().toUpperCase() === 'CONTACTO') || recruiter?.channel)
+      : isDirectCandidate
         ? 'DIRECT_OUTREACH'
         : 'JOB_POSTING';
 

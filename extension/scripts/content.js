@@ -44,51 +44,100 @@
     const pageTitle = document.title || '';
 
     // 1. LinkedIn Profile (/in/...)
-    if (currentUrl.includes('linkedin.com/in/')) {
-      const nameEl = document.querySelector('h1.text-heading-xlarge, h1.inline.t-24, h1.v-align-middle, h1');
-      const recruiterName = nameEl ? nameEl.innerText.trim() : '';
+    if (currentUrl.includes('linkedin.com/in/') || currentUrl.includes('/in/')) {
+      const nameEl = document.querySelector(
+        'h1.text-heading-xlarge, h1.inline.t-24, h1.v-align-middle, .pv-text-details__left-panel h1, section.artdeco-card h1, main section h1, h1'
+      );
+      let recruiterName = nameEl ? nameEl.innerText.trim() : '';
 
-      const headlineEl = document.querySelector('div.text-body-medium, .pv-text-details__left-panel .text-body-medium, .pv-top-card--list-bullet');
+      // Limpieza de sufijos como "• 1º", "• 2º", "• 3º+", "• 2nd", "Verificación", pronombres "(She/Her)"
+      if (recruiterName) {
+        recruiterName = recruiterName
+          .split('\n')[0]
+          .replace(/\s*•\s*[0-9]+[º°a-zA-Z]*.*$/i, '')
+          .replace(/\s*\([^\)]+\)/g, '')
+          .replace(/\s*,\s*(MBA|PMP|PHR|SHRM|MSc|BSc|Eng).*$/i, '')
+          .trim();
+      }
+
+      // Fallback desde el título del documento (ej. "Florencia Ochoa | LinkedIn")
+      if (!recruiterName && pageTitle) {
+        const titleMatch = pageTitle.match(/^([^|\-•]+)/);
+        if (titleMatch && titleMatch[1]) {
+          recruiterName = titleMatch[1].trim();
+        }
+      }
+
+      const headlineEl = document.querySelector(
+        'div.text-body-medium.break-words, .pv-text-details__left-panel .text-body-medium, div[data-generated-suggestion-target], .pv-top-card--list-bullet, div.text-body-medium'
+      );
       const recruiterRole = headlineEl ? headlineEl.innerText.trim() : '';
 
       let companyName = '';
-      const companyEl = document.querySelector('.pv-text-details__right-panel button span, button[aria-label*="Empresa actual"] span, .pv-top-card--experience-list-item');
-      if (companyEl) {
-        companyName = companyEl.innerText.trim();
+      const companySelectors = [
+        '.pv-text-details__right-panel button span',
+        '.pv-text-details__right-panel li button div.inline-show-more-text',
+        '.pv-text-details__right-panel li div',
+        '.pv-text-details__right-panel li',
+        'div[data-view-name="profile-top-card-experience-item"]',
+        'button[aria-label*="Empresa actual"] span',
+        'button[aria-label*="Current company"] span',
+        'div[aria-label*="Experiencia actual"]',
+        '.pv-top-card--experience-list-item',
+        'a[href*="/company/"] span',
+        'a[href*="/company/"]',
+      ];
+
+      for (const sel of companySelectors) {
+        const el = document.querySelector(sel);
+        if (el && el.innerText.trim()) {
+          const txt = el.innerText.trim();
+          // Evitar instituciones educativas si es posible
+          if (!txt.toLowerCase().includes('universidad') && !txt.toLowerCase().includes('university') && !txt.toLowerCase().includes('instituto') && !txt.toLowerCase().includes('colegio')) {
+            companyName = txt;
+            break;
+          }
+          if (!companyName) {
+            companyName = txt;
+          }
+        }
       }
 
       if (!companyName && recruiterRole) {
-        const match = recruiterRole.match(/(?:at|en|@|para)\s+([A-Za-z0-9\s.,&-]+?)(?:\||\u2022|\.|$)/i);
+        const match = recruiterRole.match(/(?:at|en|@|para|in|de)\s+([A-Za-z0-9\s.,&-]+?)(?:\||\u2022|\.|$)/i);
         if (match && match[1]) {
           companyName = match[1].trim();
         }
       }
 
-      const aboutEl = document.querySelector('#about ~ .display-flex .inline-show-more-text, section#about .inline-show-more-text, #about ~ div span[aria-hidden="true"]');
+      const aboutEl = document.querySelector(
+        '#about ~ .display-flex .inline-show-more-text, section#about .inline-show-more-text, section[data-section="about"] .inline-show-more-text, #about ~ div span[aria-hidden="true"], div.inline-show-more-text--is-collapsed'
+      );
       const bio = aboutEl ? aboutEl.innerText.trim() : '';
 
-      const avatarEl = document.querySelector('img.pv-top-card-profile-picture__image, img.presence-entity__image');
+      const avatarEl = document.querySelector(
+        'img.pv-top-card-profile-picture__image, img.presence-entity__image, button.pv-top-card-profile-picture img, img[alt*="Foto de perfil"]'
+      );
       const avatar = avatarEl ? avatarEl.src : '';
 
-      if (recruiterName) {
-        return {
-          success: true,
-          isRecruiter: true,
-          type: 'RECRUITER_PROFILE',
-          url: currentUrl.split('?')[0],
-          title: pageTitle,
-          recruiter: {
-            name: recruiterName,
-            role: recruiterRole,
-            companyName: companyName || '',
-            linkedinUrl: currentUrl.split('?')[0],
-            bio: bio.slice(0, 1500),
-            avatar,
-          },
-          text: `Reclutador: ${recruiterName}\nCargo: ${recruiterRole}\nEmpresa: ${companyName}\nBio: ${bio}`,
-          source: 'LINKEDIN_PROFILE',
-        };
-      }
+      const finalName = recruiterName || 'Contacto de LinkedIn';
+      return {
+        success: true,
+        isRecruiter: true,
+        type: 'RECRUITER_PROFILE',
+        url: currentUrl.split('?')[0],
+        title: pageTitle,
+        recruiter: {
+          name: finalName,
+          role: recruiterRole || 'Talent Acquisition / IT Recruiter',
+          companyName: companyName || '',
+          linkedinUrl: currentUrl.split('?')[0],
+          bio: bio.slice(0, 1500),
+          avatar,
+        },
+        text: `Reclutador: ${finalName}\nCargo: ${recruiterRole}\nEmpresa: ${companyName}\nBio: ${bio}`,
+        source: 'LINKEDIN_PROFILE',
+      };
     }
 
     // 2. GitHub Profile (github.com/username)

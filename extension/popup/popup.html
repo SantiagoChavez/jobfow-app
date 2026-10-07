@@ -70,6 +70,16 @@
         <p id="tabUrl" class="tab-url">https://...</p>
       </div>
 
+      <!-- Selector de Modo de Captura -->
+      <div class="mode-switcher" role="tablist">
+        <button id="modeVacancyBtn" class="mode-btn active" type="button" role="tab" title="Capturar vacante u oferta de empleo">
+          <span class="mode-btn-icon">💼</span> Vacante
+        </button>
+        <button id="modeRecruiterBtn" class="mode-btn" type="button" role="tab" title="Capturar reclutador o contacto directo">
+          <span class="mode-btn-icon">👤</span> Reclutador / Directo
+        </button>
+      </div>
+
       <!-- Alerta informativa si no hay token -->
       <div id="noTokenAlert" class="alert-box alert-warning hidden">
         <span class="alert-icon">⚠️</span>
@@ -82,12 +92,13 @@
       <!-- Formulario de Reclutador Detectado (Visible solo cuando es un perfil de reclutador) -->
       <div id="recruiterDetectedCard" class="recruiter-card hidden">
         <div class="recruiter-card-header">
-          <span class="recruiter-badge">👤 Perfil de Reclutador Detectado</span>
+          <span class="recruiter-badge">👤 Contacto Directo a Reclutador</span>
+          <span class="recruiter-hint-tag">Outreach IA</span>
         </div>
         
         <div class="field-group">
           <label class="field-label">Reclutador / Destinatario:</label>
-          <input type="text" id="recruiterNameInput" class="form-input" placeholder="Nombre del reclutador">
+          <input type="text" id="recruiterNameInput" class="form-input" placeholder="Nombre del reclutador (ej. Florencia Ochoa)">
         </div>
 
         <div class="field-group">
@@ -233,7 +244,7 @@
     <!-- Footer Discreto -->
     <footer class="footer">
       <span>JobFlow • Gemini AI Copilot</span>
-      <span id="versionLabel">v1.0.4</span>
+      <span id="versionLabel">v1.0.5</span>
     </footer>
   </div>
 
