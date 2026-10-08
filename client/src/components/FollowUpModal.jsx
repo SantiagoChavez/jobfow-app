@@ -33,6 +33,7 @@ const FollowUpModalDialog = ({
   const [shortNote, setShortNote] = useState('');
   const [copiedFull, setCopiedFull] = useState(false);
   const [copiedShort, setCopiedShort] = useState(false);
+  const [copiedSubject, setCopiedSubject] = useState(false);
   const [savedInteraction, setSavedInteraction] = useState(false);
 
   // Estados locales de contacto editable inicializados de forma pura
@@ -140,6 +141,18 @@ const FollowUpModalDialog = ({
       setCopiedShort(true);
       showToast('¡Mensaje corto copiado para LinkedIn/Chat!', 'success');
       setTimeout(() => setCopiedShort(false), 2200);
+    } catch {
+      showToast('No se pudo copiar al portapapeles', 'error');
+    }
+  };
+
+  const handleCopySubject = async () => {
+    if (!generatedSubject) return;
+    try {
+      await navigator.clipboard.writeText(generatedSubject);
+      setCopiedSubject(true);
+      showToast('¡Asunto copiado al portapapeles!', 'success');
+      setTimeout(() => setCopiedSubject(false), 2200);
     } catch {
       showToast('No se pudo copiar al portapapeles', 'error');
     }
@@ -371,18 +384,54 @@ const FollowUpModalDialog = ({
             </div>
           </div>
 
-          {/* Asunto (para Email) */}
+          {/* Asunto (para Email / InMail) */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-              Asunto sugerido
-            </label>
-            <input
-              type="text"
-              value={generatedSubject}
-              onChange={(e) => setGeneratedSubject(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-cyan-500"
-              placeholder="Asunto del correo de seguimiento..."
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                Asunto sugerido (para Email o InMail de LinkedIn)
+              </label>
+              <button
+                type="button"
+                onClick={handleCopySubject}
+                disabled={!generatedSubject}
+                className="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 flex items-center gap-1 transition-colors disabled:opacity-50"
+              >
+                {copiedSubject ? (
+                  <>
+                    <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-emerald-600 dark:text-emerald-400">¡Asunto copiado!</span>
+                  </>
+                ) : (
+                  <>
+                    <CopyIcon className="w-3.5 h-3.5" />
+                    <span>Copiar Asunto</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={generatedSubject}
+                onChange={(e) => setGeneratedSubject(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 pr-24 text-xs text-slate-900 dark:text-white font-medium focus:outline-none focus:border-cyan-500"
+                placeholder="Asunto del correo o mensaje de seguimiento..."
+              />
+              <button
+                type="button"
+                onClick={handleCopySubject}
+                disabled={!generatedSubject}
+                className="absolute right-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-navy-surface hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 transition-all shadow-xs disabled:opacity-40"
+                title="Copiar asunto al portapapeles"
+              >
+                {copiedSubject ? (
+                  <CheckCircleIcon className="w-3 h-3 text-emerald-500" />
+                ) : (
+                  <CopyIcon className="w-3 h-3" />
+                )}
+                <span>{copiedSubject ? '¡Listo!' : 'Copiar'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Cuerpo Principal del Mensaje (Email / InMail) */}
