@@ -35,6 +35,25 @@ const INTERACTION_TYPES = [
   { value: 'POSTULACION_ENVIADA', label: '📤 Postulación Enviada' },
 ];
 
+// Helpers de fecha local para evitar desfases de día por conversión UTC (ej: medianoche UTC restando 3h a 21:00)
+const getTodayDateString = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const parseLocalDateString = (dateStr) => {
+  if (!dateStr) return new Date();
+  if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) {
+    const [y, m, d] = dateStr.trim().split('-').map(Number);
+    return new Date(y, m - 1, d, 12, 0, 0);
+  }
+  const parsed = new Date(dateStr);
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+};
+
 export const ApplicationDetailModal = ({
   application,
   isOpen,
@@ -53,7 +72,7 @@ export const ApplicationDetailModal = ({
   // Estado del formulario de nueva interacción
   const [interactionForm, setInteractionForm] = useState({
     type: 'RESPUESTA_RECIBIDA',
-    date: new Date().toISOString().split('T')[0],
+    date: getTodayDateString(),
     notes: '',
   });
   const [submittingInteraction, setSubmittingInteraction] = useState(false);
@@ -92,12 +111,12 @@ export const ApplicationDetailModal = ({
       setSubmittingInteraction(true);
       await onAddInteraction(application._id, {
         type: interactionForm.type,
-        date: interactionForm.date ? new Date(interactionForm.date) : new Date(),
+        date: parseLocalDateString(interactionForm.date),
         notes: interactionForm.notes.trim() || undefined,
       });
       setInteractionForm({
         type: 'RESPUESTA_RECIBIDA',
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayDateString(),
         notes: '',
       });
     } catch (err) {
@@ -109,11 +128,19 @@ export const ApplicationDetailModal = ({
 
   const handleStartEdit = (interaction) => {
     setEditingInteractionId(interaction._id);
+    let dateVal = '';
+    if (interaction.date) {
+      const d = new Date(interaction.date);
+      if (!Number.isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        dateVal = `${y}-${m}-${day}`;
+      }
+    }
     setEditForm({
       type: interaction.type || 'RESPUESTA_RECIBIDA',
-      date: interaction.date
-        ? new Date(interaction.date).toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0],
+      date: dateVal || getTodayDateString(),
       notes: interaction.notes || '',
     });
   };
@@ -129,7 +156,7 @@ export const ApplicationDetailModal = ({
       setIsSavingEdit(true);
       await onUpdateInteraction(application._id, interactionId, {
         type: editForm.type,
-        date: editForm.date ? new Date(editForm.date) : new Date(),
+        date: parseLocalDateString(editForm.date),
         notes: editForm.notes.trim() || undefined,
       });
       setEditingInteractionId(null);
@@ -499,7 +526,7 @@ export const ApplicationDetailModal = ({
               <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
                 {application.interactions && application.interactions.length > 0 ? (
                   [...application.interactions]
-                    .reverse()
+                    .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
                     .map((item, idx) => {
                       const isEditing = editingInteractionId === item._id;
                       const hasNotes = Boolean(item.notes && item.notes.trim());

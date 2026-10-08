@@ -19,10 +19,15 @@ const VALID_INTERACTION_TYPES = [
 const MAX_ALL_QUERY_LIMIT = 1000; // Tope defensivo para evitar OOM
 
 /**
- * Sanitiza y valida una fecha asegurando no generar Invalid Date / NaN
+ * Sanitiza y valida una fecha asegurando no generar Invalid Date / NaN ni desfases de día por UTC
  */
 const parseSafeDate = (inputDate) => {
   if (!inputDate) return new Date();
+  if (typeof inputDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(inputDate.trim())) {
+    const [y, m, d] = inputDate.trim().split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d, 12, 0, 0);
+    return Number.isNaN(dateObj.getTime()) ? new Date() : dateObj;
+  }
   const d = new Date(inputDate);
   return Number.isNaN(d.getTime()) ? new Date() : d;
 };
