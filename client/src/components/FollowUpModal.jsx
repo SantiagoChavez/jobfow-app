@@ -47,26 +47,49 @@ const FollowUpModalDialog = ({
   // Calcular métricas de recordatorio y días transcurridos desde el último contacto
   const reminderMetrics = useMemo(() => getReminderMetrics(application), [application]);
 
-  const handleGenerate = useCallback(async (selectedTone = tone, instructions = customInstructions) => {
-    if (!application) return;
-    try {
-      setLoading(true);
-      const res = await generateFollowUpMessage(application, {
-        tone: selectedTone,
-        customInstructions: instructions.trim(),
-      });
-      if (res) {
-        setGeneratedSubject(res.subject || `Seguimiento de postulación: ${application.role}`);
-        setGeneratedMessage(res.message || '');
-        setShortNote(res.shortNote || '');
+  const handleGenerate = useCallback(
+    async (
+      selectedTone = tone,
+      instructions = customInstructions,
+      overrideContact = null
+    ) => {
+      if (!application) return;
+      const effectiveName =
+        overrideContact?.name !== undefined ? overrideContact.name : contactName;
+      const effectiveEmail =
+        overrideContact?.email !== undefined ? overrideContact.email : contactEmail;
+
+      const enrichedApplication = {
+        ...application,
+        recruiter: {
+          ...(application.recruiter || {}),
+          name: effectiveName?.trim() || undefined,
+          email: effectiveEmail?.trim() || undefined,
+        },
+      };
+
+      try {
+        setLoading(true);
+        const res = await generateFollowUpMessage(enrichedApplication, {
+          tone: selectedTone,
+          customInstructions: instructions.trim(),
+        });
+        if (res) {
+          setGeneratedSubject(
+            res.subject || `Seguimiento de postulación: ${application.role}`
+          );
+          setGeneratedMessage(res.message || '');
+          setShortNote(res.shortNote || '');
+        }
+      } catch (err) {
+        console.error('Error al generar follow-up:', err);
+        showToast(err.message || 'Error al generar el mensaje con IA', 'error');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error al generar follow-up:', err);
-      showToast(err.message || 'Error al generar el mensaje con IA', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [application, tone, customInstructions, showToast]);
+    },
+    [application, tone, customInstructions, contactName, contactEmail, showToast]
+  );
 
   // Generar automáticamente al montar el diálogo
   useEffect(() => {
@@ -100,7 +123,7 @@ const FollowUpModalDialog = ({
 
   const companyName = application.company?.name || 'la empresa';
 
-  // Guardar contacto en la base de datos si el usuario lo completó aquí
+  // Guardar contacto en la base de datos si el usuario lo completó aquí y regenerar mensaje con el nuevo contacto
   const handleSaveContact = async () => {
     if (!application._id) return;
     try {
@@ -112,8 +135,14 @@ const FollowUpModalDialog = ({
         },
       });
       setContactSaved(true);
-      showToast('¡Datos de contacto guardados en la postulación!', 'success');
+      showToast('¡Contacto guardado! Regenerando mensaje personalizado...', 'success');
       setTimeout(() => setContactSaved(false), 2500);
+
+      // Regenerar automáticamente con el nombre actualizado del reclutador
+      await handleGenerate(tone, customInstructions, {
+        name: contactName.trim(),
+        email: contactEmail.trim(),
+      });
     } catch (err) {
       console.error('Error al guardar contacto:', err);
       showToast('Error al guardar datos de contacto', 'error');
@@ -268,16 +297,22 @@ const FollowUpModalDialog = ({
                     type="text"
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveContact();
+                      }
+                    }}
                     placeholder="ej: María López"
-                    className="flex-1 bg-white dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-500"
+                    className="flex-1 bg-white dark:bg-navy-base border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-cyan-500 font-medium"
                   />
                   {(contactEmail !== (application.recruiter?.email || '') || contactName !== (application.recruiter?.name || '')) && (
                     <button
                       type="button"
                       onClick={handleSaveContact}
-                      disabled={isSavingContact}
-                      className="px-2.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-navy-base text-[11px] font-bold flex items-center gap-1 transition-all flex-shrink-0"
-                      title="Guardar contacto en la postulación"
+                      disabled={isSavingContact || loading}
+                      className="px-2.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-navy-base text-[11px] font-bold flex items-center gap-1 transition-all flex-shrink-0 disabled:opacity-50"
+                      title="Guardar contacto y personalizar mensaje con IA"
                     >
                       {contactSaved ? <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-900" /> : null}
                       <span>{contactSaved ? 'Guardado' : 'Guardar'}</span>
@@ -436,10 +471,17 @@ const FollowUpModalDialog = ({
 
           {/* Cuerpo Principal del Mensaje (Email / InMail) */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                Mensaje Completo (Para Email o InMail sin límite)
-              </label>
+            <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+              <div className="flex items-center gap-2">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                  Mensaje Completo (Para Email o InMail sin límite)
+                </label>
+                {contactName.trim() && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
+                    👤 Para: {contactName.trim().split(' ')[0]}
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 disabled={loading}
