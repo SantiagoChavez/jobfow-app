@@ -9,6 +9,33 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-08
+
+### Added & Enhanced
+- **Módulo de Contacto Directo & Mensajes a Reclutadores (`DirectContactModal.jsx`, `aiController.js`, `aiRoutes.js`):**
+  - Nuevo modal interactivo para redactar cold outreach y pitches de alto impacto dirigidos a headhunters, recruiters y líderes técnicos con IA (`POST /api/ai/direct-pitch`).
+  - Generación de notas de conexión para LinkedIn con límite de 200 caracteres y contador dinámico de caracteres en tiempo real.
+  - Generación de asunto de correo sugerido con botón de copiado en 1 clic.
+  - Integración de apertura directa en Gmail Web con destinatario, asunto y mensaje precargados.
+  - Registro de la gestión con `origin: 'DIRECT_OUTREACH'`, estado inicial `CONTACTO` e integración inmediata en el Kanban.
+- **Extensión de Chrome v1.0.5 — Captura Dual de Vacantes y Reclutadores (`manifest.json`, `popup.js`, `content.js`):**
+  - Detección contextual inteligente de perfiles de personas/reclutadores en LinkedIn además de vacantes de portales laborales (LinkedIn Jobs, Indeed, BambooHR, Glassdoor).
+  - Generación de pitch de outreach en la extensión y guardado automático con origen `DIRECT_OUTREACH`.
+- **Analítica Segmentada por Origen de Postulación (`analyticsController.js`, `KPICards.jsx`):**
+  - Pipeline de agregación de MongoDB que clasifica postulaciones a vacantes (`totalVacancies`) de contactos directos (`totalDirectOutreach`).
+  - Tarjeta KPI "Total Gestiones" con badges visuales de desglose (`💼 X vacantes` y `💬 Y directos`).
+- **Mejoras en el Generador de Seguimientos (Follow-Up):**
+  - Personalización automática del saludo inicial ("Hola [Nombre]" / "Hola equipo de [Empresa]").
+  - Botón directo para copiar el asunto de correo generado en 1 clic.
+  - Cuenta regresiva dinámica y recálculo de días de inactividad al registrar el seguimiento.
+- **Timeline Cronológico y Sanitización en Reportes PDF:**
+  - Corrección de desfases de huso horario UTC y ordenamiento cronológico garantizado en la línea de tiempo de eventos.
+  - Sanitización de caracteres especiales y emojis en generación de reportes PDF vectoriales.
+- **UX / UI & Estabilidad:**
+  - Actualización de versión oficial a `PRO v1.4.0` en modales, footer y documentación.
+  - Layout responsivo con header y footer fijos, centrado vertical y sincronización instantánea de tema claro/oscuro.
+  - Limpieza de linter Oxlint (0 warnings / 0 errors) y 91 tests automatizados pasando al 100%.
+
 ## [1.3.9] - 2026-09-26
 
 ### Added & Enhanced

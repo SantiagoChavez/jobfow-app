@@ -342,3 +342,43 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
   - [x] Acceso directo desde el menú desplegable de usuario en `Navbar.jsx` ("👤 Mi Perfil & Skills").
 - [x] **15.5 Suite de Pruebas Automatizadas (`server/src/tests/profile.test.js`)**
   - [x] 7 pruebas unitarias y de integración cubriendo actualización de perfil, extracción mockeada de GitHub, extracción con Gemini y matching dinámico (82 tests totales en verde).
+
+---
+
+## 🤖 Fase 16: Follow-Up Inteligente con IA & Reportes PDF Vectoriales Avanzados (v1.3.9 - Completada)
+- [x] **16.1 Generador de Mensajes de Seguimiento con IA (`FollowUpModal.jsx`, `aiService.js`, `aiRoutes.js`)**
+  - [x] Endpoint `POST /api/ai/follow-up` con selector de 3 tonalidades (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`) e instrucciones personalizadas.
+  - [x] Personalización de saludo contextual con el nombre del reclutador (`recruiter.name`) o equipo de la empresa.
+  - [x] Copia de mensaje completo y nota sintetizada para invitaciones de LinkedIn.
+  - [x] Botón para copiar asunto de correo sugerido en 1 clic.
+  - [x] Enlace directo de apertura en Gmail Web y registro automático de `MENSAJE_ENVIADO` en la cronología.
+  - [x] Recálculo dinámico de días de inactividad y estado crítico tras registrar el envío.
+- [x] **16.2 Reportes PDF Ejecutivos con Gráficos y Bitácora (`pdfService.js`, `reportController.js`)**
+  - [x] 6 tarjetas de métricas KPI vectoriales en el encabezado.
+  - [x] Gráficos estadísticos nativos: embudo de conversión y distribución por modalidad de trabajo.
+  - [x] Sección "Bitácora Detallada por Empresa" con pitch enviado, respuestas recibidas y feedback.
+- [x] **16.3 Lanzador e Íconos de Escritorio Windows**
+  - [x] Script `iniciar-jobflow.bat` con arranque en segundo plano y apertura de navegador.
+  - [x] Script `instalar-icono-escritorio.bat` y `jobflow-radar.ico` multi-resolución.
+
+---
+
+## ✉️ Fase 17: Módulo de Contacto Directo, Outreach a Reclutadores & Analítica por Origen (v1.4.0 - Completada)
+- [x] **17.1 Modelo y Backend para Contacto Directo (`Application.js`, `aiController.js`, `aiRoutes.js`)**
+  - [x] Soporte para `origin` (`JOB_POSTING` | `DIRECT_OUTREACH`) y datos extendidos de reclutador (`channel`, `type`, `role`, `linkedin`, `profileUrl`).
+  - [x] Endpoint `POST /api/ai/direct-pitch` para generar pitches de cold outreach a reclutadores con Gemini AI según el rol y perfil.
+  - [x] Endpoints para edición y eliminación de eventos individuales en el timeline (`PUT/DELETE /api/applications/:id/interactions/:interactionId`).
+- [x] **17.2 Interfaz de Mensajes a Reclutadores (`DirectContactModal.jsx`, `Navbar.jsx`)**
+  - [x] Modal interactivo `+ Mensaje a Reclutador` accesible desde Navbar y panel móvil.
+  - [x] Generación instantánea de pitch, nota de conexión para LinkedIn (máximo 200 caracteres con contador en vivo) y asunto de correo.
+  - [x] Botón de copiado de asunto y botón de apertura en Gmail Web.
+  - [x] Guardado como postulación con estado `CONTACTO` y origen `DIRECT_OUTREACH`.
+- [x] **17.3 Extensión de Chrome v1.0.5 con Captura Dual de Perfiles y Vacantes (`manifest.json`, `content.js`, `popup.js`)**
+  - [x] Detección contextual de perfiles de reclutadores en LinkedIn además de vacantes de portales laborales.
+  - [x] Generación de pitch de outreach en la extensión y guardado automático con origen `DIRECT_OUTREACH`.
+- [x] **17.4 Analítica Segmentada por Origen (`analyticsController.js`, `KPICards.jsx`)**
+  - [x] Pipeline de agregación en MongoDB discriminando `totalVacancies` vs `totalDirectOutreach`.
+  - [x] Tarjeta KPI "Total Gestiones" con badges visuales enriquecidos (`💼 X vacantes` y `💬 Y directos`).
+- [x] **17.5 Suite de Pruebas Automatizadas y Calidad**
+  - [x] 91 pruebas unitarias y de integración en verde en 8 suites de Vitest.
+  - [x] Conformidad con linter Oxlint (0 errores, 0 warnings).

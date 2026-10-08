@@ -6,7 +6,6 @@ import {
   CheckCircleIcon,
   MailIcon,
   LinkedInIcon,
-  UserPlusIcon,
   BuildingIcon,
   UserIcon,
   ExternalLinkIcon,
@@ -16,7 +15,7 @@ import {
 import { generateDirectPitch } from '../services/api.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useModalA11y } from '../hooks/useModalA11y.js';
-import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
+import { createGmailWebLink } from '../utils/mailto.js';
 
 export const DirectContactModal = ({ isOpen, onClose, onSave }) => {
   const { showToast } = useToast();
@@ -205,12 +204,6 @@ export const DirectContactModal = ({ isOpen, onClose, onSave }) => {
   const effectiveBody = formData.pitch || formData.shortNote || '';
 
   const gmailWebLink = createGmailWebLink(
-    formData.recruiterEmail || '',
-    effectiveSubject,
-    effectiveBody
-  );
-
-  const mailtoLink = createSafeMailto(
     formData.recruiterEmail || '',
     effectiveSubject,
     effectiveBody

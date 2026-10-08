@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   CloseIcon,
   BellIcon,
-  MailIcon,
   ClockIcon,
   ChevronRightIcon,
   AlertCircleIcon,
@@ -10,7 +9,7 @@ import {
   SparklesIcon,
   GoogleIcon,
 } from './Icons.jsx';
-import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
+import { createGmailWebLink } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { getReminderMetrics } from '../utils/reminders.js';
 
@@ -241,14 +240,6 @@ export const RemindersDrawer = ({
                 // Plantilla formal y personalizada para el trigger mailto:
                 const mailSubject = `Seguimiento de postulación - ${rem.role} - ${rem.company?.name || ''}`;
                 const mailBody = `Estimado/a ${recruiterName || 'equipo de selección de ' + (rem.company?.name || 'la empresa')},\n\nEspero que se encuentre muy bien. Le escribo para realizar un cordial seguimiento sobre mi postulación al rol de ${rem.role}, enviada el ${formatDate(rem.appliedAt)}.\n\nSigo sumamente interesado/a en la oportunidad y en aportar al equipo. Quedo atento/a a cualquier novedad o paso adicional en el proceso.\n\nMuchas gracias por su tiempo y consideración.\n\nSaludos cordiales,`;
-
-                const safeMailtoUrl = recruiterEmail
-                  ? createSafeMailto({
-                      email: recruiterEmail,
-                      subject: mailSubject,
-                      body: mailBody,
-                    })
-                  : null;
 
                 const safeGmailWebUrl = recruiterEmail
                   ? createGmailWebLink({
