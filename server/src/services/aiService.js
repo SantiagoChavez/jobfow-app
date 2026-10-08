@@ -270,8 +270,9 @@ export const generateFollowUpMessage = async ({
 
   // Plantilla de respaldo (Fallback Offline)
   const getFallbackFollowUp = () => {
+    const firstName = recruiterName ? recruiterName.split(' ')[0] : '';
     const greeting = recruiterName
-      ? `Estimado/a ${recruiterName},`
+      ? (tone === 'DIRECT' || tone === 'ENTHUSIASTIC' ? `Hola ${firstName || recruiterName},` : `Hola ${recruiterName}, espero que te encuentres muy bien.`)
       : `Estimado equipo de selección de ${companyName},`;
 
     const subject = `Seguimiento de postulación: ${role} — ${candidateName}`;
@@ -287,7 +288,7 @@ export const generateFollowUpMessage = async ({
     }
 
     // Nota corta ajustada estrictamente a <= 200 caracteres para notas de conexión en LinkedIn
-    const shortGreeting = recruiterName ? `Hola ${recruiterName},` : `Hola equipo de ${companyName},`;
+    const shortGreeting = recruiterName ? `Hola ${firstName || recruiterName},` : `Hola equipo de ${companyName},`;
     const cleanRole = role.length > 28 ? `${role.slice(0, 25)}...` : role;
     const cleanCompany = companyName.length > 20 ? `${companyName.slice(0, 18)}...` : companyName;
     const rawShort = `${shortGreeting} ¿cómo estás? Quería consultar sobre el proceso para ${cleanRole}. ¡Sigo con gran interés en sumarme a ${cleanCompany}! Saludos, ${candidateName}.`;
@@ -305,9 +306,17 @@ export const generateFollowUpMessage = async ({
 Eres un Experto Senior en Comunicación Laboral y Reclutamiento IT para JobFlow.
 Tu objetivo es redactar dos versiones de un MENSAJE DE SEGUIMIENTO (Follow-up) para un candidato que envió su postulación hace ${daysElapsed} días:
 
+REGLAS CRÍTICAS DE SALUDO Y PERSONALIZACIÓN:
+${
+  recruiterName
+    ? `- **SALUDO OBLIGATORIO PERSONALIZADO**: El contacto/reclutador es "${recruiterName}". ES OBLIGATORIO dirigir el mensaje DIRECTAMENTE a él/ella usando su nombre (ej. "Hola ${recruiterName.split(' ')[0] || recruiterName}," o "Estimada/o ${recruiterName},"). NUNCA utilices un saludo genérico como "Estimado Equipo de Selección" o "A quien corresponda" cuando se conoce el nombre del reclutador.`
+    : `- **SALUDO INSTITUCIONAL**: Como no se conoce el nombre del reclutador, saluda al "Equipo de Selección de ${companyName}".`
+}
+
 1. MENSAJE COMPLETO ("message"):
 - Extensión de 2 a 3 párrafos concisos, profesionales y persuasivos.
 - Ideal para Email o mensaje directo de LinkedIn/Chat.
+- Saludar directamente a ${recruiterName ? `"${recruiterName}"` : `el equipo de selección de "${companyName}"`}.
 - Hace referencia respetuosa a la postulación enviada hace ${daysElapsed} días para el rol de ${role}.
 - Reafirma el interés genuino y valor técnico que ${candidateName} puede aportar a ${companyName}.
 - Tono solicitado: ${tone} (CORDIAL, ENTHUSIASTIC o DIRECT).
@@ -315,12 +324,12 @@ Tu objetivo es redactar dos versiones de un MENSAJE DE SEGUIMIENTO (Follow-up) p
 2. NOTA CORTA DE CONEXIÓN ("shortNote"):
 - **REGLA CRÍTICA ESTRICTA: MÁXIMO 190 A 200 CARACTERES TOTALES (incluyendo espacios)**.
 - Diseñada específicamente para la "Nota de solicitud de contacto de LinkedIn", cuyo límite no permite más de 200 caracteres.
-- Debe ser ultra directa: Saludo breve + consulta amigable sobre el rol de ${role} en ${companyName} + interés del candidato.
+- Saludo breve (${recruiterName ? `"Hola ${recruiterName.split(' ')[0] || recruiterName},"` : `"Hola equipo,"`}) + consulta amigable sobre el rol de ${role} en ${companyName} + interés del candidato.
 
 Contexto de la postulación:
 - Empresa: "${companyName}"
 - Puesto / Rol: "${role}"
-- Reclutador / Contacto: "${recruiterName || 'Equipo de Selección'}"
+- Reclutador / Contacto: "${recruiterName || 'No especificado (usar equipo de selección)'}"
 - Días transcurridos desde postulación: ${daysElapsed} días
 - Pitch inicial / Presentación previa: "${previousPitch || 'Postulación estándar'}"
 - Perfil del candidato: ${candidateName} (${candidateTitle})
