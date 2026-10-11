@@ -57,7 +57,8 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 3. **Detección de Brechas de Conocimiento (Gap Analysis)**: Identifica las habilidades que dominás (`extractedSkills`) y lista las tecnologías secundarias o deseables a repasar antes de la entrevista técnica (`missingSkills`).
 4. **Resumen Ejecutivo de la Compañía**: Redacta una síntesis de 2 oraciones sobre el modelo de negocio, industria y cultura de la empresa para que el candidato llegue informado a la primera llamada.
 5. **Generador de Pitch de Presentación Personalizado**: Adapta la plantilla oficial del candidato (reconversión IT, versatilidad multidisciplinaria, formación académica en UTN y Soy Henry, y enlaces directos a sus perfiles de GitHub y LinkedIn) al contexto específico de la vacante, listo para enviar al reclutador con 1 clic.
-6. **Generador de Mensajes de Seguimiento (Follow-Up Inteligente)**: Para aquellas postulaciones con más de 5 días sin novedades, adapta el pitch y la propuesta técnica a 3 modalidades comunicativas (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`) con copia en 1 clic para LinkedIn/chat y apertura de correo con `mailto:`.
+6. **Generador de Mensajes de Seguimiento (Follow-Up Inteligente)**: Para aquellas postulaciones con más de 5 días sin novedades, adapta el pitch y la propuesta técnica a 3 modalidades comunicativas (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`) con personalización del nombre del reclutador, botón para copiar asunto generado y apertura de correo en Gmail Web.
+7. **Generador de Pitch para Contacto Directo a Reclutadores (Outreach)**: En el modal **`+ Mensaje a Reclutador`**, genera pitches personalizados para headhunters y reclutadores, notas sintetizadas para invitación de LinkedIn (límite 200 caracteres con contador reactivo) y asuntos sugeridos listos para abrir en Gmail Web.
 
 ---
 
@@ -161,8 +162,10 @@ Dentro del modal **`+ Nueva Postulación`**, al pegar la descripción sin proces
 - [x] **Autenticación Multiusuario y Google OAuth (Tarjeta 13):** Registro tradicional con bcrypt y JWT, inicio de sesión 1-click mediante Google Identity Services (`@google-auth-library`), persistencia de sesión segura y aislamiento de postulaciones por cuenta de usuario.
 - [x] **Modo Claro Armónico & Switch Dual (Tarjeta 14):** Selector de tema interactivo Sol/Luna en Navbar, paleta híbrida descansada (ice/slate con acentos dorados y cobalto), persistencia en `localStorage` y sincronización con perfil de usuario (`PATCH /api/auth/theme`).
 - [x] **Gestión de Perfil & Skills Dinámicas (Tarjeta 15):** Modal interactivo `ProfileModal` con gestor de chips, extracción automática de tecnologías desde repositorios de GitHub API, análisis inteligente de extracto de CV/LinkedIn con Gemini AI (`@google/genai`), cálculo personalizado de afinidad (Match %) y pitch de presentación IA adaptado al postulante.
-- [x] **Generador de Mensajes de Seguimiento con IA (Tarjeta 16 / v1.3.9):** Sistema de follow-up inteligente para postulaciones con alarmas de seguimiento (>5 días sin respuesta), adaptación dinámica del pitch principal con 3 tonalidades (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`), copia en 1 clic para LinkedIn/chat y registro automático de `MENSAJE_ENVIADO` en la cronología.
-- [x] **Reportes PDF Ejecutivos con Gráficos Vectoriales y Bitácora Personalizada (v1.3.9):** Exportación en PDF con 6 tarjetas KPI, gráficos vectoriales nativos (Embudo de conversión y Modalidad laboral) y Bitácora detallada por empresa (pitch enviado vs. feedback/respuesta del reclutador).
+- [x] **Generador de Mensajes de Seguimiento con IA (Tarjeta 16 / v1.3.9):** Sistema de follow-up inteligente para postulaciones con alarmas de seguimiento (>5 días sin respuesta), adaptación dinámica del pitch principal con 3 tonalidades (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`), personalización de saludo, copia de asunto, notas para LinkedIn con contador en vivo y registro automático de `MENSAJE_ENVIADO` en la cronología.
+- [x] **Módulo de Contacto Directo a Reclutadores & Cold Outreach (Tarjeta 17 / v1.4.0):** Modal interactivo `DirectContactModal` para generar pitches a reclutadores con IA (`POST /api/ai/direct-pitch`), notas de conexión cortas para LinkedIn (máximo 200 caracteres con contador reactivo), copia de asunto de correo en 1 clic, apertura directa en Gmail Web y registro diferenciado en el Kanban (`origin: 'DIRECT_OUTREACH'`).
+- [x] **Analítica Segmentada por Origen y Captura Dual en Extensión Chrome v1.0.5 (v1.4.0):** Extensión V3 con reconocimiento contextual de vacantes y perfiles de reclutadores en LinkedIn, y panel KPI con desglose visual de gestiones (`totalVacancies` vs `totalDirectOutreach`).
+- [x] **Reportes PDF Ejecutivos con Gráficos Vectoriales y Bitácora Personalizada (v1.3.9 / v1.4.0):** Exportación en PDF con 6 tarjetas KPI, gráficos vectoriales nativos (Embudo de conversión y Modalidad laboral) y Bitácora detallada por empresa (pitch enviado vs. feedback/respuesta del reclutador).
 - [x] **Lanzador de Escritorio e Ícono Nativo Windows (v1.3.9):** Scripts de inicio automático en segundo plano con apertura de navegador (`iniciar-jobflow.bat`) e instalador de accesos directos de escritorio con ícono multi-resolución Cyber Cyan Radar (`instalar-icono-escritorio.bat`).
 - [x] **Despliegue Full-Stack en la Nube (DevOps):** Frontend en Vercel con SPA routing (`vercel.json`), Backend en Render (`render.yaml`) y Base de Datos en MongoDB Atlas M0.
 
@@ -287,6 +290,7 @@ Jobflow-app/
 
 [ APPLICATION ]
  ├── user: ObjectId (ref: 'User', requerido)
+ ├── origin ('JOB_POSTING' | 'DIRECT_OUTREACH', default: 'JOB_POSTING')
  ├── company:
  │    ├── name (String, requerido)
  │    ├── website (String)
@@ -297,7 +301,7 @@ Jobflow-app/
  ├── workMode (REMOTE | HYBRID | ON_SITE)
  ├── salary (String)
  ├── experienceLevel (String)
- ├── recruiter: { name, email }
+ ├── recruiter: { name, email, role, linkedin, channel, type, profileUrl }
  ├── jobUrl (String)
  ├── requirementsRaw (String)
  ├── extractedSkills: [String]
@@ -334,11 +338,14 @@ Jobflow-app/
 | `POST` | `/api/applications/match-preview` | Previsualizar afinidad semántica y match de habilidades técnicas | ✅ Implementado y testeado |
 | `POST` | `/api/ai/analyze-job` | Extraer datos de vacantes con Google Gemini y generar pitch sugerido | ✅ Implementado y testeado |
 | `POST` | `/api/ai/follow-up` | Generar mensaje de seguimiento personalizado con IA adaptado al pitch y tono (`CORDIAL`, `ENTHUSIASTIC`, `DIRECT`) | ✅ Implementado y testeado |
+| `POST` | `/api/ai/direct-pitch` | Generar pitch de contacto directo para reclutador / headhunter con IA | ✅ Implementado y testeado |
 | `GET` | `/api/applications/:id` | Obtener detalle completo de una postulación por ID | ✅ Implementado |
 | `PATCH` | `/api/applications/:id/status` | Actualizar estado de postulación, recalcular métricas y proteger degradación involuntaria de `OFERTA` (HTTP 409) | ✅ Implementado y testeado |
 | `DELETE` | `/api/applications/:id` | Eliminar una postulación por ID | ✅ Implementado |
 | `POST` | `/api/applications/:id/interactions` | Añadir evento/interacción manual y recalcular tiempos | ✅ Implementado y testeado |
-| `GET` | `/api/analytics/summary` | Resumen de métricas consolidadas (KPIs, distribución y tiempos) | ✅ Implementado y testeado |
+| `PUT` | `/api/applications/:id/interactions/:interactionId` | Editar evento individual del timeline (tipo, fecha, notas) | ✅ Implementado y testeado |
+| `DELETE` | `/api/applications/:id/interactions/:interactionId` | Eliminar evento individual del timeline | ✅ Implementado y testeado |
+| `GET` | `/api/analytics/summary` | Resumen de métricas consolidadas (KPIs desglosados por origen, distribución y tiempos) | ✅ Implementado y testeado |
 | `GET` | `/api/reports/pdf?from=...&to=...` | Generar y descargar reporte PDF estructurado con KPIs, gráficos vectoriales y bitácora por empresa | ✅ Implementado y testeado |
 
 ---

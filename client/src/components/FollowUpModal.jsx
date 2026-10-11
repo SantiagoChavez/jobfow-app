@@ -7,14 +7,13 @@ import {
   CheckCircleIcon,
   ClockIcon,
   RefreshIcon,
-  SendIcon,
   ExternalLinkIcon,
   LinkedInIcon,
   UserIcon,
   GoogleIcon,
 } from './Icons.jsx';
 import { generateFollowUpMessage, updateApplication } from '../services/api.js';
-import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
+import { createGmailWebLink } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { getReminderMetrics } from '../utils/reminders.js';
@@ -202,14 +201,7 @@ const FollowUpModalDialog = ({
     }
   };
 
-  // Generador seguro de URL mailto y Gmail Web (funciona con email o sin email destinatario para abrir cliente)
-  const safeMailto = generatedMessage
-    ? createSafeMailto({
-        email: contactEmail.trim(),
-        subject: generatedSubject,
-        body: generatedMessage,
-      })
-    : null;
+  // Generador seguro de enlace a Gmail Web
 
   const safeGmailWeb = generatedMessage
     ? createGmailWebLink({

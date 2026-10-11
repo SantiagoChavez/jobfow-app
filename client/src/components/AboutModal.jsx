@@ -108,7 +108,7 @@ export const AboutModal = ({ isOpen, onClose }) => {
                   Acerca de JobFlow
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 dark:bg-gold-primary/15 text-amber-700 dark:text-gold-primary border border-amber-500/30 dark:border-gold-primary/30">
-                  PRO v1.2.0
+                  PRO v1.4.0
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -133,9 +133,9 @@ export const AboutModal = ({ isOpen, onClose }) => {
               Propósito del Proyecto
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              JobFlow fue creado para potenciar y simplificar la búsqueda laboral de desarrolladores y profesionales tecnológicos.
-              Centraliza postulaciones en un tablero interactivo, analiza requerimientos con Inteligencia Artificial,
-              calcula afinidad técnica en tiempo real y exporta reportes ejecutivos en PDF.
+              JobFlow fue creado para potenciar y acelerar la búsqueda laboral de desarrolladores y profesionales tecnológicos.
+              Centraliza postulaciones y contacto directo a reclutadores en un tablero Kanban interactivo, genera pitches y follow-ups con Inteligencia Artificial (Google Gemini),
+              calcula afinidad técnica en tiempo real, captura ofertas con su extensión de Chrome y exporta reportes ejecutivos en PDF.
             </p>
           </div>
 

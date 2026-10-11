@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createSafeMailto, createGmailWebLink } from '../utils/mailto.js';
+import { createGmailWebLink } from '../utils/mailto.js';
 import { useModalA11y } from '../hooks/useModalA11y.js';
 import { useToast } from '../context/ToastContext.jsx';
 import {

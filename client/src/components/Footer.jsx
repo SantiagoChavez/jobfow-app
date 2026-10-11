@@ -4,7 +4,7 @@ import { RadarIcon } from './Icons.jsx';
 /**
  * Footer Fijo de la aplicación JobFlow
  * - Izquierda: Firma del creador freelance (SoftwareChavez Dev) con enlace a GitHub
- * - Derecha: Logotipo del Radar institucional + versión oficial de la aplicación (v1.2.0)
+ * - Derecha: Logotipo del Radar institucional + versión oficial de la aplicación (v1.4.0)
  * - Posicionamiento adaptativo: Fijo en el fondo de la pantalla (en móvil se eleva automáticamente sobre el BottomNav)
  */
 export const Footer = ({ isAuthenticated = false }) => {
@@ -39,7 +39,7 @@ export const Footer = ({ isAuthenticated = false }) => {
             <span className="hidden sm:inline">JobFlow</span>
           </div>
           <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-navy-surface text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/80">
-            v1.2.0
+            v1.4.0
           </span>
         </div>
       </div>

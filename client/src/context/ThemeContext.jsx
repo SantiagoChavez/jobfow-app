@@ -79,8 +79,10 @@ export const ThemeProvider = ({ children }) => {
       prevUserThemeRef.current = user.theme;
 
       if (user.theme === 'dark' || user.theme === 'light') {
-        setThemeState(user.theme);
-        applyThemeToDom(user.theme);
+        setTimeout(() => {
+          setThemeState(user.theme);
+          applyThemeToDom(user.theme);
+        }, 0);
         try {
           localStorage.setItem('jobflow_theme', user.theme);
         } catch (err) {

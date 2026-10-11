@@ -105,7 +105,7 @@ Cuando encuentres un recruiter o headhunter en LinkedIn y quieras iniciar una co
    - Tipo de contacto (*Headhunter*, *Talent Acquisition*, *Líder Técnico*, *Referido*).
 3. Presiona **"✨ Generar Pitch con IA"**: Gemini redactará un mensaje de presentación magnético basado en tus habilidades de perfil.
 4. Tienes a disposición:
-   - **Copiar Pitch** o **Copiar Nota LinkedIn** (adaptada al límite de 300 caracteres de conexión).
+   - **Copiar Pitch**, **Copiar Nota LinkedIn** (adaptada al límite estricto de 200 caracteres con contador en vivo) y **Copiar Asunto Sugerido**.
    - **Abrir en Gmail Web**: Abre instantáneamente el redactor oficial de Gmail con el destinatario, asunto y mensaje listos para enviar en 1 clic.
 5. Haz clic en **"Registrar Contacto Directo"** y se integrará a tu flujo con métricas de conversión diferenciadas.
 
@@ -132,7 +132,8 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 - En la barra superior verás una **Campana con un número** que indica cuántas oportunidades necesitan tu atención.
 - Si una empresa lleva **más de 5 días en silencio**, aparecerá como *"Seguimiento Urgente"*.
 - Haz clic en la campana para abrir el panel lateral de recordatorios:
-  - Encontrarás el botón **"Abrir en Gmail"**: al presionarlo se abrirá directamente el redactor de Gmail Web con el email del reclutador, un asunto profesional y el texto de seguimiento ya redactado.
+  - Encontrarás el botón **"Abrir en Gmail"**: al presionarlo se abrirá directamente el redactor de Gmail Web con el email del reclutador, un asunto profesional y el texto de seguimiento ya redactado con saludo personalizado.
+  - Puedes abrir el generador de **Follow-Up con IA** para adaptar el tono a `CORDIAL`, `ENTHUSIASTIC` o `DIRECT`.
 
 ---
 
@@ -147,6 +148,7 @@ Uno de los mayores secretos para conseguir empleo es hacer seguimiento a las emp
 <p align="center">
   <img src="../client/src/assets/tabla.png" alt="Vista de Tabla Interactiva" width="800" />
 </p>
+
 <p align="center">
   <img src="../client/src/assets/reporte.png" alt="Modal Descarga de Reporte PDF para Career Coach" width="400" />
 </p>
@@ -162,15 +164,15 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
 
 ---
 
-### Paso 10: Captura en 1 Clic con la Extensión de Chrome (LinkedIn, Indeed, BambooHR & Glassdoor)
-¿Quieres guardar empleos mientras navegas por LinkedIn, Indeed, BambooHR o Glassdoor sin tener que copiar y pegar manualmente? Utiliza la **Extensión oficial de Chrome de Jobflow**:
+### Paso 10: Captura en 1 Clic con la Extensión de Chrome (Vacantes y Reclutadores)
+¿Quieres guardar empleos o perfiles de reclutadores mientras navegas por LinkedIn, Indeed, BambooHR o Glassdoor sin tener que copiar y pegar manualmente? Utiliza la **Extensión oficial de Chrome de Jobflow (v1.0.5)**:
 
 1. **Instalar o Actualizar la extensión en el navegador:**
    - Abre Google Chrome (o un navegador basado en Chromium como Brave o Edge).
    - Escribe en la barra de direcciones: `chrome://extensions/` y presiona Enter.
    - En la esquina superior derecha, activa el interruptor **"Modo de desarrollador"** (*Developer mode*).
    - Si es la primera vez: Haz clic en el botón **"Cargar descomprimida"** (*Load unpacked*) en la esquina superior izquierda y selecciona la carpeta `extension` ubicada en la raíz de este proyecto (`Jobfow-app/extension`).
-   - Si ya la tenías instalada: Simplemente busca la tarjeta de Jobflow y pulsa el botón circular de **Recargar (🔄)** para activar la versión `v1.0.2`.
+   - Si ya la tenías instalada: Simplemente busca la tarjeta de Jobflow y pulsa el botón circular de **Recargar (🔄)** para activar la versión `v1.0.5`.
    - *(Recomendado)*: Haz clic en el ícono de rompecabezas en la barra de Chrome y **fija** (*Pin*) la extensión de Jobflow para tenerla siempre visible.
 
 2. **Vincular tu cuenta con el Token JWT en 3 segundos:**
@@ -186,11 +188,12 @@ Jobflow está diseñado con dos paletas visuales de alta gama pensadas para trab
   <img src="../client/src/assets/jwk.png" alt="Opción Copiar Token Extensión destacada en el Menú de Usuario" width="750" />
 </p>
 
-3. **Capturar una vacante al instante:**
-   - Navega a cualquier empleo en LinkedIn, Indeed, BambooHR o cualquier portal laboral.
-   - Abre la extensión y haz clic en el botón dorado **"⚡ Capturar y Procesar con IA"**.
-   - El sistema extraerá automáticamente el contenido de la vacante, la IA de Google Gemini analizará el perfil de la empresa y los requisitos requeridos, calculará tu afinidad y registrará la postulación directamente en tu **Tablero Kanban**.
-   - Si estás en un portal con diseño atípico o iframes, simplemente selecciona el texto de la vacante con el ratón antes de presionar el botón y se procesará la selección.
+3. **Capturar una vacante o perfil de reclutador al instante:**
+   - Navega a cualquier empleo o perfil de reclutador en LinkedIn, Indeed, BambooHR o cualquier portal laboral.
+   - Abre la extensión: detectará automáticamente si estás viendo una vacante o un perfil de recruiter/headhunter.
+   - Haz clic en el botón dorado **"⚡ Capturar y Procesar con IA"** (o generar pitch de outreach si es un reclutador).
+   - El sistema extraerá automáticamente los datos, la IA de Google Gemini analizará los requerimientos o perfil, calculará tu afinidad y registrará la postulación o contacto directo en tu **Tablero Kanban**.
+   - Si estás en un portal con diseño atípico o iframes, simplemente selecciona el texto con el ratón antes de presionar el botón y se procesará la selección prioritaria.
 
 ---
 
