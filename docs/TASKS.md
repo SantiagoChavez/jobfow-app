@@ -382,3 +382,16 @@ Este documento centraliza el roadmap y el desglose de tareas técnicas necesaria
 - [x] **17.5 Suite de Pruebas Automatizadas y Calidad**
   - [x] 91 pruebas unitarias y de integración en verde en 8 suites de Vitest.
   - [x] Conformidad con linter Oxlint (0 errores, 0 warnings).
+
+---
+
+## 🛡️ Fase 18: Estabilidad del Copiloto de IA y Parches de Seguridad (v1.4.1 - Completada)
+- [x] **18.1 Optimización del Copiloto de IA con Gemini 3.5 Flash**
+  - [x] Migración del modelo base de `gemini-3.5-flash-lite` a `gemini-3.5-flash` reduciendo tiempos de inferencia a 2-6 segundos.
+  - [x] Ampliación del timeout defensivo a 25 segundos (`GEMINI_TIMEOUT_MS=25000`).
+  - [x] Fallback automático a `gemini-flash-latest` ante contingencias de red, sobrecarga (503), modelo no disponible (404) o timeout.
+  - [x] Actualización de variables de entorno en `render.yaml` y `.env.example`.
+- [x] **18.2 Mitigación de Vulnerabilidad Crítica en Dependencias**
+  - [x] Identificación y resolución de vulnerabilidad crítica en `proxy-addr` (`GHSA-jqcg-44mw-7w3h`).
+  - [x] Configuración de bloque `overrides` en `server/package.json` y `server/pnpm-workspace.yaml`.
+  - [x] Auditoría limpia con 0 vulnerabilidades críticas y 91 tests automatizados en verde.
