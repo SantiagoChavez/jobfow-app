@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { calculateJobMatch } from './matchService.js';
 
 const DEFAULT_AI_SCHEMA = {
   companyName: '',
@@ -185,16 +186,31 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
         }
         response = await generateWithTimeout(fallbackModel, 20000);
       } catch (fallbackErr) {
-        if (
-          fallbackErr.status === 503 ||
-          fallbackErr.message?.includes('503') ||
-          fallbackErr.message?.includes('demand') ||
-          err.status === 503 ||
-          err.message?.includes('demand')
-        ) {
-          throw new Error('El servicio de IA de Google está experimentando alta demanda en este momento. Por favor reintenta en unos instantes.');
-        }
-        throw err;
+        console.warn('[AI Service] Ambos modelos de IA no respondieron, generando análisis heurístico estructurado de respaldo:', fallbackErr.message);
+        const matchResult = calculateJobMatch(sanitizedText, Array.isArray(userProfile?.skills) ? userProfile.skills : undefined);
+        const lines = sanitizedText.split('\n').map((l) => l.trim()).filter(Boolean);
+        const firstLine = lines[0] || 'Profesional IT';
+        const secondLine = lines.length > 1 ? lines[1] : '';
+
+        const lower = sanitizedText.toLowerCase();
+        let workMode = 'REMOTE';
+        if (lower.includes('hibrid') || lower.includes('híbrid')) workMode = 'HYBRID';
+        else if (lower.includes('presencial') || lower.includes('on-site') || lower.includes('on site')) workMode = 'ON_SITE';
+
+        return {
+          companyName: secondLine && secondLine.length < 50 ? secondLine : 'Empresa Vacante',
+          companyWebsite: '',
+          role: firstLine && firstLine.length < 80 ? firstLine : 'Desarrollador / Profesional IT',
+          workMode,
+          priority: 'MEDIUM',
+          salary: undefined,
+          companySummary: 'Información analizada con procesador de respaldo (servicio de IA en alta demanda temporal).',
+          matchScore: matchResult.matchScore || 50,
+          extractedSkills: matchResult.matchedSkills,
+          keySkills: matchResult.matchedSkills,
+          missingSkills: matchResult.missingSkills,
+          suggestedPitch: basePitchTemplate,
+        };
       }
     } else {
       throw err;
