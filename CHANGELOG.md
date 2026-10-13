@@ -11,9 +11,9 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ### Fixed & Security
 - **Copiloto IA & Resiliencia (`aiService.js`, `profileService.js`, `render.yaml`):**
-  - Migración del modelo base a `gemini-3.5-flash` (~2 a 6s de latencia), mitigando las respuestas lentas y saturación (error 503) experimentados por `gemini-3.5-flash-lite`.
-  - Ampliación del timeout defensivo de 12s a 25s configurables (`GEMINI_TIMEOUT_MS=25000`) para vacantes extensas.
-  - Implementación de fallback automático resiliente con conmutación dinámica hacia `gemini-flash-latest` ante contingencias de red, sobrecarga (503), modelo no disponible (404) o timeout.
+  - Migración oficial al modelo `gemini-3.8-flash` (recomendado y activo por Google GenAI), resolviendo la indisponibilidad y saturación (error 503) de `gemini-3.5-flash-lite`.
+  - Mecanismo de reintento automático con retardo defensivo de 1.5s ante picos transitorios de demanda (503) antes de conmutar a modelos alternativos (`gemini-flash-latest`).
+  - Timeout controlado de 25s (`GEMINI_TIMEOUT_MS=25000`) y blindaje de generación de pitch en `analyzeJobPosting`, `generateFollowUpMessage` y `generateDirectOutreachPitch`.
 - **Seguridad en Backend (`package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`):**
   - Mitigación de vulnerabilidad crítica en `proxy-addr` (`GHSA-jqcg-44mw-7w3h`) mediante directiva de `overrides` en `package.json` y `pnpm-workspace.yaml`.
   - Parches a subdependencias `source-map-js` y `brace-expansion`. Auditoría en 0 vulnerabilidades críticas.
