@@ -133,7 +133,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
   const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
@@ -165,7 +165,19 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
 
   let response;
   try {
-    response = await generateWithTimeout(primaryModel);
+    try {
+      response = await generateWithTimeout(primaryModel);
+    } catch (firstErr) {
+      // Si fue error de alta demanda temporal (503), reintentar una vez tras 1.5s
+      const is503 = firstErr.status === 503 || firstErr.message?.includes('503') || firstErr.message?.includes('demand');
+      if (is503) {
+        console.warn(`[AI Service] Alta demanda temporal en ${primaryModel}, reintentando en 1.5s...`);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        response = await generateWithTimeout(primaryModel);
+      } else {
+        throw firstErr;
+      }
+    }
   } catch (err) {
     // Si el modelo falla por no estar disponible, sobrecarga o timeout, intentar con modelo alternativo de respaldo
     const isRecoverableError =
@@ -178,7 +190,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
       err.message?.includes('Timeout');
 
     if (isRecoverableError) {
-      const fallbackModel = primaryModel === 'gemini-3.5-flash-lite' ? 'gemini-3.5-flash' : 'gemini-3.5-flash-lite';
+      const fallbackModel = primaryModel === 'gemini-3.8-flash' ? 'gemini-flash-latest' : 'gemini-3.8-flash';
       console.warn(`[AI Service] Error con modelo ${primaryModel} (${err.message}), reintentando con ${fallbackModel} de respaldo...`);
       try {
         if (err.status === 503 || err.message?.includes('503') || err.message?.includes('demand')) {
@@ -388,16 +400,29 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguient
 `;
 
   try {
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
-    const response = await ai.models.generateContent({
-      model: primaryModel,
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-      },
-    });
+    const callApi = () =>
+      ai.models.generateContent({
+        model: primaryModel,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+        },
+      });
+
+    let response;
+    try {
+      response = await callApi();
+    } catch (firstErr) {
+      if (firstErr.status === 503 || firstErr.message?.includes('503') || firstErr.message?.includes('demand')) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        response = await callApi();
+      } else {
+        throw firstErr;
+      }
+    }
 
     const rawJson = response?.text || (typeof response?.candidates?.[0]?.content?.parts?.[0]?.text === 'string' ? response.candidates[0].content.parts[0].text : '{}');
     const cleaned = extractJson(rawJson);
@@ -573,16 +598,29 @@ Responde ÚNICAMENTE un objeto JSON estrictamente válido:
 `;
 
   try {
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
-    const response = await ai.models.generateContent({
-      model: primaryModel,
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-      },
-    });
+    const callApi = () =>
+      ai.models.generateContent({
+        model: primaryModel,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+        },
+      });
+
+    let response;
+    try {
+      response = await callApi();
+    } catch (firstErr) {
+      if (firstErr.status === 503 || firstErr.message?.includes('503') || firstErr.message?.includes('demand')) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        response = await callApi();
+      } else {
+        throw firstErr;
+      }
+    }
 
     const rawJson = response?.text || (typeof response?.candidates?.[0]?.content?.parts?.[0]?.text === 'string' ? response.candidates[0].content.parts[0].text : '{}');
     const cleaned = extractJson(rawJson);

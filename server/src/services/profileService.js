@@ -170,7 +170,7 @@ Responde ÚNICAMENTE un objeto JSON válido, sin bloques de código adicionales 
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
   const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
@@ -213,7 +213,7 @@ Responde ÚNICAMENTE un objeto JSON válido, sin bloques de código adicionales 
       err.message?.includes('Timeout');
 
     if (isRecoverableError) {
-      const fallbackModel = primaryModel === 'gemini-3.5-flash-lite' ? 'gemini-3.5-flash' : 'gemini-3.5-flash-lite';
+      const fallbackModel = primaryModel === 'gemini-3.8-flash' ? 'gemini-flash-latest' : 'gemini-3.8-flash';
       try {
         if (err.status === 503 || err.message?.includes('503') || err.message?.includes('demand')) {
           await new Promise((resolve) => setTimeout(resolve, 1500));
