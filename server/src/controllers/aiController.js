@@ -57,12 +57,19 @@ export const analyzeJob = async (req, res) => {
 
     const isTimeout = error.message?.includes('Timeout');
     const isApiKeyError = error.message?.includes('GEMINI_API_KEY');
+    const isHighDemand = error.message?.includes('503') || error.message?.includes('demand') || error.message?.includes('UNAVAILABLE');
     const statusCode = isTimeout ? 504 : isApiKeyError ? 500 : 502;
+
+    const friendlyMessage = isTimeout
+      ? error.message
+      : isHighDemand
+        ? 'El servicio de IA de Google está experimentando alta demanda en este momento. Por favor reintenta en unos instantes.'
+        : error.message || 'Error al procesar el análisis de la vacante con IA.';
 
     return res.status(statusCode).json({
       success: false,
-      error: error.message || 'Error al procesar el análisis de la vacante con IA.',
-      message: error.message || 'Error al procesar el análisis de la vacante con IA.',
+      error: friendlyMessage,
+      message: friendlyMessage,
     });
   }
 };
