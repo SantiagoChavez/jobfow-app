@@ -440,10 +440,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       const aiJson = await aiResponse.json().catch(() => ({}));
 
       if (!aiResponse.ok) {
-        throw new Error(aiJson.message || aiJson.error || 'Error al invocar la IA.');
+        console.warn('[Jobflow] Servicio de IA no disponible (' + (aiJson.error || aiResponse.status) + '), guardando datos básicos de la vacante...');
+        const lines = (pageData.text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+        const titleParts = (currentTab?.title || '').split(/[-|–•]/);
+        aiResult = {
+          companyName: titleParts[1]?.trim() || (lines.length > 1 ? lines[1] : '') || 'Empresa Vacante',
+          role: titleParts[0]?.trim() || (lines.length > 0 ? lines[0] : '') || 'Profesional IT',
+          workMode: 'REMOTE',
+          priority: 'MEDIUM',
+          extractedSkills: [],
+          companySummary: 'Guardado con datos básicos (servicio de IA en alta demanda temporal).',
+          matchScore: 0,
+        };
+      } else {
+        aiResult = aiJson.data || aiJson;
       }
-
-      aiResult = aiJson.data || aiJson;
 
       updateLoadingStep('Guardando en tu cuenta de Jobflow...', '85%');
 
