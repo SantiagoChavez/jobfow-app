@@ -333,6 +333,7 @@ export async function extractProfileFromText(text) {
   });
 }
 
+
 /**
  * Generar mensaje de seguimiento / follow-up personalizado con IA
  * @param {string|Object} applicationOrId - ID de la postulación o datos de la misma
