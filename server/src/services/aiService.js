@@ -132,7 +132,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
   const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
@@ -177,11 +177,23 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
       err.message?.includes('Timeout');
 
     if (isRecoverableError) {
-      const fallbackModel = primaryModel === 'gemini-3.5-flash' ? 'gemini-flash-latest' : 'gemini-3.5-flash';
-      console.warn(`[AI Service] Error con modelo ${primaryModel} (${err.message}), intentando con ${fallbackModel} de respaldo...`);
+      const fallbackModel = primaryModel === 'gemini-3.5-flash-lite' ? 'gemini-3.5-flash' : 'gemini-3.5-flash-lite';
+      console.warn(`[AI Service] Error con modelo ${primaryModel} (${err.message}), reintentando con ${fallbackModel} de respaldo...`);
       try {
+        if (err.status === 503 || err.message?.includes('503') || err.message?.includes('demand')) {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
         response = await generateWithTimeout(fallbackModel, 20000);
       } catch (fallbackErr) {
+        if (
+          fallbackErr.status === 503 ||
+          fallbackErr.message?.includes('503') ||
+          fallbackErr.message?.includes('demand') ||
+          err.status === 503 ||
+          err.message?.includes('demand')
+        ) {
+          throw new Error('El servicio de IA de Google está experimentando alta demanda en este momento. Por favor reintenta en unos instantes.');
+        }
         throw err;
       }
     } else {
