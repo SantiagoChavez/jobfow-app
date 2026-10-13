@@ -132,15 +132,17 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
-  // Invocación con control de timeout defensivo (12 segundos)
-  const generateWithTimeout = async (modelName, timeoutMs = 12000) => {
+  // Invocación con control de timeout defensivo
+  const generateWithTimeout = async (modelName, timeoutMs = defaultTimeoutMs) => {
     let timer;
     const timeoutPromise = new Promise((_, reject) => {
       timer = setTimeout(() => {
-        reject(new Error('Timeout: El servicio de IA tardó más de 12 segundos en responder.'));
+        const seconds = Math.round(timeoutMs / 1000);
+        reject(new Error(`Timeout: El servicio de IA tardó más de ${seconds} segundos en responder.`));
       }, timeoutMs);
     });
 
@@ -164,12 +166,24 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
   try {
     response = await generateWithTimeout(primaryModel);
   } catch (err) {
-    // Si el modelo específico falla por no estar disponible, reintentar con modelo alternativo de respaldo
-    const isModelNotFound = err.status === 404 || err.message?.includes('not found') || err.message?.includes('404');
-    if (isModelNotFound) {
-      const fallbackModel = primaryModel === 'gemini-1.5-flash' ? 'gemini-1.5-flash-latest' : 'gemini-1.5-flash';
-      console.warn(`[AI Service] Modelo ${primaryModel} no disponible, intentando con ${fallbackModel} de respaldo...`);
-      response = await generateWithTimeout(fallbackModel);
+    // Si el modelo falla por no estar disponible, sobrecarga o timeout, intentar con modelo alternativo de respaldo
+    const isRecoverableError =
+      err.status === 404 ||
+      err.status === 503 ||
+      err.message?.includes('not found') ||
+      err.message?.includes('404') ||
+      err.message?.includes('demand') ||
+      err.message?.includes('503') ||
+      err.message?.includes('Timeout');
+
+    if (isRecoverableError) {
+      const fallbackModel = primaryModel === 'gemini-3.5-flash' ? 'gemini-flash-latest' : 'gemini-3.5-flash';
+      console.warn(`[AI Service] Error con modelo ${primaryModel} (${err.message}), intentando con ${fallbackModel} de respaldo...`);
+      try {
+        response = await generateWithTimeout(fallbackModel, 20000);
+      } catch (fallbackErr) {
+        throw err;
+      }
     } else {
       throw err;
     }
@@ -346,7 +360,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguient
 `;
 
   try {
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
     const response = await ai.models.generateContent({
@@ -531,7 +545,7 @@ Responde ÚNICAMENTE un objeto JSON estrictamente válido:
 `;
 
   try {
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
     const response = await ai.models.generateContent({
