@@ -25,6 +25,17 @@ const extractJson = (text) => {
 };
 
 /**
+ * Resuelve el modelo de Gemini garantizando el uso de versiones activas y recomendadas
+ */
+export const getActiveGeminiModel = () => {
+  const envModel = process.env.GEMINI_MODEL?.trim();
+  if (!envModel || envModel.includes('3.5') || envModel.includes('2.5') || envModel.includes('1.5')) {
+    return 'gemini-3.8-flash';
+  }
+  return envModel;
+};
+
+/**
  * Analiza la descripción de una oferta laboral con Google Gemini AI
  * @param {string} rawText - Texto de la oferta de empleo
  * @param {string} [userProfile=''] - Perfil o stack técnico del postulante
@@ -133,7 +144,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido, sin texto adic
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const primaryModel = getActiveGeminiModel();
   const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
@@ -400,7 +411,7 @@ Debes responder ÚNICAMENTE un objeto JSON estrictamente válido con la siguient
 `;
 
   try {
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+    const primaryModel = getActiveGeminiModel();
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
     const callApi = () =>
@@ -598,7 +609,7 @@ Responde ÚNICAMENTE un objeto JSON estrictamente válido:
 `;
 
   try {
-    const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+    const primaryModel = getActiveGeminiModel();
     const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
     const callApi = () =>

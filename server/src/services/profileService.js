@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { TECH_DICTIONARY } from '../config/skillsCatalog.js';
+import { getActiveGeminiModel } from './aiService.js';
 
 /**
  * Parsea y extrae el nombre de usuario de GitHub a partir de una URL o input de texto
@@ -170,7 +171,7 @@ Responde ÚNICAMENTE un objeto JSON válido, sin bloques de código adicionales 
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const primaryModel = getActiveGeminiModel();
   const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
