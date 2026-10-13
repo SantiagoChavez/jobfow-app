@@ -170,14 +170,16 @@ Responde ÚNICAMENTE un objeto JSON válido, sin bloques de código adicionales 
 }
 `;
 
-  const primaryModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const defaultTimeoutMs = Number(process.env.GEMINI_TIMEOUT_MS) || 25000;
   const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
 
-  const generateWithTimeout = async (modelName, timeoutMs = 12000) => {
+  const generateWithTimeout = async (modelName, timeoutMs = defaultTimeoutMs) => {
     let timer;
     const timeoutPromise = new Promise((_, reject) => {
       timer = setTimeout(() => {
-        reject(new Error('Timeout: El servicio de IA tardó más de 12 segundos en responder.'));
+        const seconds = Math.round(timeoutMs / 1000);
+        reject(new Error(`Timeout: El servicio de IA tardó más de ${seconds} segundos en responder.`));
       }, timeoutMs);
     });
 
@@ -201,10 +203,22 @@ Responde ÚNICAMENTE un objeto JSON válido, sin bloques de código adicionales 
   try {
     response = await generateWithTimeout(primaryModel);
   } catch (err) {
-    const isModelNotFound = err.status === 404 || err.message?.includes('not found') || err.message?.includes('404');
-    if (isModelNotFound) {
-      const fallbackModel = primaryModel === 'gemini-1.5-flash' ? 'gemini-1.5-flash-latest' : 'gemini-1.5-flash';
-      response = await generateWithTimeout(fallbackModel);
+    const isRecoverableError =
+      err.status === 404 ||
+      err.status === 503 ||
+      err.message?.includes('not found') ||
+      err.message?.includes('404') ||
+      err.message?.includes('demand') ||
+      err.message?.includes('503') ||
+      err.message?.includes('Timeout');
+
+    if (isRecoverableError) {
+      const fallbackModel = primaryModel === 'gemini-3.5-flash' ? 'gemini-flash-latest' : 'gemini-3.5-flash';
+      try {
+        response = await generateWithTimeout(fallbackModel, 20000);
+      } catch (fallbackErr) {
+        throw err;
+      }
     } else {
       throw err;
     }
